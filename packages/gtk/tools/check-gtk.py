@@ -10,11 +10,16 @@ or GDK_BACKEND=broadway / a headless compositor (CI uses xvfb-run):
 It also loads a probe sheet that reads every --ndl-* variable on a real widget, so a variable
 that GTK cannot substitute into the property it is meant for shows up as an error here.
 """
+import os
 import pathlib
 import re
 import sys
 
 import gi
+
+# Xvfb has no GL, and GTK aborts trying to make a GL renderer; parsing needs none.
+os.environ.setdefault("GSK_RENDERER", "cairo")
+os.environ.setdefault("GDK_DISABLE", "gl,vulkan")
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
@@ -32,7 +37,7 @@ DIST = pathlib.Path(__file__).resolve().parent.parent / "crate" / "src" / "css"
 # Which property each kind of variable is probed with. A variable is only useful if GTK accepts
 # it where an app would put it, so the probe uses the same property.
 PROBES = [
-    (re.compile(r"--ndl-color-"), "color"),
+    (re.compile(r"--ndl-(color|palette)-"), "color"),
     (re.compile(r"--ndl-elevation-"), "box-shadow"),
     (re.compile(r"--ndl-(radius|component-.*radius)"), "border-radius"),
     (re.compile(r"--ndl-font-family-"), "font-family"),
