@@ -209,6 +209,27 @@ macro_rules! window_type {
             pub(crate) fn dialog_layer(&self) -> Option<gtk::Overlay> {
                 self.imp().layer.borrow().clone()
             }
+
+            /// The dialog on top, if one is showing over this window.
+            pub fn visible_dialog(&self) -> Option<crate::Dialog> {
+                let layer = self.dialog_layer()?;
+                let mut child = layer.last_child();
+                while let Some(c) = child {
+                    if c.has_css_class("ndl-dialog-host") {
+                        if let Some(d) = c.first_child().and_downcast::<crate::Dialog>() {
+                            return Some(d);
+                        }
+                    }
+                    child = c.prev_sibling();
+                }
+                None
+            }
+        }
+
+        impl Default for $name {
+            fn default() -> Self {
+                glib::Object::new()
+            }
         }
     };
 }
@@ -250,12 +271,6 @@ impl Window {
 
     pub fn builder() -> WindowBuilder {
         WindowBuilder::default()
-    }
-}
-
-impl Default for Window {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

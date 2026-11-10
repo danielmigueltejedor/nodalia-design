@@ -14,6 +14,11 @@ mod toolbar_imp {
     pub struct ToolbarView {
         #[property(get, nullable)]
         pub content: RefCell<Option<gtk::Widget>>,
+        /// Height of the top bars, for things floated over the content that must clear them.
+        #[property(get)]
+        pub top_bar_height: Cell<i32>,
+        #[property(get)]
+        pub bottom_bar_height: Cell<i32>,
         pub top: RefCell<Option<gtk::Box>>,
         pub bottom: RefCell<Option<gtk::Box>>,
         pub holder: RefCell<Option<gtk::Box>>,
@@ -83,7 +88,27 @@ mod toolbar_imp {
         }
     }
 
-    impl WidgetImpl for ToolbarView {}
+    impl WidgetImpl for ToolbarView {
+        fn size_allocate(&self, width: i32, height: i32, baseline: i32) {
+            self.parent_size_allocate(width, height, baseline);
+            let top = self.top.borrow().as_ref().map_or(0, |b| b.height());
+            let bottom = self.bottom.borrow().as_ref().map_or(0, |b| b.height());
+            if top != self.top_bar_height.get() || bottom != self.bottom_bar_height.get() {
+                // Notified after allocation: a handler that moves widgets must not do it mid-layout.
+                let weak = self.obj().downgrade();
+                glib::idle_add_local_once(move || {
+                    let Some(obj) = weak.upgrade() else { return };
+                    let imp = obj.imp();
+                    if imp.top_bar_height.replace(top) != top {
+                        obj.notify_top_bar_height();
+                    }
+                    if imp.bottom_bar_height.replace(bottom) != bottom {
+                        obj.notify_bottom_bar_height();
+                    }
+                });
+            }
+        }
+    }
 }
 
 glib::wrapper! {

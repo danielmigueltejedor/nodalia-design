@@ -458,8 +458,8 @@ impl Avatar {
         self.sync();
     }
 
-    pub fn set_text(&self, text: &str) {
-        self.imp().text.replace(text.to_owned());
+    pub fn set_text(&self, text: Option<&str>) {
+        self.imp().text.replace(text.unwrap_or_default().to_owned());
         self.sync();
     }
 
@@ -549,9 +549,7 @@ impl AvatarBuilder {
         if let Some(s) = self.show_initials {
             a.set_show_initials(s);
         }
-        if let Some(t) = &self.text {
-            a.set_text(t);
-        }
+        a.set_text(self.text.as_deref());
         if let Some(h) = self.halign {
             a.set_halign(h);
         }

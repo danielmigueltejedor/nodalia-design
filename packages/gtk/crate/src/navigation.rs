@@ -354,6 +354,13 @@ impl NavigationView {
         }
     }
 
+    /// Off, pushes and pops cut instead of sliding.
+    pub fn set_animate_transitions(&self, animate: bool) {
+        if let Some(stack) = self.stack() {
+            stack.set_transition_duration(if animate { 240 } else { 0 });
+        }
+    }
+
     pub fn push(&self, page: &impl IsA<NavigationPage>) {
         let page = page.as_ref().clone();
         if self.imp().pages.borrow().contains(&page) {

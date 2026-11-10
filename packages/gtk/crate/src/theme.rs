@@ -248,8 +248,8 @@ impl StyleManager {
         use gtk::subclass::prelude::ObjectSubclassIsExt;
         let css = match colors {
             Some((bg, fg)) => format!(
-                ":root {{ --ndl-color-accent-default: {bg}; --ndl-color-accent-hover: {bg}; \
-                 --ndl-color-accent-pressed: {bg}; --ndl-color-accent-text: {bg}; \
+                ":root {{ --ndl-color-accent-default: {bg}; --ndl-color-accent-hover: shade({bg}, 0.92); \
+                 --ndl-color-accent-pressed: shade({bg}, 0.84); --ndl-color-accent-text: {bg}; \
                  --ndl-color-text-on-accent: {fg}; --ndl-color-border-focus: {bg}; \
                  --ndl-color-accent-subtle: alpha({bg}, 0.16); \
                  --accent-bg-color: {bg}; --accent-fg-color: {fg}; --accent-color: {bg}; }} \

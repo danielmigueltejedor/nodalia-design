@@ -53,6 +53,7 @@ impl CallbackAnimationTarget {
 pub enum AnimationState {
     Idle,
     Playing,
+    Paused,
     Finished,
 }
 
@@ -171,6 +172,14 @@ impl TimedAnimation {
             }
         });
         self.0.tick.replace(Some(id));
+    }
+
+    /// Stops where it is, without finishing. `play` starts again from the beginning.
+    pub fn pause(&self) {
+        self.stop_ticking();
+        if self.0.state.get() == AnimationState::Playing {
+            self.0.state.set(AnimationState::Paused);
+        }
     }
 
     /// Jumps to the end.

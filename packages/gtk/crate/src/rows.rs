@@ -493,9 +493,18 @@ glib::wrapper! {
 }
 
 row_common!(ComboRow);
-row_builder!(ComboRowBuilder, ComboRow, { selected: u32, model: gtk::gio::ListModel }, |row, b| {
+/// Anything that is a list model, for [`ComboRowBuilder::model`].
+pub struct ModelArg(gtk::gio::ListModel);
+
+impl<T: IsA<gtk::gio::ListModel>> From<&T> for ModelArg {
+    fn from(model: &T) -> Self {
+        Self(model.as_ref().clone())
+    }
+}
+
+row_builder!(ComboRowBuilder, ComboRow, { selected: u32, model: ModelArg }, |row, b| {
     if let Some(m) = &b.model {
-        row.set_model(Some(m));
+        row.set_model(Some(&m.0));
     }
     if let Some(s) = b.selected {
         row.set_selected(s);
