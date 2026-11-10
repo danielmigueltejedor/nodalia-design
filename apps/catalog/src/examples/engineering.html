@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engineering demo · Nodalia Design</title>
+<link rel="stylesheet" href="../nodalia.css"><link rel="stylesheet" href="../catalog.css">
+</head>
+<body class="ndl-app">
+<div class="demo-frame">
+  <div class="demo-frame__bar" role="navigation" aria-label="Demo controls"><a href="../index.html">← Catalog</a><span>Reference demo: engineering workspace. The wireframe is a stand-in for a CAD viewport; NDL renders no geometry.</span><div id="appearance"></div></div>
+  <div class="ndl-workspace" style="grid-template-areas:'titlebar titlebar titlebar' 'toolbar toolbar toolbar' 'main main side' 'status status status'">
+    <header class="ndl-titlebar" data-area="titlebar"><span class="ndl-titlebar__title">Bracket.ndl</span><span class="ndl-badge" data-tone="warning" id="dirty" hidden>Unsaved</span></header>
+    <section aria-label="Document tools" data-area="toolbar"><div class="ndl-toolbar" role="toolbar" aria-label="Document" id="tb">
+      <button class="ndl-button" data-variant="subtle" id="undo" disabled>Undo</button>
+      <button class="ndl-button" data-variant="subtle" id="redo" disabled>Redo</button>
+      <span class="ndl-toolbar__sep" role="separator"></span>
+      <button class="ndl-button" data-variant="subtle" id="suppress" aria-pressed="false">Suppress hole</button>
+      <span class="ndl-toolbar__spacer"></span>
+      <button class="ndl-button" id="imp">Import…</button><button class="ndl-button" data-variant="primary" id="exp">Export…</button>
+    </div></section>
+    <main data-area="main" class="ndl-split" id="split" style="min-block-size:0;--ndl-split-start:var(--ndl-size-sidebar)">
+      <div class="ndl-panel ndl-panel--flush" style="border-radius:0;border-block-width:0">
+        <h1 class="ndl-visually-hidden">Bracket engineering demo</h1>
+        <div class="ndl-tabs" role="tablist" aria-label="Browser" id="tabs" style="padding-inline:var(--ndl-space-sm)">
+          <button class="ndl-tab" role="tab" id="t-ops" aria-controls="p-ops" aria-selected="true">Operations</button>
+          <button class="ndl-tab" role="tab" id="t-hist" aria-controls="p-hist" aria-selected="false">History</button>
+        </div>
+        <div role="tabpanel" id="p-ops" aria-labelledby="t-ops">
+          <ul class="ndl-tree" role="tree" aria-label="Feature tree" id="tree">
+            <li role="treeitem" aria-expanded="true" aria-selected="false" data-op="part"><span class="ndl-tree__row">Bracket</span>
+              <ul role="group">
+                <li role="treeitem" aria-selected="true" data-op="sketch"><span class="ndl-tree__row">Sketch 1<span class="ndl-tree__meta" id="m-sketch"></span></span></li>
+                <li role="treeitem" aria-selected="false" data-op="extrude"><span class="ndl-tree__row">Extrude 1<span class="ndl-tree__meta" id="m-extrude"></span></span></li>
+                <li role="treeitem" aria-selected="false" data-op="hole" id="hole-item"><span class="ndl-tree__row">Hole 1<span class="ndl-tree__meta" id="m-hole"></span></span></li>
+              </ul></li>
+          </ul>
+        </div>
+        <div role="tabpanel" id="p-hist" aria-labelledby="t-hist" hidden><ul class="ndl-list" role="listbox" aria-label="History" id="hist"></ul></div>
+      </div>
+      <div class="ndl-splitter" role="separator" tabindex="0" aria-label="Resize browser" id="spl"></div>
+      <div class="ndl-viewport demo-grid" style="overflow:hidden">
+        <canvas class="demo-canvas" id="cv" role="img" aria-label="Isometric preview of the part"></canvas>
+        <div class="ndl-viewport__overlay" data-corner="top-start"><span class="ndl-type-small ndl-text-secondary">Isometric</span></div>
+        <div class="ndl-viewport__overlay" data-corner="bottom-end"><span class="ndl-type-small ndl-numeric" id="dims"></span></div>
+      </div>
+    </main>
+    <aside data-area="side" aria-label="Parameters">
+      <div class="ndl-panel__header" id="ins-title">Sketch 1</div>
+      <div id="ins"></div>
+    </aside>
+    <footer class="ndl-statusbar" data-area="status"><span id="st">Ready</span><span class="ndl-statusbar__spacer"></span><label>Units <select class="ndl-select" id="unit" style="min-block-size:var(--ndl-size-target-min)"><option value="mm">mm</option><option value="in">in</option></select></label><span id="vol" class="ndl-numeric"></span></footer>
+  </div>
+</div>
+<dialog class="ndl-dialog" id="dlg" aria-labelledby="d-t"><form method="dialog"><div class="ndl-dialog__header" id="d-t">Export STEP</div>
+  <div class="ndl-dialog__body"><div class="ndl-progress" id="dp" role="progressbar" aria-label="Export progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--ndl-value:0%"></div><p id="ds" style="margin:var(--ndl-space-sm) 0 0">Ready to export.</p></div>
+  <div class="ndl-dialog__footer"><button class="ndl-button" value="cancel">Close</button><button class="ndl-button" data-variant="primary" type="button" id="dg">Start</button></div></form></dialog>
+<div class="ndl-toast-region" id="toasts" role="status" aria-live="polite"></div>
+<script type="module">
+import { toolbar, tabs, tree, splitter, roving, tooltips } from '../behaviors.mjs';
+import { initAppearance, APPEARANCE_BAR, cssVar, onAppearanceChange } from '../shared.mjs';
+document.getElementById('appearance').innerHTML = APPEARANCE_BAR; initAppearance();
+const $ = (id) => document.getElementById(id);
+
+// Document state is in millimetres; the unit selector only changes presentation.
+let part = { width: 80, depth: 50, height: 20, holeDia: 12, holeOn: true };
+let opSel = 'sketch', unit = 'mm';
+const undo = [], redo = [];
+const hist = [{ label: 'New part', state: { ...part } }];
+let histIndex = 0;
+const K = 25.4;
+const show = (mm) => (unit === 'mm' ? mm : +(mm / K).toFixed(3));
+const parse = (v) => (unit === 'mm' ? Number(v) : Number(v) * K);
+
+const OPS = {
+  sketch: { title: 'Sketch 1', fields: [['width', 'Width'], ['depth', 'Depth']] },
+  extrude: { title: 'Extrude 1', fields: [['height', 'Height']] },
+  hole: { title: 'Hole 1', fields: [['holeDia', 'Diameter']] },
+  part: { title: 'Bracket', fields: [] },
+};
+
+function commit(label, next) {
+  if (JSON.stringify(next) === JSON.stringify(part)) return;
+  part = next; hist.splice(histIndex + 1); hist.push({ label, state: { ...part } }); histIndex = hist.length - 1;
+  undo.length = 0; render();
+}
+function goto(i) { histIndex = i; part = { ...hist[i].state }; render(); }
+
+function renderInspector() {
+  const op = OPS[opSel]; $('ins-title').textContent = op.title;
+  $('ins').innerHTML = `<div class="ndl-group__body">${op.fields.map(([k, l]) => `<div class="ndl-prop"><label for="f-${k}">${l}</label><span class="ndl-unit-field"><input class="ndl-input" id="f-${k}" type="number" min="1" step="${unit === 'mm' ? 1 : 0.05}" value="${show(part[k])}" ${opSel === 'hole' && !part.holeOn ? 'disabled' : ''}><span class="ndl-unit-field__unit" aria-hidden="true">${unit}</span></span></div>`).join('') || '<p class="ndl-text-secondary">Select an operation to edit its parameters.</p>'}${opSel === 'hole' && !part.holeOn ? '<p class="ndl-text-secondary ndl-type-small">Suppressed: parameters are locked.</p>' : ''}</div>`;
+  for (const [k, l] of op.fields) {
+    $(`f-${k}`).addEventListener('change', (e) => {
+      const mm = parse(e.target.value);
+      if (!Number.isFinite(mm) || mm <= 0) { e.target.setAttribute('aria-invalid', 'true'); $('st').textContent = `${l} must be a positive number`; return; }
+      e.target.removeAttribute('aria-invalid');
+      commit(`${l} = ${show(mm)} ${unit}`, { ...part, [k]: mm });
+    });
+  }
+}
+function renderHistory() {
+  $('hist').replaceChildren(...hist.map((h, i) => {
+    const li = document.createElement('li'); li.className = 'ndl-list__item'; li.setAttribute('role', 'option'); li.tabIndex = -1;
+    li.setAttribute('aria-selected', 'false'); li.textContent = h.label; li.dataset.i = i;
+    if (i === histIndex) li.dataset.current = ''; if (i > histIndex) li.dataset.undone = '';
+    li.addEventListener('click', () => goto(i)); return li;
+  }));
+  roving($('hist'), { items: '[role="option"]', orientation: 'vertical', onActivate: (el) => goto(Number(el.dataset.i)) });
+}
+function draw() {
+  const cv = $('cv'), b = cv.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  cv.width = b.width * dpr; cv.height = b.height * dpr;
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const c = Math.cos(Math.PI / 6), s = 0.5;
+  const { width: W, depth: D, height: H } = part;
+  // Fit the projected bounding box into 80% of the viewport and centre it.
+  const k = Math.min((b.width * 0.8) / ((W + D) * c), (b.height * 0.8) / ((W + D) * s + H));
+  const P = (x, y, z) => [b.width / 2 + (x - y - (W - D) / 2) * c * k, b.height / 2 + (x + y - (W + D) / 2) * s * k - (z - H / 2) * k];
+  const poly = (pts, fill, stroke) => { g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(...p) : g.moveTo(...p))); g.closePath(); if (fill) { g.fillStyle = fill; g.fill(); } g.strokeStyle = stroke; g.lineWidth = 1.5; g.stroke(); };
+  const edge = cssVar('--ndl-color-text-primary');
+  poly([P(0, 0, H), P(W, 0, H), P(W, D, H), P(0, D, H)], cssVar('--ndl-color-surface-raised'), edge);
+  poly([P(W, 0, 0), P(W, D, 0), P(W, D, H), P(W, 0, H)], cssVar('--ndl-color-control-bg'), edge);
+  poly([P(0, D, 0), P(W, D, 0), P(W, D, H), P(0, D, H)], cssVar('--ndl-color-control-bg-hover'), edge);
+  if (part.holeOn) {
+    const r = part.holeDia / 2, cx = W / 2, cy = D / 2;
+    g.beginPath(); for (let a = 0; a <= 64; a++) { const t = (a / 64) * Math.PI * 2; const p = P(cx + r * Math.cos(t), cy + r * Math.sin(t), H); a ? g.lineTo(...p) : g.moveTo(...p); }
+    g.fillStyle = cssVar('--ndl-color-surface-sunken'); g.fill(); g.strokeStyle = edge; g.stroke();
+  }
+}
+function render() {
+  const u = unit;
+  $('m-sketch').textContent = `${show(part.width)} × ${show(part.depth)} ${u}`;
+  $('m-extrude').textContent = `${show(part.height)} ${u}`;
+  $('m-hole').textContent = part.holeOn ? `Ø ${show(part.holeDia)} ${u}` : 'suppressed';
+  if (part.holeOn) $('hole-item').removeAttribute('data-suppressed'); else $('hole-item').setAttribute('data-suppressed', '');
+  $('suppress').setAttribute('aria-pressed', String(!part.holeOn));
+  $('dims').textContent = `${show(part.width)} × ${show(part.depth)} × ${show(part.height)} ${u}`;
+  const vol = part.width * part.depth * part.height - (part.holeOn ? Math.PI * (part.holeDia / 2) ** 2 * part.height : 0);
+  $('vol').textContent = `Volume ${unit === 'mm' ? (vol / 1000).toFixed(1) + ' cm³' : (vol / K ** 3).toFixed(2) + ' in³'}`;
+  $('undo').disabled = histIndex === 0; $('redo').disabled = histIndex === hist.length - 1; $('dirty').hidden = histIndex === 0 && hist.length === 1;
+  renderInspector(); renderHistory(); draw();
+}
+toolbar($('tb')); tabs($('tabs')); splitter($('spl'));
+tree($('tree'), { onSelect: (el) => { opSel = el.dataset.op; renderInspector(); draw(); } });
+$('undo').addEventListener('click', () => goto(histIndex - 1));
+$('redo').addEventListener('click', () => goto(histIndex + 1));
+$('suppress').addEventListener('click', () => commit(part.holeOn ? 'Suppress Hole 1' : 'Unsuppress Hole 1', { ...part, holeOn: !part.holeOn }));
+$('unit').addEventListener('change', (e) => { unit = e.target.value; render(); });
+$('exp').addEventListener('click', () => $('dlg').showModal());
+$('imp').addEventListener('click', () => { const t = document.createElement('div'); t.className = 'ndl-toast'; t.textContent = 'Import needs a file picker; not wired in this demo.'; $('toasts').append(t); setTimeout(() => t.remove(), 4000); });
+$('dg').addEventListener('click', () => {
+  let p = 0; $('dg').disabled = true; $('ds').textContent = 'Exporting…';
+  const t = setInterval(() => { p += 10; $('dp').setAttribute('aria-valuenow', p); $('dp').style.setProperty('--ndl-value', `${p}%`); if (p >= 100) { clearInterval(t); $('ds').textContent = 'Export complete.'; $('dg').disabled = false; } }, 120);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.target.closest('input, select, textarea')) return;
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); if (histIndex > 0) goto(histIndex - 1); }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) { e.preventDefault(); if (histIndex < hist.length - 1) goto(histIndex + 1); }
+});
+addEventListener('resize', draw); onAppearanceChange(draw);
+render();
+</script>
+</body></html>

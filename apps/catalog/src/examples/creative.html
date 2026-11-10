@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creative editor demo · Nodalia Design</title>
+<link rel="stylesheet" href="../nodalia.css"><link rel="stylesheet" href="../catalog.css">
+</head>
+<body class="ndl-app">
+<div class="demo-frame">
+  <div class="demo-frame__bar" role="navigation" aria-label="Demo controls"><a href="../index.html">← Catalog</a><span>Reference demo: creative editor. The canvas is a placeholder renderer; NDL provides the chrome.</span><div id="appearance"></div></div>
+  <div class="ndl-workspace">
+    <header class="ndl-titlebar" data-area="titlebar"><span class="ndl-titlebar__title">Poster.ndl</span><span class="ndl-badge" data-tone="warning" id="dirty" hidden>Unsaved</span></header>
+    <section aria-label="Document tools" data-area="toolbar"><div class="ndl-toolbar" role="toolbar" aria-label="Document" id="tb">
+      <button class="ndl-button" data-variant="subtle" id="undo" disabled>Undo</button>
+      <button class="ndl-button" data-variant="subtle" id="redo" disabled>Redo</button>
+      <span class="ndl-toolbar__sep" role="separator"></span>
+      <label class="ndl-choice" style="padding-inline:var(--ndl-space-sm)">Zoom <input class="ndl-slider" type="range" min="50" max="200" value="100" id="zoom" style="inline-size:8em"></label>
+      <span class="ndl-toolbar__spacer"></span>
+      <button class="ndl-button" id="export">Export…</button>
+    </div></section>
+    <section aria-label="Tools" data-area="tools"><div class="ndl-toolbar" role="toolbar" aria-orientation="vertical" aria-label="Tools" id="tools">
+      <button class="ndl-button" data-variant="subtle" data-icon-only aria-pressed="true" aria-label="Move" data-ndl-tooltip="Move (V)">V</button>
+      <button class="ndl-button" data-variant="subtle" data-icon-only aria-pressed="false" aria-label="Rectangle" data-ndl-tooltip="Rectangle (R)">R</button>
+      <button class="ndl-button" data-variant="subtle" data-icon-only aria-pressed="false" aria-label="Pen" data-ndl-tooltip="Pen (P)">P</button>
+      <button class="ndl-button" data-variant="subtle" data-icon-only aria-pressed="false" aria-label="Zoom" data-ndl-tooltip="Zoom (Z)">Z</button>
+    </div></section>
+    <main data-area="main" class="ndl-viewport demo-grid" style="padding:var(--ndl-space-xl)"><h1 class="ndl-visually-hidden">Poster editor demo</h1><canvas class="demo-canvas" id="cv" role="img" aria-label="Canvas preview of the visible layers"></canvas></main>
+    <aside data-area="side" aria-label="Layers and properties">
+      <div class="ndl-panel__header">Layers</div>
+      <ul class="ndl-list" aria-label="Layers" id="layers"></ul>
+      <div class="ndl-panel__header">Properties</div>
+      <div class="ndl-group__body">
+        <div class="ndl-prop"><label for="l-name">Name</label><input class="ndl-input" id="l-name"></div>
+        <div class="ndl-prop"><label for="l-op">Opacity</label><input class="ndl-slider" type="range" id="l-op" min="0" max="100"></div>
+        <div class="ndl-prop"><label for="l-col">Fill</label><select class="ndl-select" id="l-col"><option value="--ndl-color-accent-default">Accent</option><option value="--ndl-color-status-warning-fg">Amber</option><option value="--ndl-color-status-danger-fg">Red</option><option value="--ndl-color-status-info-fg">Blue</option></select></div>
+      </div>
+    </aside>
+    <footer class="ndl-statusbar" data-area="status"><span id="st">Move tool</span><span class="ndl-statusbar__spacer"></span><span id="zl">100%</span></footer>
+  </div>
+</div>
+<dialog class="ndl-dialog" id="exp" aria-labelledby="e-t"><form method="dialog"><div class="ndl-dialog__header" id="e-t">Export PNG</div>
+  <div class="ndl-dialog__body"><div class="ndl-progress" id="ep" role="progressbar" aria-label="Export progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--ndl-value:0%"></div><p id="es" style="margin:var(--ndl-space-sm) 0 0">Ready to export 3 layers.</p></div>
+  <div class="ndl-dialog__footer"><button class="ndl-button" value="cancel" id="ec">Close</button><button class="ndl-button" data-variant="primary" type="button" id="eg">Start</button></div></form></dialog>
+<script type="module">
+import { toolbar, slider } from '../behaviors.mjs';
+import { initAppearance, APPEARANCE_BAR, cssVar, onAppearanceChange } from '../shared.mjs';
+document.getElementById('appearance').innerHTML = APPEARANCE_BAR; initAppearance();
+const $ = (id) => document.getElementById(id);
+
+let layers = [
+  { id: 1, name: 'Background shape', col: '--ndl-color-accent-default', op: 90, vis: true, r: [0.08, 0.12, 0.6, 0.7] },
+  { id: 2, name: 'Highlight', col: '--ndl-color-status-warning-fg', op: 80, vis: true, r: [0.45, 0.35, 0.42, 0.5] },
+  { id: 3, name: 'Accent bar', col: '--ndl-color-status-danger-fg', op: 100, vis: true, r: [0.2, 0.78, 0.7, 0.1] },
+];
+let sel = 2, zoom = 100;
+const undo = [], redo = [];
+const snap = () => JSON.stringify({ layers, sel });
+const commit = () => { undo.push(before); redo.length = 0; before = snap(); sync(); };
+let before = snap();
+function restore(s) { ({ layers, sel } = JSON.parse(s)); before = snap(); render(); sync(); }
+function sync() { $('undo').disabled = !undo.length; $('redo').disabled = !redo.length; $('dirty').hidden = !undo.length; }
+
+function draw() {
+  const cv = $('cv'), box = cv.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  cv.width = box.width * dpr; cv.height = box.height * dpr;
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const w = Math.min(box.width, box.height * 0.75) * 0.9 * (zoom / 100), h = w / 0.75;
+  const x0 = (box.width - w) / 2, y0 = (box.height - h) / 2;
+  g.fillStyle = cssVar('--ndl-color-surface-panel'); g.fillRect(x0, y0, w, h);
+  for (const l of [...layers].reverse()) {
+    if (!l.vis) continue;
+    g.globalAlpha = l.op / 100; g.fillStyle = cssVar(l.col);
+    g.fillRect(x0 + l.r[0] * w, y0 + l.r[1] * h, l.r[2] * w, l.r[3] * h);
+  }
+  g.globalAlpha = 1;
+  const cur = layers.find((l) => l.id === sel);
+  if (cur) { g.strokeStyle = cssVar('--ndl-color-border-focus'); g.lineWidth = 2; g.strokeRect(x0 + cur.r[0] * w, y0 + cur.r[1] * h, cur.r[2] * w, cur.r[3] * h); }
+}
+function render() {
+  $('layers').replaceChildren(...layers.map((l) => {
+    const li = document.createElement('li'); li.className = 'ndl-list__item'; li.dataset.id = l.id;
+    const eye = Object.assign(document.createElement('button'), { className: 'ndl-button', textContent: l.vis ? 'Shown' : 'Hidden' });
+    eye.dataset.variant = 'subtle'; eye.setAttribute('aria-pressed', String(l.vis)); eye.setAttribute('aria-label', `Visible: ${l.name}`);
+    eye.addEventListener('click', (e) => { e.stopPropagation(); l.vis = !l.vis; commit(); render(); });
+    const name = Object.assign(document.createElement('button'), { className: 'ndl-button ndl-list__grow', textContent: l.name });
+    name.dataset.variant = 'subtle'; name.style.justifyContent = 'flex-start';
+    if (l.id === sel) name.setAttribute('aria-current', 'true');
+    li.append(eye, name);
+    name.addEventListener('click', () => { sel = l.id; before = snap(); render(); });
+    return li;
+  }));
+  const cur = layers.find((l) => l.id === sel);
+  $('l-name').value = cur?.name ?? ''; $('l-op').value = cur?.op ?? 0; $('l-col').value = cur?.col ?? '';
+  $('l-op').dispatchEvent(new Event('input'));
+  draw();
+}
+slider($('l-op')); slider($('zoom'));
+$('l-name').addEventListener('change', (e) => { layers.find((l) => l.id === sel).name = e.target.value; commit(); render(); });
+$('l-op').addEventListener('change', (e) => { layers.find((l) => l.id === sel).op = Number(e.target.value); commit(); });
+$('l-op').addEventListener('input', (e) => { layers.find((l) => l.id === sel).op = Number(e.target.value); draw(); });
+$('l-col').addEventListener('change', (e) => { layers.find((l) => l.id === sel).col = e.target.value; commit(); render(); });
+$('undo').addEventListener('click', () => { redo.push(snap()); restore(undo.pop()); });
+$('redo').addEventListener('click', () => { undo.push(snap()); restore(redo.pop()); });
+$('zoom').addEventListener('input', (e) => { zoom = Number(e.target.value); $('zl').textContent = `${zoom}%`; draw(); });
+toolbar($('tb')); toolbar($('tools'));
+const toolNames = ['Move', 'Rectangle', 'Pen', 'Zoom'];
+$('tools').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  [...$('tools').children].forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  $('st').textContent = `${toolNames[[...$('tools').children].indexOf(b)]} tool`;
+});
+$('export').addEventListener('click', () => $('exp').showModal());
+$('eg').addEventListener('click', () => {
+  let p = 0; $('eg').disabled = true; $('es').textContent = 'Exporting…';
+  const t = setInterval(() => {
+    p += 10; $('ep').setAttribute('aria-valuenow', p); $('ep').style.setProperty('--ndl-value', `${p}%`);
+    if (p >= 100) { clearInterval(t); $('es').textContent = 'Export complete.'; $('eg').disabled = false; }
+  }, 120);
+});
+addEventListener('resize', draw); onAppearanceChange(draw);
+render();
+</script>
+</body></html>

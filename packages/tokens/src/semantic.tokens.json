@@ -1,0 +1,119 @@
+{
+  "$description": "Semantic tokens: roles. Colours carry per-mode values in com.nodalia.modes (dark, light-hc, dark-hc); a missing mode falls back as documented in docs/tokens.md.",
+  "color": {
+    "$type": "color",
+    "surface": {
+      "window": { "$value": "{palette.neutral.50}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.1000}", "light-hc": "{palette.neutral.0}", "dark-hc": "{palette.neutral.1000}" } } },
+      "panel": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.900}", "dark-hc": "{palette.neutral.950}" } } },
+      "raised": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.850}", "dark-hc": "{palette.neutral.900}" } } },
+      "sunken": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.950}", "light-hc": "{palette.neutral.50}", "dark-hc": "{palette.neutral.1000}" } } },
+      "overlay": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.850}", "dark-hc": "{palette.neutral.900}" } } },
+      "inverse": { "$value": "{palette.neutral.900}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.100}", "light-hc": "{palette.neutral.1000}" } } }
+    },
+    "text": {
+      "primary": { "$value": "{palette.neutral.900}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.50}", "light-hc": "{palette.neutral.1000}", "dark-hc": "{palette.neutral.0}" } } },
+      "secondary": { "$value": "{palette.neutral.600}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.300}", "light-hc": "{palette.neutral.800}", "dark-hc": "{palette.neutral.100}" } } },
+      "tertiary": { "$value": "{palette.neutral.500}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.400}", "light-hc": "{palette.neutral.700}", "dark-hc": "{palette.neutral.200}" } } },
+      "disabled": { "$value": "{palette.neutral.400}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.500}", "light-hc": "{palette.neutral.500}", "dark-hc": "{palette.neutral.400}" } } },
+      "on-accent": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.1000}", "light-hc": "{palette.neutral.0}" } } },
+      "link": { "$value": "{palette.accent.700}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.300}", "light-hc": "{palette.accent.800}", "dark-hc": "{palette.accent.200}" } } },
+      "inverse": { "$value": "{palette.neutral.50}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.900}", "light-hc": "{palette.neutral.0}" } } }
+    },
+    "border": {
+      "subtle": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.800}", "light-hc": "{palette.neutral.500}", "dark-hc": "{palette.neutral.400}" } } },
+      "default": { "$value": "{palette.neutral.300}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.600}", "light-hc": "{palette.neutral.700}", "dark-hc": "{palette.neutral.300}" } } },
+      "strong": { "$value": "{palette.neutral.500}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.400}", "light-hc": "{palette.neutral.900}", "dark-hc": "{palette.neutral.100}" } } },
+      "focus": { "$value": "{palette.accent.600}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.300}", "light-hc": "{palette.accent.800}", "dark-hc": "{palette.accent.200}" } } }
+    },
+    "accent": {
+      "default": { "$value": "{palette.accent.600}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.300}", "light-hc": "{palette.accent.800}", "dark-hc": "{palette.accent.200}" } } },
+      "hover": { "$value": "{palette.accent.700}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.200}", "light-hc": "{palette.accent.900}", "dark-hc": "{palette.accent.100}" } } },
+      "pressed": { "$value": "{palette.accent.800}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.400}", "light-hc": "{palette.accent.950}", "dark-hc": "{palette.accent.300}" } } },
+      "subtle": { "$value": "{palette.accent.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.900}", "light-hc": "{palette.accent.100}", "dark-hc": "{palette.accent.900}" } } },
+      "text": { "$value": "{palette.accent.700}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.300}", "light-hc": "{palette.accent.800}", "dark-hc": "{palette.accent.200}" } } }
+    },
+    "control": {
+      "bg": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.800}", "light-hc": "{palette.neutral.50}", "dark-hc": "{palette.neutral.900}" } } },
+      "bg-hover": { "$value": "{palette.neutral.200}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.700}", "light-hc": "{palette.neutral.100}", "dark-hc": "{palette.neutral.800}" } } },
+      "bg-pressed": { "$value": "{palette.neutral.300}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.600}", "light-hc": "{palette.neutral.200}", "dark-hc": "{palette.neutral.700}" } } },
+      "bg-disabled": { "$value": "{palette.neutral.50}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.900}", "light-hc": "{palette.neutral.50}", "dark-hc": "{palette.neutral.950}" } } },
+      "field-bg": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.950}", "dark-hc": "{palette.neutral.1000}" } } },
+      "track": { "$value": "{palette.neutral.400}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.500}", "light-hc": "{palette.neutral.600}", "dark-hc": "{palette.neutral.400}" } } }
+    },
+    "selection": {
+      "bg": { "$value": "{palette.accent.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.900}", "dark-hc": "{palette.accent.800}" } } },
+      "bg-inactive": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.800}" } } }
+    },
+    "status": {
+      "success": {
+        "fg": { "$value": "{palette.green.600}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.green.300}", "light-hc": "{palette.green.700}", "dark-hc": "{palette.green.300}" } } },
+        "bg": { "$value": "{palette.green.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.green.900}" } } }
+      },
+      "warning": {
+        "fg": { "$value": "{palette.amber.700}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.amber.300}", "light-hc": "{palette.amber.900}", "dark-hc": "{palette.amber.300}" } } },
+        "bg": { "$value": "{palette.amber.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.amber.900}" } } }
+      },
+      "danger": {
+        "fg": { "$value": "{palette.red.700}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.red.300}", "light-hc": "{palette.red.900}", "dark-hc": "{palette.red.300}" } } },
+        "bg": { "$value": "{palette.red.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.red.900}" } } }
+      },
+      "info": {
+        "fg": { "$value": "{palette.blue.700}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.blue.300}", "light-hc": "{palette.blue.900}", "dark-hc": "{palette.blue.300}" } } },
+        "bg": { "$value": "{palette.blue.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.blue.900}" } } }
+      }
+    },
+    "scrim": {
+      "$description": "Opaque-enough veil behind modal dialogs. The only translucent colour in the system.",
+      "default": { "$value": "#0D0F1566", "$extensions": { "com.nodalia.modes": { "dark": "#07080C99" } } }
+    }
+  },
+  "elevation": {
+    "$type": "shadow",
+    "$description": "Two levels only. Flat surfaces rely on borders, not shadows. Dark mode uses stronger shadows because borders carry less contrast.",
+    "raised": {
+      "$value": { "color": "#0D0F151F", "offsetX": "0px", "offsetY": "1px", "blur": "3px", "spread": "0px" },
+      "$extensions": { "com.nodalia.modes": { "dark": { "color": "#00000066", "offsetX": "0px", "offsetY": "1px", "blur": "3px", "spread": "0px" } } }
+    },
+    "overlay": {
+      "$value": { "color": "#0D0F1533", "offsetX": "0px", "offsetY": "8px", "blur": "24px", "spread": "0px" },
+      "$extensions": { "com.nodalia.modes": { "dark": { "color": "#000000A6", "offsetX": "0px", "offsetY": "8px", "blur": "24px", "spread": "0px" } } }
+    }
+  },
+  "typography": {
+    "$type": "typography",
+    "caption": { "$value": { "fontFamily": "{font.family.ui}", "fontWeight": "{font.weight.regular}", "fontSize": "{font.size.caption}", "lineHeight": "{font.line-height.caption}" } },
+    "small": { "$value": { "fontFamily": "{font.family.ui}", "fontWeight": "{font.weight.regular}", "fontSize": "{font.size.small}", "lineHeight": "{font.line-height.small}" } },
+    "body": { "$value": { "fontFamily": "{font.family.ui}", "fontWeight": "{font.weight.regular}", "fontSize": "{font.size.body}", "lineHeight": "{font.line-height.body}" } },
+    "label": { "$value": { "fontFamily": "{font.family.ui}", "fontWeight": "{font.weight.medium}", "fontSize": "{font.size.body}", "lineHeight": "{font.line-height.body}" } },
+    "large": { "$value": { "fontFamily": "{font.family.ui}", "fontWeight": "{font.weight.regular}", "fontSize": "{font.size.large}", "lineHeight": "{font.line-height.large}" } },
+    "title": { "$value": { "fontFamily": "{font.family.ui}", "fontWeight": "{font.weight.semibold}", "fontSize": "{font.size.title}", "lineHeight": "{font.line-height.title}" } },
+    "headline": { "$value": { "fontFamily": "{font.family.display}", "fontWeight": "{font.weight.semibold}", "fontSize": "{font.size.headline}", "lineHeight": "{font.line-height.headline}" } },
+    "display": { "$value": { "fontFamily": "{font.family.display}", "fontWeight": "{font.weight.semibold}", "fontSize": "{font.size.display}", "lineHeight": "{font.line-height.display}" } },
+    "code": { "$value": { "fontFamily": "{font.family.mono}", "fontWeight": "{font.weight.regular}", "fontSize": "{font.size.small}", "lineHeight": "{font.line-height.body}" } }
+  },
+  "motion": {
+    "$type": "transition",
+    "$description": "Roles. Under reduced motion every duration collapses to 0ms: state still changes, nothing travels.",
+    "feedback": { "$value": { "duration": "{duration.fast}", "delay": "{duration.instant}", "timingFunction": "{easing.standard}" }, "$description": "Hover, press, focus." },
+    "state": { "$value": { "duration": "{duration.normal}", "delay": "{duration.instant}", "timingFunction": "{easing.standard}" }, "$description": "Toggle, check, selection." },
+    "panel": { "$value": { "duration": "{duration.slow}", "delay": "{duration.instant}", "timingFunction": "{easing.standard}" }, "$description": "Sidebar and inspector open or resize." },
+    "enter": { "$value": { "duration": "{duration.slow}", "delay": "{duration.instant}", "timingFunction": "{easing.enter}" }, "$description": "Dialogs, menus, toasts appearing." },
+    "exit": { "$value": { "duration": "{duration.normal}", "delay": "{duration.instant}", "timingFunction": "{easing.exit}" }, "$description": "Dialogs, menus, toasts leaving." }
+  },
+  "size": {
+    "$type": "dimension",
+    "icon": {
+      "small": { "$value": "12px" },
+      "medium": { "$value": "16px" },
+      "large": { "$value": "20px" }
+    },
+    "focus-ring-offset": { "$value": "2px" },
+    "target-min": { "$value": "24px", "$description": "Smallest pointer target. Matches WCAG 2.2 SC 2.5.8." },
+    "scrollbar": { "$value": "10px" },
+    "sidebar": { "$value": "240px" },
+    "inspector": { "$value": "280px" },
+    "dialog": { "$value": "420px" },
+    "tooltip-max": { "$value": "280px" },
+    "toast": { "$value": "360px" }
+  }
+}

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nodalia Design catalog</title>
+<link rel="stylesheet" href="nodalia.css">
+<link rel="stylesheet" href="catalog.css">
+</head>
+<body class="ndl-app">
+<a class="ndl-button skip-link" href="#main">Skip to content</a>
+<div class="cat">
+  <nav class="cat__nav ndl-sidebar" aria-label="Catalog sections">
+    <div class="ndl-type-title" style="padding:var(--ndl-space-sm) var(--ndl-density-control-padding-x)">Nodalia Design</div>
+    <div class="ndl-sidebar__heading">Foundations</div>
+    <a class="ndl-nav-item" href="#color">Colour</a>
+    <a class="ndl-nav-item" href="#type">Typography</a>
+    <a class="ndl-nav-item" href="#geometry">Space and geometry</a>
+    <a class="ndl-nav-item" href="#motion">Motion</a>
+    <div class="ndl-sidebar__heading">Components</div>
+    <a class="ndl-nav-item" href="#actions">Buttons</a>
+    <a class="ndl-nav-item" href="#inputs">Inputs</a>
+    <a class="ndl-nav-item" href="#feedback">Feedback</a>
+    <a class="ndl-nav-item" href="#overlays">Overlays</a>
+    <a class="ndl-nav-item" href="#navigation">Navigation</a>
+    <a class="ndl-nav-item" href="#data">Lists, tables, trees</a>
+    <div class="ndl-sidebar__heading">States</div>
+    <a class="ndl-nav-item" href="#states">Interaction states</a>
+    <div class="ndl-sidebar__heading">Reference demos</div>
+    <a class="ndl-nav-item" href="examples/productivity.html">Productivity</a>
+    <a class="ndl-nav-item" href="examples/creative.html">Creative editor</a>
+    <a class="ndl-nav-item" href="examples/engineering.html">Engineering</a>
+  </nav>
+  <div class="cat__main">
+    <header class="cat__top"><div id="appearance"></div></header>
+    <main id="main" class="cat__content" tabindex="-1">
+      <section aria-labelledby="intro">
+        <h1 id="intro">Nodalia Design Language</h1>
+        <p>Live reference for the tokens and components. Change theme, contrast, density, scale and motion above: everything below, including the demos, follows. Every control is a real element, not a screenshot.</p>
+      </section>
+
+      <section id="color" aria-labelledby="h-color">
+        <h2 id="h-color">Colour</h2>
+        <p>Semantic roles, resolved for the current appearance. Components never use palette values directly.</p>
+        <!--@swatches-->
+      </section>
+
+      <section id="type" aria-labelledby="h-type">
+        <h2 id="h-type">Typography</h2>
+        <p>Inter for interface text, Sora for display, system monospace for code. Fonts are not bundled in this release: the stacks fall back to system fonts.</p>
+        <!--@type-->
+      </section>
+
+      <section id="geometry" aria-labelledby="h-geo">
+        <h2 id="h-geo">Space and geometry</h2>
+        <h3>Spacing (4 px grid)</h3>
+        <!--@space-->
+        <h3>Corner radius</h3>
+        <!--@radius-->
+        <h3>Elevation</h3>
+        <div class="spec">
+          <div class="elev" style="box-shadow:var(--ndl-elevation-raised)"><code>raised</code></div>
+          <div class="elev" style="box-shadow:var(--ndl-elevation-overlay)"><code>overlay</code></div>
+          <div class="elev" style="border:var(--ndl-border-width-thin) solid var(--ndl-color-border-default)"><code>flat + border</code></div>
+        </div>
+      </section>
+
+      <section id="motion" aria-labelledby="h-motion">
+        <h2 id="h-motion">Motion</h2>
+        <p>Each role pairs a duration with an easing. With reduced motion every role collapses to 0 ms: the state still changes, nothing travels.</p>
+        <!--@motion-->
+      </section>
+
+      <section id="actions" aria-labelledby="h-actions">
+        <h2 id="h-actions">Buttons</h2>
+        <div class="spec">
+          <button class="ndl-button" data-variant="primary">Primary</button>
+          <button class="ndl-button">Secondary</button>
+          <button class="ndl-button" data-variant="subtle">Subtle</button>
+          <button class="ndl-button" data-variant="danger">Delete</button>
+          <button class="ndl-button" disabled>Disabled</button>
+          <button class="ndl-button" data-icon-only aria-label="Add" data-ndl-tooltip="Add item">+</button>
+          <button class="ndl-button" aria-pressed="false" id="toggle-btn">Toggle</button>
+        </div>
+      </section>
+
+      <section id="inputs" aria-labelledby="h-inputs">
+        <h2 id="h-inputs">Inputs</h2>
+        <div class="spec">
+          <div class="ndl-field"><label class="ndl-field__label" for="f-name">Name</label><input class="ndl-input" id="f-name" placeholder="Untitled" aria-describedby="f-name-h"><span class="ndl-field__hint" id="f-name-h">Shown in the title bar.</span></div>
+          <div class="ndl-field"><label class="ndl-field__label" for="f-bad">With error</label><input class="ndl-input" id="f-bad" value="12x" aria-invalid="true" aria-describedby="f-bad-e"><span class="ndl-field__error" id="f-bad-e">Enter a number.</span></div>
+          <div class="ndl-field"><label class="ndl-field__label" for="f-num">Length</label><span class="ndl-unit-field"><input class="ndl-input" id="f-num" type="number" value="42.5" step="0.5"><span class="ndl-unit-field__unit" aria-hidden="true">mm</span></span></div>
+          <div class="ndl-field"><label class="ndl-field__label" for="f-sel">Material</label><select class="ndl-select" id="f-sel"><option>Aluminium 6061</option><option>Steel S235</option><option>PLA</option></select></div>
+          <div class="ndl-field"><span class="ndl-field__label" id="srch-l">Search</span><div class="ndl-search" role="search"><input class="ndl-input" type="search" aria-labelledby="srch-l" placeholder="Search"></div></div>
+        </div>
+        <div class="spec">
+          <label class="ndl-choice"><input class="ndl-check" type="checkbox" checked> Checked</label>
+          <label class="ndl-choice"><input class="ndl-check" type="checkbox"> Unchecked</label>
+          <label class="ndl-choice"><input class="ndl-check" type="checkbox" id="indet"> Indeterminate</label>
+          <fieldset style="border:0;padding:0;margin:0;display:flex;gap:var(--ndl-space-lg)"><legend class="ndl-visually-hidden">Units</legend>
+            <label class="ndl-choice"><input class="ndl-check" type="radio" name="u" checked> Metric</label>
+            <label class="ndl-choice"><input class="ndl-check" type="radio" name="u"> Imperial</label></fieldset>
+          <label class="ndl-choice"><input class="ndl-switch" type="checkbox" role="switch" checked> Snap to grid</label>
+          <label class="ndl-choice" style="inline-size:14em">Opacity <input class="ndl-slider" type="range" min="0" max="100" value="60" id="sl"></label>
+        </div>
+      </section>
+
+      <section id="feedback" aria-labelledby="h-fb">
+        <h2 id="h-fb">Feedback</h2>
+        <div class="spec">
+          <span class="ndl-badge">Neutral</span><span class="ndl-badge" data-tone="accent">Accent</span><span class="ndl-badge" data-tone="success">Saved</span>
+          <span class="ndl-badge" data-tone="warning">Unsaved</span><span class="ndl-badge" data-tone="danger">Failed</span><span class="ndl-badge" data-tone="info">Beta</span>
+        </div>
+        <div class="spec">
+          <div style="inline-size:16em"><div class="ndl-progress" role="progressbar" aria-label="Export" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40" style="--ndl-value:40%"></div></div>
+          <div style="inline-size:16em"><div class="ndl-progress" role="progressbar" aria-label="Loading"></div></div>
+          <span class="ndl-spinner" role="status" aria-label="Working"></span>
+          <button class="ndl-button" id="toast-btn">Show notification</button>
+        </div>
+      </section>
+
+      <section id="overlays" aria-labelledby="h-ov">
+        <h2 id="h-ov">Overlays</h2>
+        <div class="spec">
+          <button class="ndl-button" id="dlg-btn">Open confirmation</button>
+          <button class="ndl-button" id="ctx-btn" aria-haspopup="menu">Context menu (or right click)</button>
+          <button class="ndl-button" data-variant="subtle" data-ndl-tooltip="Appears on hover and keyboard focus">Tooltip</button>
+          <div class="ndl-menu ndl-menu--static" role="menu" aria-label="Example menu">
+            <div class="ndl-menu__item" role="menuitem" tabindex="-1">Rename<span class="ndl-menu__shortcut">F2</span></div>
+            <div class="ndl-menu__item" role="menuitem" tabindex="-1">Duplicate<span class="ndl-menu__shortcut">Ctrl+D</span></div>
+            <div class="ndl-menu__item" role="menuitem" aria-disabled="true" tabindex="-1">Paste</div>
+            <div role="separator"></div>
+            <div class="ndl-menu__item" role="menuitem" data-tone="danger" tabindex="-1">Delete</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="navigation" aria-labelledby="h-nav">
+        <h2 id="h-nav">Navigation and structure</h2>
+        <h3>Tabs</h3>
+        <div class="spec spec--column" style="align-items:stretch">
+          <div class="ndl-tabs" role="tablist" aria-label="Inspector" id="tabs">
+            <button class="ndl-tab" role="tab" id="t1" aria-controls="p1" aria-selected="true">Properties</button>
+            <button class="ndl-tab" role="tab" id="t2" aria-controls="p2" aria-selected="false">Materials</button>
+            <button class="ndl-tab" role="tab" id="t3" aria-controls="p3" aria-selected="false">History</button>
+          </div>
+          <div class="ndl-tabpanel" role="tabpanel" id="p1" aria-labelledby="t1">Properties panel</div>
+          <div class="ndl-tabpanel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>Materials panel</div>
+          <div class="ndl-tabpanel" role="tabpanel" id="p3" aria-labelledby="t3" hidden>History panel</div>
+        </div>
+        <h3>Toolbar, split panes and status bar</h3>
+        <div class="ndl-panel ndl-panel--flush" style="block-size:16em">
+          <div class="ndl-toolbar" role="toolbar" aria-label="Formatting" id="tb">
+            <button class="ndl-button" data-variant="subtle" aria-pressed="true"><b>B</b></button>
+            <button class="ndl-button" data-variant="subtle" aria-pressed="false"><i>I</i></button>
+            <span class="ndl-toolbar__sep" role="separator"></span>
+            <button class="ndl-button" data-variant="subtle">Undo</button>
+            <button class="ndl-button" data-variant="subtle">Redo</button>
+          </div>
+          <div class="ndl-split" style="flex:1;min-block-size:0">
+            <div class="ndl-panel__body">Left pane</div>
+            <div class="ndl-splitter" role="separator" tabindex="0" aria-label="Resize panes" id="spl"></div>
+            <div class="ndl-panel__body">Right pane</div>
+          </div>
+          <div class="ndl-statusbar"><span>Ready</span><span class="ndl-statusbar__spacer"></span><span>Ln 12, Col 4</span><span>UTF-8</span></div>
+        </div>
+        <h3>Empty state</h3>
+        <div class="ndl-panel" style="block-size:14em"><div class="ndl-empty"><div class="ndl-empty__title">No documents open</div><div>Open a file or start a new document.</div><button class="ndl-button" data-variant="primary">New document</button></div></div>
+      </section>
+
+      <section id="data" aria-labelledby="h-data">
+        <h2 id="h-data">Lists, tables and trees</h2>
+        <div class="spec" style="align-items:flex-start">
+          <div class="ndl-panel ndl-panel--flush" style="inline-size:18em"><div class="ndl-panel__header">Operations</div>
+            <ul class="ndl-tree" role="tree" aria-label="Operations" id="tree">
+              <li role="treeitem" aria-expanded="true" aria-selected="true"><span class="ndl-tree__row">Part 1</span>
+                <ul role="group">
+                  <li role="treeitem" aria-selected="false"><span class="ndl-tree__row">Sketch 1</span></li>
+                  <li role="treeitem" aria-expanded="true" aria-selected="false"><span class="ndl-tree__row">Extrude 1<span class="ndl-tree__meta">20 mm</span></span>
+                    <ul role="group"><li role="treeitem" aria-selected="false"><span class="ndl-tree__row">Fillet 1</span></li></ul></li>
+                  <li role="treeitem" aria-selected="false" data-suppressed><span class="ndl-tree__row">Hole 1 (suppressed)</span></li>
+                </ul></li>
+            </ul></div>
+          <div class="ndl-panel ndl-panel--flush" style="inline-size:18em"><div class="ndl-panel__header">History</div>
+            <ul class="ndl-list" role="listbox" aria-label="History" id="hist">
+              <li class="ndl-list__item" role="option" aria-selected="false">Create sketch</li>
+              <li class="ndl-list__item" role="option" aria-selected="false" data-current>Extrude 20 mm</li>
+              <li class="ndl-list__item" role="option" aria-selected="false" data-undone>Fillet 2 mm</li>
+            </ul></div>
+          <div class="ndl-panel ndl-panel--flush" style="flex:1;min-inline-size:20em"><div class="ndl-panel__header">Files</div>
+            <table class="ndl-table"><caption class="ndl-visually-hidden">Project files</caption>
+              <thead><tr><th scope="col">Name</th><th scope="col" data-numeric>Size</th><th scope="col">Modified</th></tr></thead>
+              <tbody><tr aria-selected="true"><td>bracket.ndl</td><td data-numeric>128 KB</td><td>Today</td></tr><tr><td>housing.ndl</td><td data-numeric>2.4 MB</td><td>Yesterday</td></tr><tr><td>notes.md</td><td data-numeric>3 KB</td><td>Mon</td></tr></tbody></table></div>
+        </div>
+        <h3>Property inspector</h3>
+        <div class="ndl-panel ndl-panel--flush" style="inline-size:var(--ndl-size-inspector)">
+          <details class="ndl-group" open><summary>Dimensions</summary><div class="ndl-group__body">
+            <div class="ndl-prop"><label for="pi-w">Width</label><span class="ndl-unit-field"><input class="ndl-input" id="pi-w" type="number" value="80"><span class="ndl-unit-field__unit" aria-hidden="true">mm</span></span></div>
+            <div class="ndl-prop"><label for="pi-h">Height</label><span class="ndl-unit-field"><input class="ndl-input" id="pi-h" type="number" value="40"><span class="ndl-unit-field__unit" aria-hidden="true">mm</span></span></div>
+          </div></details>
+          <details class="ndl-group"><summary>Appearance</summary><div class="ndl-group__body">
+            <div class="ndl-prop"><label for="pi-m">Material</label><select class="ndl-select" id="pi-m"><option>Aluminium</option><option>Steel</option></select></div>
+            <div class="ndl-prop"><span class="ndl-prop__label">Visible</span><input class="ndl-switch" type="checkbox" role="switch" checked aria-label="Visible"></div>
+          </div></details>
+        </div>
+      </section>
+
+      <section id="states" aria-labelledby="h-states">
+        <h2 id="h-states">Interaction states</h2>
+        <p>Forced with <code>data-state</code> so every state is visible at once. Real controls respond to the matching pseudo-classes.</p>
+        <!--@states-->
+      </section>
+    </main>
+  </div>
+</div>
+
+<dialog class="ndl-dialog" id="dlg" aria-labelledby="dlg-t" aria-describedby="dlg-d">
+  <form method="dialog">
+    <div class="ndl-dialog__header" id="dlg-t">Delete 3 items?</div>
+    <div class="ndl-dialog__body" id="dlg-d">The items move to the project trash and can be restored for 30 days.</div>
+    <div class="ndl-dialog__footer"><button class="ndl-button" value="cancel" autofocus>Cancel</button><button class="ndl-button" data-variant="danger" value="delete">Delete</button></div>
+  </form>
+</dialog>
+<div class="ndl-menu" role="menu" aria-label="Item actions" id="ctx" hidden>
+  <div class="ndl-menu__item" role="menuitem" tabindex="-1">Rename<span class="ndl-menu__shortcut">F2</span></div>
+  <div class="ndl-menu__item" role="menuitem" tabindex="-1">Duplicate<span class="ndl-menu__shortcut">Ctrl+D</span></div>
+  <div role="separator"></div>
+  <div class="ndl-menu__item" role="menuitem" data-tone="danger" tabindex="-1">Delete</div>
+</div>
+<div class="ndl-toast-region" id="toasts" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { tabs, tree, splitter, slider, toolbar, contextMenu, roving } from './behaviors.mjs';
+import { initAppearance, APPEARANCE_BAR } from './shared.mjs';
+
+document.getElementById('appearance').innerHTML = APPEARANCE_BAR;
+initAppearance();
+
+const paintHex = () => {
+  for (const el of document.querySelectorAll('[data-hex]')) el.textContent = getComputedStyle(document.documentElement).getPropertyValue(el.dataset.hex).trim();
+};
+paintHex();
+new MutationObserver(paintHex).observe(document.documentElement, { attributes: true });
+for (const q of ['(prefers-color-scheme: dark)', '(prefers-contrast: more)']) matchMedia(q).addEventListener('change', paintHex);
+
+document.getElementById('indet').indeterminate = true;
+tabs(document.getElementById('tabs'));
+toolbar(document.getElementById('tb'));
+tree(document.getElementById('tree'));
+splitter(document.getElementById('spl'));
+slider(document.getElementById('sl'));
+roving(document.getElementById('hist'), { items: '[role="option"]', orientation: 'vertical' });
+for (const o of document.querySelectorAll('#hist [role="option"]')) o.addEventListener('click', () => { document.querySelectorAll('#hist [role="option"]').forEach((x) => x.setAttribute('aria-selected', String(x === o))); });
+
+const toggle = document.getElementById('toggle-btn');
+toggle.addEventListener('click', () => toggle.setAttribute('aria-pressed', String(toggle.getAttribute('aria-pressed') !== 'true')));
+
+const dlg = document.getElementById('dlg');
+document.getElementById('dlg-btn').addEventListener('click', () => dlg.showModal());
+
+const toasts = document.getElementById('toasts');
+document.getElementById('toast-btn').addEventListener('click', () => {
+  const t = document.createElement('div');
+  t.className = 'ndl-toast';
+  t.innerHTML = '<span>Export finished.</span><button class="ndl-button" data-variant="subtle">Undo</button>';
+  t.querySelector('button').addEventListener('click', () => t.remove());
+  toasts.append(t);
+  setTimeout(() => t.remove(), 6000);
+});
+
+contextMenu(document.getElementById('ctx-btn'), document.getElementById('ctx'));
+document.getElementById('ctx-btn').addEventListener('click', (e) => {
+  const r = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.dispatchEvent(new MouseEvent('contextmenu', { clientX: r.left, clientY: r.bottom, bubbles: true, cancelable: true }));
+});
+for (const b of document.querySelectorAll('[data-motion-play]')) {
+  b.addEventListener('click', () => b.parentElement.querySelector('.motion-demo').toggleAttribute('data-on'));
+}
+</script>
+</body>
+</html>

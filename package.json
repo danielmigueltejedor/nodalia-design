@@ -1,0 +1,27 @@
+{
+  "name": "nodalia-design",
+  "private": true,
+  "version": "0.1.0-alpha.0",
+  "description": "Nodalia Design Language: tokens, adapters, components and catalog.",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @nodalia/tokens && npm run build -w @nodalia/gtk -w @nodalia/qml -w @nodalia/web -w @nodalia/catalog",
+    "validate": "npm run validate -w @nodalia/tokens && npm run lint -w @nodalia/web",
+    "test": "npm run build && npm test --workspaces --if-present",
+    "test:browser": "node --test \"tests/browser/*.test.mjs\"",
+    "ci": "npm run validate && npm test && npm run check:repro && npm run test:browser",
+    "check:repro": "node scripts/repro.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.11.0",
+    "playwright-core": "1.63.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

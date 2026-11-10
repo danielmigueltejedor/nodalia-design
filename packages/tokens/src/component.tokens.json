@@ -1,0 +1,44 @@
+{
+  "$description": "Component tokens: the only tokens components.css may read besides semantic ones. They alias semantic tokens so a component can be re-themed without touching the roles.",
+  "component": {
+    "button": {
+      "radius": { "$type": "dimension", "$value": "{radius.md}" },
+      "border-width": { "$type": "dimension", "$value": "{border-width.thin}" },
+      "font": { "$type": "typography", "$value": "{typography.label}" }
+    },
+    "field": {
+      "radius": { "$type": "dimension", "$value": "{radius.md}" },
+      "border-width": { "$type": "dimension", "$value": "{border-width.thin}" }
+    },
+    "switch": {
+      "width": { "$type": "dimension", "$value": "44px" },
+      "height": { "$type": "dimension", "$value": "24px" },
+      "thumb": { "$type": "dimension", "$value": "18px" }
+    },
+    "slider": {
+      "track-height": { "$type": "dimension", "$value": "4px" },
+      "thumb": { "$type": "dimension", "$value": "16px" }
+    },
+    "progress": {
+      "height": { "$type": "dimension", "$value": "4px" }
+    },
+    "toggle-box": {
+      "size": { "$type": "dimension", "$value": "16px" }
+    },
+    "spinner": {
+      "size": { "$type": "dimension", "$value": "16px" },
+      "stroke": { "$type": "dimension", "$value": "2px" },
+      "period": { "$type": "duration", "$value": "800ms" }
+    },
+    "badge": {
+      "radius": { "$type": "dimension", "$value": "{radius.full}" },
+      "font": { "$type": "typography", "$value": "{typography.small}" }
+    },
+    "panel": {
+      "radius": { "$type": "dimension", "$value": "{radius.lg}" }
+    },
+    "splitter": {
+      "hit": { "$type": "dimension", "$value": "8px" }
+    }
+  }
+}
