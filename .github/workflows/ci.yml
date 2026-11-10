@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install GTK 4 and Rust
-        run: dnf install -y --setopt=install_weak_deps=False gtk4-devel gcc cargo clippy rustfmt python3-gobject xorg-x11-server-Xvfb
+        run: dnf install -y --setopt=install_weak_deps=False gtk4-devel gcc cargo clippy rustfmt python3-gobject python3-cairo gobject-introspection xorg-x11-server-Xvfb
       - name: Format, lints and tests
         working-directory: packages/gtk/crate
         run: |
