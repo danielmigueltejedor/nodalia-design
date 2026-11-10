@@ -1,11 +1,11 @@
 {
   "name": "@nodalia/catalog",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "private": true,
   "description": "Interactive visual catalog and reference demos for Nodalia Design Language.",
   "license": "MIT",
   "type": "module",
   "scripts": { "build": "node scripts/build.mjs", "test": "node --test \"test/*.test.mjs\"", "serve": "node scripts/serve.mjs" },
-  "dependencies": { "@nodalia/web": "0.1.0-alpha.0", "@nodalia/tokens": "0.1.0-alpha.0" },
+  "dependencies": { "@nodalia/web": "0.1.0-alpha.1", "@nodalia/tokens": "0.1.0-alpha.1" },
   "engines": { "node": ">=20" }
 }

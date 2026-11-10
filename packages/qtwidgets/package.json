@@ -1,12 +1,12 @@
 {
   "name": "@nodalia/qtwidgets",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Nodalia Design Language for Qt Widgets: flat tokens, a style-sheet template and rendered style sheets.",
   "license": "MIT",
   "type": "module",
   "files": ["dist"],
   "exports": { "./*": "./dist/*" },
   "scripts": { "build": "node scripts/build.mjs", "test": "node --test \"test/*.test.mjs\"" },
-  "dependencies": { "@nodalia/tokens": "0.1.0-alpha.0" },
+  "dependencies": { "@nodalia/tokens": "0.1.0-alpha.1" },
   "engines": { "node": ">=20" }
 }

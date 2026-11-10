@@ -2,7 +2,7 @@
 
 Lenguaje de diseño de las aplicaciones de Nodalia: una especificación única, *design tokens* en el estándar abierto DTCG y adaptadores por tecnología, para que Forja, Pluma, Lienzo, Vortia, Letra, Lámina o Cifra se reconozcan como parte del mismo ecosistema en Linux, macOS y Windows.
 
-> **Estado: `0.1.0-alpha.0`.** Las APIs pueden cambiar entre versiones alfa. Qué funciona hoy, qué está verificado y qué falta está en [docs/status.md](docs/status.md); no hay nada presentado como terminado que no lo esté.
+> **Estado: `0.1.0-alpha.1`.** Las APIs pueden cambiar entre versiones alfa. Qué funciona hoy, qué está verificado y qué falta está en [docs/status.md](docs/status.md); no hay nada presentado como terminado que no lo esté.
 
 ## Qué contiene
 
@@ -10,6 +10,7 @@ Lenguaje de diseño de las aplicaciones de Nodalia: una especificación única, 
 | --- | --- | --- |
 | [`@nodalia/tokens`](packages/tokens) | 190 tokens DTCG (primitivos, semánticos, de componente), cuatro modos de apariencia, validación de contraste WCAG y generador de CSS | Operativo |
 | [`@nodalia/web`](packages/web) | Componentes CSS sin framework + comportamientos ARIA (pestañas, árbol, barra de herramientas, separador, menú contextual, tooltip) | Operativo |
+| [`@nodalia/icons`](packages/icons) | 55 iconos originales de trazo: SVG sueltos, *sprite* e índice | Operativo; en uso en Vortia 0.5.0 |
 | [`@nodalia/gtk`](packages/gtk) | Hojas de estilo GTK4 / libadwaita (colores con nombre públicos) generadas desde los tokens | Generado y probado estructuralmente; **sin verificar en un runtime GTK real** |
 | [`@nodalia/qml`](packages/qml) | Singleton `NodaliaTheme` para Qt Quick generado desde los tokens | Generado y probado estructuralmente; **sin verificar en Qt** |
 | [`@nodalia/qtwidgets`](packages/qtwidgets) | Tokens aplanados, plantilla de hoja de estilos y hojas rellenas para Qt Widgets | En uso en Vortia 0.5.0 (Qt 6, macOS); **sin probar en Linux ni Windows** |

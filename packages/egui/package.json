@@ -1,11 +1,11 @@
 {
   "name": "@nodalia/egui",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Nodalia Design Language for Rust and egui: generates the nodalia-theme crate from the tokens.",
   "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": { "build": "node scripts/build.mjs", "test": "node --test \"test/*.test.mjs\"" },
-  "dependencies": { "@nodalia/tokens": "0.1.0-alpha.0" },
+  "dependencies": { "@nodalia/tokens": "0.1.0-alpha.1" },
   "engines": { "node": ">=20" }
 }

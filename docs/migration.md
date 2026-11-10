@@ -4,7 +4,7 @@ NDL está pensado para adoptarse por capas, sin reescribir la interfaz de golpe 
 
 ## Principios
 
-- **Fija la versión.** Cada app depende de una versión exacta (`0.1.0-alpha.0`, no `^0.1`). Mientras NDL esté en alfa, cualquier versión puede cambiar nombres de token.
+- **Fija la versión.** Cada app depende de una versión exacta (`0.1.0-alpha.1`, no `^0.1`). Mientras NDL esté en alfa, cualquier versión puede cambiar nombres de token.
 - **Empieza por el color.** Es lo que da coherencia visual con menos riesgo.
 - **No copies ficheros.** Se consume como paquete; si falta algo, se pide un token, no se duplica un valor.
 - **Un cambio visible = una PR de la app**, con captura antes/después y comprobación de contraste.

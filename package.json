@@ -1,7 +1,7 @@
 {
   "name": "nodalia-design",
   "private": true,
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Nodalia Design Language: tokens, adapters, components and catalog.",
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @nodalia/tokens && npm run build -w @nodalia/gtk -w @nodalia/qml -w @nodalia/egui -w @nodalia/qtwidgets -w @nodalia/web -w @nodalia/catalog",
+    "build": "npm run build -w @nodalia/tokens -w @nodalia/icons && npm run build -w @nodalia/gtk -w @nodalia/qml -w @nodalia/egui -w @nodalia/qtwidgets -w @nodalia/web -w @nodalia/catalog",
     "validate": "npm run validate -w @nodalia/tokens && npm run lint -w @nodalia/web",
     "test": "npm run build && npm test --workspaces --if-present",
     "test:rust": "cargo test --manifest-path packages/egui/crate/Cargo.toml && cargo test --manifest-path packages/egui/crate/Cargo.toml --features egui",

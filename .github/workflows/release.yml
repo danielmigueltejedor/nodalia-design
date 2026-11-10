@@ -23,9 +23,11 @@ jobs:
       - name: The tag must match the package versions
         run: |
           v="${GITHUB_REF_NAME#v}"
-          for p in tokens gtk qml qtwidgets web; do
+          for p in tokens icons gtk qml qtwidgets web; do
             [ "$(node -p "require('./packages/$p/package.json').version")" = "$v" ] || { echo "packages/$p version does not match $GITHUB_REF_NAME"; exit 1; }
           done
+      - name: The Rust crate carries the same version
+        run: grep -qx "version = \"${GITHUB_REF_NAME#v}\"" packages/egui/crate/Cargo.toml
       - run: npm run validate
       - run: npm test
       - run: npm run check:repro
@@ -34,7 +36,7 @@ jobs:
       - name: Pack
         run: |
           mkdir -p release
-          for p in tokens gtk qml qtwidgets web; do npm pack -w "@nodalia/$p" --pack-destination release; done
+          for p in tokens icons gtk qml qtwidgets web; do npm pack -w "@nodalia/$p" --pack-destination release; done
           tar -czf "release/nodalia-design-catalog-${GITHUB_REF_NAME}.tar.gz" -C apps/catalog/dist .
           (cd release && sha256sum * > SHA256SUMS)
       - name: Create draft release

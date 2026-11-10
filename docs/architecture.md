@@ -19,6 +19,7 @@ tokens (DTCG)  ──►  @nodalia/tokens  ──►  CSS de variables
 | Paquete | Entrada | Salida |
 | --- | --- | --- |
 | `@nodalia/tokens` | `src/*.tokens.json` (DTCG) | `dist/tokens.css`, `tokens.json`, `resolved.json` |
+| `@nodalia/icons` | `src/icons.mjs` | `dist/svg/*.svg`, `dist/mono/*.svg`, `sprite.svg`, `icons.json` |
 | `@nodalia/gtk` | `mapping.json` + tokens resueltos | `dist/nodalia-{light,dark,light-hc,dark-hc}.css` |
 | `@nodalia/qml` | tokens resueltos | `dist/Nodalia/NodaliaTheme.qml` + `qmldir` |
 | `@nodalia/qtwidgets` | `src/nodalia.qss` + tokens resueltos | `dist/nodalia-qt.json`, `nodalia.qss`, `nodalia-<modo>-<densidad>.qss` |
@@ -26,7 +27,7 @@ tokens (DTCG)  ──►  @nodalia/tokens  ──►  CSS de variables
 | `@nodalia/web` | `src/components.css`, `src/behaviors.mjs` | `dist/nodalia.css` (con capas), `dist/behaviors.mjs` |
 | `@nodalia/catalog` | `src/` | sitio estático en `dist/` |
 
-Dependencias: `gtk`, `qml`, `egui`, `qtwidgets` y `web` dependen solo de `tokens`. `tokens` no depende de nada. No hay dependencias de ejecución externas; las de desarrollo son `playwright-core` y `axe-core`, con versión exacta.
+Dependencias: `gtk`, `qml`, `egui`, `qtwidgets` y `web` dependen solo de `tokens`. `tokens` e `icons` no dependen de nada. No hay dependencias de ejecución externas; las de desarrollo son `playwright-core` y `axe-core`, con versión exacta.
 
 ## Flujo de generación
 
