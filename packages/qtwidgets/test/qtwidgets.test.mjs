@@ -24,6 +24,7 @@ test('translucent colours become rgba with alpha 0-255', () => {
 test('names are two-level and letters only, so one placeholder syntax covers them all', () => {
   for (const [group, values] of Object.entries(flat)) {
     if (typeof values !== 'object' || Array.isArray(values)) continue;
+    if (group === 'accent') continue;
     const leaves = ['color', 'density'].includes(group) ? Object.values(values).flatMap((v) => Object.keys(v)) : Object.keys(values);
     for (const name of leaves) assert.match(name, /^[A-Za-z]+$/, `${group}.${name}`);
   }
@@ -69,4 +70,19 @@ test('the colour pairs the sheet draws keep WCAG contrast in every mode', () => 
     const ratio = contrast(resolve(tokens, `color.${fg}`, mode).slice(0, 7), resolve(tokens, `color.${bg}`, mode).slice(0, 7));
     assert.ok(ratio >= min, `${mode}: ${fg} on ${bg} is ${ratio.toFixed(2)}, needs ${min}`);
   }
+});
+
+test('an app accent replaces the accent colours of the sheet and nothing else', () => {
+  assert.deepEqual(flat.accent.nodalia.light, {});
+  for (const mode of MODES) {
+    const names = Object.keys(flat.accent.vortia[mode]);
+    assert.ok(names.includes('accentDefault') && names.includes('selectionBg'), mode);
+    for (const name of names) assert.ok(name in flat.color[mode], name);
+  }
+  const base = render(source, flat, 'dark', 'regular');
+  const vortia = render(source, flat, 'dark', 'regular', 'vortia');
+  assert.notEqual(vortia, base);
+  assert.ok(vortia.includes(flat.accent.vortia.dark.accentDefault) && !vortia.includes(flat.color.dark.accentDefault));
+  assert.ok(vortia.includes(flat.color.dark.surfacePanel));
+  assert.throws(() => render(source, flat, 'dark', 'regular', 'nope'), /unknown accent/);
 });

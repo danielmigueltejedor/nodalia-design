@@ -1,0 +1,20 @@
+{
+  "$description": "One key colour per app: the colour of its icon. NDL builds each accent ramp from it. `nodalia` is the default accent, defined in primitive.tokens.json.",
+  "nodalix": "#0A93B8",
+  "vortia": "#0B55DB",
+  "brujula": "#0C9A58",
+  "vinilo": "#5A27D6",
+  "buzon": "#D4241B",
+  "letra": "#1C86D2",
+  "celdas": "#1D6B3B",
+  "lamina": "#7C1F41",
+  "papel": "#68778F",
+  "pliego": "#3340D0",
+  "pluma": "#EE5A14",
+  "lienzo": "#EE3B6B",
+  "luz": "#F59300",
+  "toma": "#C2188F",
+  "pulso": "#6FB312",
+  "forja": "#96501F",
+  "torno": "#8C7419"
+}

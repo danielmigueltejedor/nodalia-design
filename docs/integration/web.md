@@ -14,6 +14,14 @@ Los paquetes no están publicados en un registro todavía. Mientras tanto, `npm 
 
 o, con un bundler, `import '@nodalia/web/nodalia.css'`. Un único fichero contiene los tokens (`@layer ndl.tokens`) y los componentes (`@layer ndl.components`). Tus estilos, sin capa o en una capa posterior, ganan sin `!important`.
 
+## Acento de la app
+
+```html
+<html data-accent="vortia">
+```
+
+Cambia la rampa de acento y, con ella, botón primario, selección, foco y enlaces. Sin el atributo se usa el cian por defecto. Los nombres están en [tokens](../tokens.md#acento-por-app).
+
 ## Marcado
 
 ```html

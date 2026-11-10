@@ -54,3 +54,46 @@ fn reduced_motion_collapses_durations() {
     assert_eq!(motion::STATE.seconds(true), 0.0);
     assert!((motion::STATE.seconds(false) - duration::NORMAL as f32 / 1000.0).abs() < 1e-6);
 }
+
+#[test]
+fn every_app_accent_keeps_the_contrast_of_the_default_one() {
+    use nodalia_theme::Accent;
+    assert_eq!(Accent::default(), Accent::Nodalia);
+    assert_eq!(
+        Mode::Dark.palette_with(Accent::Nodalia),
+        *Mode::Dark.palette()
+    );
+    for accent in Accent::ALL {
+        for mode in Mode::ALL {
+            let p = mode.palette_with(accent);
+            let text = if mode.is_high_contrast() { 7.0 } else { 4.5 };
+            for (name, fg, bg, minimum) in [
+                (
+                    "on-accent on accent",
+                    p.text_on_accent,
+                    p.accent_default,
+                    text,
+                ),
+                ("on-accent on hover", p.text_on_accent, p.accent_hover, text),
+                ("accent text on panel", p.accent_text, p.surface_panel, text),
+                (
+                    "accent text on subtle",
+                    p.accent_text,
+                    p.accent_subtle,
+                    text,
+                ),
+                ("text on selection", p.text_primary, p.selection_bg, text),
+                ("link on window", p.text_link, p.surface_window, text),
+                ("focus on panel", p.border_focus, p.surface_panel, 3.0),
+            ] {
+                let ratio = contrast(fg, bg);
+                assert!(
+                    ratio >= minimum,
+                    "{} {}: {name} is {ratio:.2}, needs {minimum}",
+                    accent.name(),
+                    mode.name()
+                );
+            }
+        }
+    }
+}
