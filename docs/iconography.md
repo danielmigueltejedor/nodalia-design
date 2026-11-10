@@ -1,10 +1,27 @@
 # Iconografía
 
-**Estado: 55 iconos funcionales incluidos en `@nodalia/icons`.** Son dibujos originales de este proyecto (MIT). No se incluyen fuentes ni imágenes de terceros.
+**Estado: 247 iconos funcionales incluidos en `@nodalia/icons`.** Son dibujos originales de este proyecto (MIT). No se incluyen fuentes ni imágenes de terceros.
 
 ## El conjunto
 
-`@nodalia/icons` cubre edición, archivos, ejecución, vista, croquis, simulación y resultados. Nació en Vortia 0.5.0; faltan los iconos propios de otras apps (texto, capas, medios, correo), que se añaden aquí cuando una app los necesite, no en la app.
+`@nodalia/icons` está pensado para que cualquier app de Nodalia encuentre lo que necesita sin dibujar iconos propios:
+
+| Grupo | Para qué |
+| --- | --- |
+| `general` | Navegación, estados, archivos, ajustes, cuenta, sistema |
+| `edit`, `files`, `run`, `view` | Acciones comunes de edición, archivo, ejecución y vista |
+| `text` | Formato de texto, párrafo, tablas, comentarios (Letra, Pliego) |
+| `data` | Hojas de cálculo y datos (Celdas) |
+| `slides` | Presentaciones (Lámina) |
+| `design` | Dibujo vectorial e imagen: pluma, pincel, alinear, transformar (Pluma, Lienzo) |
+| `photo` | Revelado: exposición, contraste, temperatura (Luz) |
+| `media` | Reproducción, audio, vídeo y línea de tiempo (Vinilo, Toma, Pulso) |
+| `mail` | Correo (Buzón) |
+| `sketch`, `model` | Croquis y modelado 3D (Forja, Torno, Vortia) |
+| `simulation`, `results` | Simulación y resultados (Vortia) |
+| `document` | PDF y maquetación (Papel, Pliego) |
+
+Los 55 primeros se han usado en Vortia 0.5.0. Los demás están dibujados con las mismas normas y revisados en hoja, pero **ninguna app los ha usado todavía**. Un icono que falte se añade aquí, no en la app.
 
 | Salida | Para qué |
 | --- | --- |
@@ -12,6 +29,7 @@
 | `dist/mono/<nombre>.svg` | En negro: toolkits que tiñen por opacidad (motores de iconos de Qt, texturas en egui) |
 | `dist/sprite.svg` | Todos como `<symbol id="ndl-<nombre>">` para `<use href>` |
 | `dist/icons.json` | Nombres y grupos |
+| `dist/preview.html` | Página con todos los iconos por grupo, en claro y oscuro |
 
 Para añadir o cambiar un icono se edita `packages/icons/src/icons.mjs` y se regenera; un SVG generado no se retoca.
 
@@ -53,6 +71,7 @@ Los tokens nombran `Inter` y `Sora` con respaldo en la pila del sistema, pero **
 
 ## Pendiente
 
-- Iconos para las apps que aún no tienen (texto, capas, medios, correo).
+- Revisar los iconos nuevos en contexto, dentro de cada app.
+- Mostrar los iconos en el catálogo.
 - Pipeline que convierta SVG a recurso GTK (`gresource`), Qt (`qrc`) y web (sprite) sin copiar a mano.
 - Decisión sobre fuente propia.

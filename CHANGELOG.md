@@ -4,6 +4,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 
 ## [Sin publicar]
 
+### Añadido
+- `@nodalia/icons`: 192 iconos nuevos (247 en total) en diez grupos más: general, medios, texto, datos, diapositivas, diseño, foto, correo, modelado y documento. Mismas normas de dibujo. `dist/preview.html` muestra el conjunto completo.
+
 ## [0.1.0-alpha.1]
 
 Primera versión etiquetada: una app puede fijarla y descargar su paquete desde la release.

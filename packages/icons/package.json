@@ -1,7 +1,7 @@
 {
   "name": "@nodalia/icons",
   "version": "0.1.0-alpha.1",
-  "description": "Nodalia Design Language icons: original 24 px stroke icons as SVG files, a sprite and an index.",
+  "description": "Nodalia Design Language icons: original 24 px stroke icons as SVG files, a sprite, an index and a preview page.",
   "license": "MIT",
   "type": "module",
   "files": ["dist", "src"],

@@ -1,12 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ICONS } from '../src/icons.mjs';
-import { SIZE, index, names, sprite, svg } from '../scripts/build.mjs';
+import { SIZE, index, names, preview, sprite, svg } from '../scripts/build.mjs';
 
 const numbers = (text) => [...text.matchAll(/-?\d*\.?\d+/g)].map((m) => Number(m[0]));
 
 test('names are kebab-case, unique and grouped', () => {
-  assert.ok(names().length >= 55);
+  assert.ok(names().length >= 240);
   for (const name of names()) {
     assert.match(name, /^[a-z]+(-[a-z]+)*$/);
     assert.match(ICONS[name].group, /^[a-z]+$/);
@@ -56,4 +56,10 @@ test('the sprite and the index list every icon once', () => {
   assert.deepEqual(ids, names());
   assert.deepEqual(index().icons.map((i) => i.name), names());
   assert.equal(new Set(ids).size, ids.length);
+});
+
+test('the preview page shows every icon and loads nothing from outside', () => {
+  const page = preview();
+  assert.equal((page.match(/<figure>/g) ?? []).length, names().length);
+  assert.ok(!/https?:\/\/(?!www\.w3\.org)/.test(page) && !/<script|<link|<img/.test(page));
 });
