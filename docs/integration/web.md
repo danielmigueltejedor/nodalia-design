@@ -1,10 +1,10 @@
 # Integración web
 
 ```bash
-npm install @nodalia/web@0.1.0-alpha.0   # versión exacta
+npm install @nodalia/web@0.1.0-alpha.1   # versión exacta
 ```
 
-Los paquetes no están publicados en un registro todavía. Mientras tanto, `npm pack` en este repositorio genera los tarballs (los adjunta el flujo de release) y se instalan con `npm install ./nodalia-web-0.1.0-alpha.0.tgz`.
+Los paquetes no están publicados en un registro todavía. Mientras tanto, `npm pack` en este repositorio genera los tarballs (los adjunta el flujo de release) y se instalan con `npm install ./nodalia-web-0.1.0-alpha.1.tgz`.
 
 ## CSS
 

@@ -1,6 +1,6 @@
 {
   "name": "@nodalia/web",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Nodalia Design Language for the web: framework-free CSS components and ARIA behaviours.",
   "license": "MIT",
   "type": "module",
@@ -19,7 +19,7 @@
     "lint": "node scripts/lint.mjs"
   },
   "dependencies": {
-    "@nodalia/tokens": "0.1.0-alpha.0"
+    "@nodalia/tokens": "0.1.0-alpha.1"
   },
   "engines": {
     "node": ">=20"

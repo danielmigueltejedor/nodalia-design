@@ -10,4 +10,4 @@ import { loadTokens, resolve } from '@nodalia/tokens/lib';
 @import '@nodalia/tokens/css'; /* variables --ndl-*, modos, densidades, movimiento reducido */
 ```
 
-Ver [docs/tokens.md](../../docs/tokens.md). Versión `0.1.0-alpha.0` (pre-release: la API puede cambiar).
+Ver [docs/tokens.md](../../docs/tokens.md). Versión `0.1.0-alpha.1` (pre-release: la API puede cambiar).
