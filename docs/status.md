@@ -13,14 +13,16 @@ Versión: `0.1.0-alpha.0`. Este documento es la fuente de verdad sobre qué est�
 | Salida CSS | Operativo | Matriz de 12 combinaciones de cascada en Chromium |
 | Componentes web (`@nodalia/web`) | Operativo en Chromium | 53 tests de navegador, 16 ejecuciones de axe-core sin violaciones, teclado |
 | Catálogo y 3 demostraciones | Operativo | Tests de navegador (humo, interacción y axe) |
+| Crate Rust `nodalia-theme` (`@nodalia/egui`) | Compila y pasa sus tests con egui 0.37 | 6 tests del generador (incluye que `tokens.rs` coincide con los tokens); 12 tests Rust: contraste de los pares que dibuja egui, métricas por densidad, movimiento reducido, aplicación a un `Context` |
 | Compilación reproducible | Operativo | `npm run check:repro`: dos compilaciones limpias, SHA-256 idéntico en 19 ficheros |
 | Linter de CSS (sin literales de color ni de tamaño, sin variables desconocidas) | Operativo | Tests unitarios del linter y ejecución sobre el CSS real |
 | Presupuesto de tamaño | Operativo | CSS y comportamientos comprobados en gzip |
 
-Totales en la última ejecución completa: 38 tests unitarios y 53 de navegador, todos correctos.
+Totales en la última ejecución completa: 44 tests unitarios, 12 tests Rust y 53 de navegador, todos correctos.
 
 ## Qué NO está verificado
 
+- **egui en una app real.** El estilo se construye y se comprueba por valores, pero nadie ha revisado visualmente una app con él. La primera integración (Vortia en Rust) dirá qué hay que ajustar.
 - **GTK4 / libadwaita.** `@nodalia/gtk` genera hojas con `@define-color` y solo nombres de color públicos de libadwaita. Se prueba que el contenido es el esperado, que solo se usan nombres documentados y que los pares críticos cumplen contraste. **No se ha cargado en un runtime GTK real** (no había libadwaita en el entorno de desarrollo). Hay que comprobarlo con una app de verdad antes de darlo por bueno.
 - **Qt Quick.** `NodaliaTheme.qml` se genera y se prueba estructuralmente (paletas, formato `#AARRGGBB`, curvas de easing). **No se ha ejecutado con Qt.**
 - **Otros navegadores.** Solo se ha probado Chromium. Firefox y WebKit están sin probar.
@@ -30,7 +32,7 @@ Totales en la última ejecución completa: 38 tests unitarios y 53 de navegador,
 
 ## Limitaciones conocidas
 
-- Las apps del ecosistema son mayoritariamente **egui (Rust)**; Vortia y Lienzo usan **Qt 6 Widgets**, para los que el adaptador QML no sirve directamente. Ver [integración con otros toolkits](integration/other.md).
+- El adaptador de egui solo aporta estilo, no componentes. Vortia usa hoy **Qt 6 Widgets** y está migrando a egui; mientras tanto no tiene adaptador. Ver [egui](integration/egui.md) y [otros toolkits](integration/other.md).
 - No hay fuentes ni iconos incluidos (los tokens nombran Inter y Sora, que caen al sistema si no están instaladas). Ver [iconografía](iconography.md).
 - Componentes no implementados: combobox con autocompletado, submenús, tablas ordenables, gestor de notificaciones, acoplamiento de paneles por arrastre. Ver [componentes](components.md).
 - Capas, árbol de operaciones e historial aparecen como **composiciones en las demostraciones**, no como componentes empaquetados.
@@ -39,8 +41,8 @@ Totales en la última ejecución completa: 38 tests unitarios y 53 de navegador,
 
 ## Pendiente, por prioridad
 
-1. **Generador para Rust/egui** (constantes de color, métricas y `egui::Style`): es la tecnología de 11 de las apps.
-2. **Generador para Qt Widgets** (`QPalette` + hoja QSS) para Vortia y Lienzo.
+1. Integrar `nodalia-theme` en la primera app egui y revisar el resultado visualmente.
+2. Generador para Qt Widgets (`QPalette` + hoja QSS), solo si alguna app sigue en Qt Widgets.
 3. Verificar GTK y QML en apps reales y corregir lo que aparezca.
 4. Integrar NDL en la primera app (ver [migración](migration.md)) y recoger fricciones.
 5. Política de iconos: elegir el origen de los iconos propios y su licencia (ver [iconografía](iconography.md)).

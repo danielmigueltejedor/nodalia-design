@@ -32,6 +32,13 @@ jobs:
         run: npm test
       - name: Builds are reproducible
         run: npm run check:repro
+      - name: Rust crate nodalia-theme (format, lints, tests with and without egui)
+        working-directory: packages/egui/crate
+        run: |
+          cargo fmt --check
+          cargo clippy --all-targets --features egui -- -D warnings
+          cargo test
+          cargo test --features egui
       - name: Install Chromium for browser tests
         run: npx playwright-core install --with-deps chromium
       - name: Browser tests (mode cascade, accessibility with axe, keyboard behaviour, demos)

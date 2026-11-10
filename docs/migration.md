@@ -11,7 +11,7 @@ NDL está pensado para adoptarse por capas, sin reescribir la interfaz de golpe 
 
 ## Pasos recomendados
 
-1. **Elige la integración** según la tecnología de la app: [web](integration/web.md), [GTK](integration/gtk.md), [QML](integration/qml.md) u [otros](integration/other.md).
+1. **Elige la integración** según la tecnología de la app: [web](integration/web.md), [GTK](integration/gtk.md), [QML](integration/qml.md), [egui](integration/egui.md) u [otros](integration/other.md).
 2. **Cuadro de equivalencias.** Lista los colores, tamaños y radios que la app usa hoy y asígnales un token semántico. Lo que no encaje señala un token que falta o un valor propio que quizá no deba existir.
 3. **Sustituye valores, no estructura.** Primero los colores y la tipografía; después espaciado y radios; al final los componentes.
 4. **Apariencia.** Conecta tema, contraste, densidad y movimiento a las preferencias del sistema (y a las de la app si las tiene).
@@ -22,7 +22,7 @@ NDL está pensado para adoptarse por capas, sin reescribir la interfaz de golpe 
 
 1. Una app con GTK/libadwaita (por ejemplo, Brújula o Vinilo): la integración es solo cargar una hoja de estilos, así que da feedback rápido sobre el adaptador GTK, que es el menos verificado.
 2. Una app web (Nodalia Web), que valida el paquete `@nodalia/web` en producción.
-3. Las apps egui y Qt Widgets, cuando existan sus generadores (ver [estado](status.md)).
+3. Las apps egui, con el crate `nodalia-theme` ([integración](integration/egui.md)).
 
 La elección de la «primera app» es de Daniel y del equipo; esto es solo una recomendación basada en el riesgo.
 
