@@ -93,6 +93,7 @@ mod imp {
         pub dark: Cell<bool>,
         pub high_contrast: Cell<bool>,
         pub installed: Cell<bool>,
+        pub refreshing: Cell<bool>,
         pub mode: RefCell<gtk::CssProvider>,
         pub metrics: RefCell<gtk::CssProvider>,
         pub widgets: RefCell<gtk::CssProvider>,
@@ -198,6 +199,11 @@ impl StyleManager {
     fn refresh(&self) {
         use gtk::subclass::prelude::ObjectSubclassIsExt;
         let imp = self.imp();
+        // GTK 4.20+ maps the deprecated prefer-dark setter onto gtk-interface-color-scheme, whose
+        // notify calls back in here: without this guard that is a loop at 100% CPU on startup.
+        if imp.refreshing.replace(true) {
+            return;
+        }
         let dark = match imp.scheme.get() {
             ColorScheme::ForceDark => true,
             ColorScheme::ForceLight => false,
@@ -209,11 +215,16 @@ impl StyleManager {
         // overwrite (see the module header).
         if let Some(settings) = gtk::Settings::default() {
             #[allow(deprecated)]
-            settings.set_gtk_application_prefer_dark_theme(dark);
+            let current = settings.is_gtk_application_prefer_dark_theme();
+            if current != dark {
+                #[allow(deprecated)]
+                settings.set_gtk_application_prefer_dark_theme(dark);
+            }
         }
         if let Some(css) = mode_css(mode_name(dark, high_contrast)) {
             imp.mode.borrow().load_from_string(css);
         }
+        imp.refreshing.set(false);
         let dark_changed = imp.dark.replace(dark) != dark;
         let contrast_changed = imp.high_contrast.replace(high_contrast) != high_contrast;
         if dark_changed {
