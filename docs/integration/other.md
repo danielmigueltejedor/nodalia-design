@@ -1,6 +1,6 @@
-# Otros toolkits (Qt Widgets, nativos…)
+# Otros toolkits
 
-La mayoría de las apps de Nodalia usan **egui (Rust)**, que ya tiene adaptador: ver [egui](egui.md). Para el resto de toolkits se pueden consumir los tokens hoy y generar el adaptador después.
+La mayoría de las apps de Nodalia usan **egui (Rust)**, que ya tiene adaptador: ver [egui](egui.md). Qt Widgets también: ver [Qt Widgets](qt-widgets.md). Para el resto de toolkits se pueden consumir los tokens hoy y generar el adaptador después.
 
 ## Opción A: usar los tokens resueltos
 
@@ -11,10 +11,6 @@ import { loadTokens, resolve } from '@nodalia/tokens/lib';
 ```
 
 `packages/qml/scripts/build.mjs`, `packages/gtk/scripts/build.mjs` y `packages/egui/scripts/build.mjs` son ejemplos cortos de generadores completos (menos de 100 líneas cada uno).
-
-## Qt Widgets (pendiente: generador oficial)
-
-Plan: `QPalette` por modo y una hoja QSS mínima para lo que la paleta no cubre.
 
 ## Cómo proponer un adaptador nuevo
 

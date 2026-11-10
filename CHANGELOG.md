@@ -5,6 +5,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 ## [Sin publicar]
 
 ### Añadido
+- `@nodalia/qtwidgets`: tokens aplanados, plantilla de hoja de estilos y doce hojas rellenas para Qt Widgets. Integrado en Vortia 0.5.0; sin probar en Linux ni Windows.
 - `@nodalia/egui`: genera el crate Rust `nodalia-theme` (tokens como constantes; con la *feature* `egui`, `egui::Style` y `Visuals` para los cuatro modos y las tres densidades). Probado contra egui 0.37; sin verificar visualmente en una app.
 
 ## [0.1.0-alpha.0]
