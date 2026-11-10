@@ -1,0 +1,50 @@
+# Estado y pendientes
+
+Versión: `0.1.0-alpha.0`. Este documento es la fuente de verdad sobre qué está hecho. Si algo no aparece como verificado, no lo está.
+
+## Qué funciona y cómo se ha comprobado
+
+| Área | Estado | Comprobación |
+| --- | --- | --- |
+| Tokens DTCG (190) con capas primitivo → semántico → componente | Operativo | `npm run validate`: alias, ciclos, tipos, capas |
+| Modos claro, oscuro, claro alto contraste, oscuro alto contraste | Operativo | Validación WCAG de pares texto/fondo (4,5:1 y 3:1; 7:1 y 4,5:1 en alto contraste) |
+| Densidades compacta / regular / cómoda | Operativo | Tests de navegador: altura de control medida |
+| Movimiento reducido (sistema y forzado) | Operativo | Tests de navegador: duraciones computadas a 0 ms |
+| Salida CSS | Operativo | Matriz de 12 combinaciones de cascada en Chromium |
+| Componentes web (`@nodalia/web`) | Operativo en Chromium | 53 tests de navegador, 16 ejecuciones de axe-core sin violaciones, teclado |
+| Catálogo y 3 demostraciones | Operativo | Tests de navegador (humo, interacción y axe) |
+| Compilación reproducible | Operativo | `npm run check:repro`: dos compilaciones limpias, SHA-256 idéntico en 19 ficheros |
+| Linter de CSS (sin literales de color ni de tamaño, sin variables desconocidas) | Operativo | Tests unitarios del linter y ejecución sobre el CSS real |
+| Presupuesto de tamaño | Operativo | CSS y comportamientos comprobados en gzip |
+
+Totales en la última ejecución completa: 38 tests unitarios y 53 de navegador, todos correctos.
+
+## Qué NO está verificado
+
+- **GTK4 / libadwaita.** `@nodalia/gtk` genera hojas con `@define-color` y solo nombres de color públicos de libadwaita. Se prueba que el contenido es el esperado, que solo se usan nombres documentados y que los pares críticos cumplen contraste. **No se ha cargado en un runtime GTK real** (no había libadwaita en el entorno de desarrollo). Hay que comprobarlo con una app de verdad antes de darlo por bueno.
+- **Qt Quick.** `NodaliaTheme.qml` se genera y se prueba estructuralmente (paletas, formato `#AARRGGBB`, curvas de easing). **No se ha ejecutado con Qt.**
+- **Otros navegadores.** Solo se ha probado Chromium. Firefox y WebKit están sin probar.
+- **Lectores de pantalla reales.** axe-core detecta una parte de los problemas; no sustituye a una prueba manual con Orca, NVDA o VoiceOver.
+- **Regresión visual por píxeles.** No se hace: las fuentes no se incluyen y los sustitutos del sistema difieren entre máquinas, así que las comparaciones darían falsos positivos. Lo que sí se comprueba es estructura, estilos computados, contraste y accesibilidad.
+- **Windows y macOS.** El código es multiplataforma, pero solo se ha ejecutado en Linux.
+
+## Limitaciones conocidas
+
+- Las apps del ecosistema son mayoritariamente **egui (Rust)**; Vortia y Lienzo usan **Qt 6 Widgets**, para los que el adaptador QML no sirve directamente. Ver [integración con otros toolkits](integration/other.md).
+- No hay fuentes ni iconos incluidos (los tokens nombran Inter y Sora, que caen al sistema si no están instaladas). Ver [iconografía](iconography.md).
+- Componentes no implementados: combobox con autocompletado, submenús, tablas ordenables, gestor de notificaciones, acoplamiento de paneles por arrastre. Ver [componentes](components.md).
+- Capas, árbol de operaciones e historial aparecen como **composiciones en las demostraciones**, no como componentes empaquetados.
+- Las acciones de GitHub usan etiquetas de versión mayor (`@v4`), no SHA fijados.
+- No se han publicado paquetes; el flujo de release crea borradores y marca como pre-release cualquier etiqueta con guion.
+
+## Pendiente, por prioridad
+
+1. **Generador para Rust/egui** (constantes de color, métricas y `egui::Style`): es la tecnología de 11 de las apps.
+2. **Generador para Qt Widgets** (`QPalette` + hoja QSS) para Vortia y Lienzo.
+3. Verificar GTK y QML en apps reales y corregir lo que aparezca.
+4. Integrar NDL en la primera app (ver [migración](migration.md)) y recoger fricciones.
+5. Política de iconos: elegir el origen de los iconos propios y su licencia (ver [iconografía](iconography.md)).
+6. Probar en Firefox y WebKit; añadir una pasada manual con lector de pantalla.
+7. Componentes pendientes: combobox, submenús, tablas ordenables, notificaciones, acoplamiento.
+8. Fijar acciones de CI por SHA; crear el proyecto en SonarQube y activar CodeRabbit si se desea.
+9. Publicación de paquetes en un registro (solo con decisión explícita; hoy no hay publicación automática).

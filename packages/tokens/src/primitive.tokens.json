@@ -1,0 +1,141 @@
+{
+  "$description": "Primitive tokens: raw values with no meaning attached. Never consumed directly by components.",
+  "palette": {
+    "$type": "color",
+    "neutral": {
+      "0": { "$value": "#FFFFFF" },
+      "50": { "$value": "#F3F4F8" },
+      "100": { "$value": "#E8EAF0" },
+      "200": { "$value": "#D5D8E1" },
+      "300": { "$value": "#B4B8C6" },
+      "400": { "$value": "#8A90A3" },
+      "500": { "$value": "#636A7E" },
+      "600": { "$value": "#444A5C" },
+      "700": { "$value": "#2E3342" },
+      "800": { "$value": "#1F2330" },
+      "850": { "$value": "#181B25" },
+      "900": { "$value": "#11131B" },
+      "950": { "$value": "#0D0F15" },
+      "1000": { "$value": "#07080C" }
+    },
+    "accent": {
+      "50": { "$value": "#EEFBFB" },
+      "100": { "$value": "#D8F6F7" },
+      "200": { "$value": "#B5EBEE" },
+      "300": { "$value": "#8ADBE0", "$description": "Nodalia brand cyan, as used on the official web." },
+      "400": { "$value": "#5FC4CB" },
+      "500": { "$value": "#2FA6AF" },
+      "600": { "$value": "#12838C" },
+      "700": { "$value": "#0C6870" },
+      "800": { "$value": "#0A4F56" },
+      "900": { "$value": "#083A40" },
+      "950": { "$value": "#052B30" }
+    },
+    "green": {
+      "100": { "$value": "#DDF3E6" },
+      "300": { "$value": "#7ED6A4" },
+      "600": { "$value": "#1B7545" },
+      "700": { "$value": "#145A35" },
+      "900": { "$value": "#0F2E1E" }
+    },
+    "amber": {
+      "100": { "$value": "#FBEFD0" },
+      "300": { "$value": "#F2C14E" },
+      "700": { "$value": "#7A4F00" },
+      "900": { "$value": "#33240A" }
+    },
+    "red": {
+      "100": { "$value": "#FBE0DE" },
+      "300": { "$value": "#FF9A90" },
+      "600": { "$value": "#C0352B" },
+      "700": { "$value": "#A12A22" },
+      "900": { "$value": "#3A1412" }
+    },
+    "blue": {
+      "100": { "$value": "#DEEBFB" },
+      "300": { "$value": "#8DBBF5" },
+      "700": { "$value": "#1F5FA8" },
+      "900": { "$value": "#0F2640" }
+    }
+  },
+  "space": {
+    "$type": "dimension",
+    "none": { "$value": "0px" },
+    "xxs": { "$value": "2px" },
+    "xs": { "$value": "4px" },
+    "sm": { "$value": "8px" },
+    "md": { "$value": "12px" },
+    "lg": { "$value": "16px" },
+    "xl": { "$value": "24px" },
+    "xxl": { "$value": "32px" },
+    "xxxl": { "$value": "48px" }
+  },
+  "radius": {
+    "$type": "dimension",
+    "none": { "$value": "0px" },
+    "sm": { "$value": "4px" },
+    "md": { "$value": "6px" },
+    "lg": { "$value": "10px" },
+    "full": { "$value": "9999px" }
+  },
+  "border-width": {
+    "$type": "dimension",
+    "thin": { "$value": "1px" },
+    "thick": { "$value": "2px" }
+  },
+  "font": {
+    "family": {
+      "$type": "fontFamily",
+      "ui": { "$value": ["Inter", "system-ui", "-apple-system", "Segoe UI Variable Text", "Segoe UI", "Cantarell", "Roboto", "sans-serif"] },
+      "display": { "$value": ["Sora", "Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"] },
+      "mono": { "$value": ["ui-monospace", "JetBrains Mono", "SF Mono", "Cascadia Code", "Menlo", "Consolas", "monospace"] }
+    },
+    "weight": {
+      "$type": "fontWeight",
+      "regular": { "$value": 400 },
+      "medium": { "$value": 500 },
+      "semibold": { "$value": 600 }
+    },
+    "size": {
+      "$type": "dimension",
+      "caption": { "$value": "11px" },
+      "small": { "$value": "12px" },
+      "body": { "$value": "13px" },
+      "large": { "$value": "15px" },
+      "title": { "$value": "18px" },
+      "headline": { "$value": "24px" },
+      "display": { "$value": "32px" }
+    },
+    "line-height": {
+      "$type": "dimension",
+      "caption": { "$value": "16px" },
+      "small": { "$value": "16px" },
+      "body": { "$value": "20px" },
+      "large": { "$value": "22px" },
+      "title": { "$value": "26px" },
+      "headline": { "$value": "32px" },
+      "display": { "$value": "40px" }
+    }
+  },
+  "duration": {
+    "$type": "duration",
+    "instant": { "$value": "0ms" },
+    "fast": { "$value": "100ms" },
+    "normal": { "$value": "160ms" },
+    "slow": { "$value": "240ms" },
+    "slower": { "$value": "360ms" }
+  },
+  "easing": {
+    "$type": "cubicBezier",
+    "standard": { "$value": [0.3, 0, 0.2, 1], "$description": "Moves between two resting states." },
+    "enter": { "$value": [0, 0, 0.2, 1], "$description": "Decelerates into rest. For things that appear." },
+    "exit": { "$value": [0.4, 0, 1, 1], "$description": "Accelerates away. For things that leave." }
+  },
+  "breakpoint": {
+    "$type": "dimension",
+    "$description": "Lower bounds of the width classes. Informational in CSS: media queries cannot read custom properties.",
+    "medium": { "$value": "640px" },
+    "expanded": { "$value": "1024px" },
+    "wide": { "$value": "1440px" }
+  }
+}

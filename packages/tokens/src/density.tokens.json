@@ -1,0 +1,27 @@
+{
+  "$description": "Density sets. Each density defines the same keys; CSS exposes the active one as --ndl-density-*.",
+  "density": {
+    "$type": "dimension",
+    "compact": {
+      "control-height": { "$value": "24px" },
+      "control-padding-x": { "$value": "8px" },
+      "row-height": { "$value": "24px" },
+      "gap": { "$value": "4px" },
+      "panel-padding": { "$value": "8px" }
+    },
+    "regular": {
+      "control-height": { "$value": "32px" },
+      "control-padding-x": { "$value": "12px" },
+      "row-height": { "$value": "32px" },
+      "gap": { "$value": "8px" },
+      "panel-padding": { "$value": "12px" }
+    },
+    "comfortable": {
+      "control-height": { "$value": "40px" },
+      "control-padding-x": { "$value": "16px" },
+      "row-height": { "$value": "40px" },
+      "gap": { "$value": "12px" },
+      "panel-padding": { "$value": "16px" }
+    }
+  }
+}

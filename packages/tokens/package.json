@@ -1,0 +1,21 @@
+{
+  "name": "@nodalia/tokens",
+  "version": "0.1.0-alpha.0",
+  "description": "Nodalia Design Language tokens (DTCG) and the transforms that generate CSS, GTK and QML from them.",
+  "license": "MIT",
+  "type": "module",
+  "files": ["src", "lib", "dist"],
+  "exports": {
+    ".": "./dist/tokens.json",
+    "./css": "./dist/tokens.css",
+    "./resolved": "./dist/resolved.json",
+    "./src/*": "./src/*",
+    "./lib": "./lib/index.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate": "node scripts/validate.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "engines": { "node": ">=20" }
+}

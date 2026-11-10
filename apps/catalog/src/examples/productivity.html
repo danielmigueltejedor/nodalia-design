@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productivity demo · Nodalia Design</title>
+<link rel="stylesheet" href="../nodalia.css"><link rel="stylesheet" href="../catalog.css">
+</head>
+<body class="ndl-app">
+<div class="demo-frame">
+  <div class="demo-frame__bar" role="navigation" aria-label="Demo controls"><a href="../index.html">← Catalog</a><span>Reference demo: productivity. Components only, no real task storage.</span><div id="appearance"></div></div>
+  <div class="ndl-workspace" style="grid-template-areas:'titlebar titlebar titlebar' 'tools main side' 'status status status';grid-template-rows:auto minmax(0,1fr) auto">
+    <header class="ndl-titlebar" data-area="titlebar">
+      <div class="ndl-search" role="search" style="inline-size:var(--ndl-size-sidebar)"><input class="ndl-input" type="search" id="q" aria-label="Search tasks" placeholder="Search tasks"></div>
+      <span class="ndl-titlebar__title">Tasks</span>
+      <button class="ndl-button" data-variant="primary" id="add">New task</button>
+    </header>
+    <nav class="ndl-sidebar" data-area="tools" aria-label="Lists">
+      <a class="ndl-nav-item" href="#" aria-current="page" data-filter="all">All tasks</a>
+      <a class="ndl-nav-item" href="#" data-filter="open">Open</a>
+      <a class="ndl-nav-item" href="#" data-filter="done">Completed</a>
+    </nav>
+    <main data-area="main" style="overflow:auto;padding:var(--ndl-space-lg)" id="main">
+      <h1 class="ndl-visually-hidden">Tasks demo</h1>
+      <div class="ndl-panel ndl-panel--flush">
+        <div class="ndl-panel__header"><span id="list-title">All tasks</span><span class="ndl-badge" id="count">0</span></div>
+        <ul class="ndl-list" id="tasks" aria-label="Tasks"></ul>
+        <div class="ndl-empty" id="empty" hidden><div class="ndl-empty__title">Nothing here</div><div>No tasks match this view.</div></div>
+      </div>
+    </main>
+    <aside data-area="side" aria-label="Task details">
+      <div class="ndl-panel__header">Details</div>
+      <div class="ndl-group__body" id="details">
+        <div class="ndl-field"><label class="ndl-field__label" for="d-title">Title</label><input class="ndl-input" id="d-title" disabled></div>
+        <div class="ndl-field"><label class="ndl-field__label" for="d-prio">Priority</label><select class="ndl-select" id="d-prio" disabled><option>Low</option><option>Normal</option><option>High</option></select></div>
+        <label class="ndl-choice"><input class="ndl-switch" type="checkbox" role="switch" id="d-done" disabled> Completed</label>
+        <button class="ndl-button" data-variant="danger" id="d-del" disabled>Delete task</button>
+      </div>
+    </aside>
+    <footer class="ndl-statusbar" data-area="status"><span id="summary"></span><span class="ndl-statusbar__spacer"></span><div style="inline-size:10em"><div class="ndl-progress" id="prog" role="progressbar" aria-label="Completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div></footer>
+  </div>
+</div>
+<dialog class="ndl-dialog" id="confirm" aria-labelledby="c-t"><form method="dialog"><div class="ndl-dialog__header" id="c-t">Delete this task?</div><div class="ndl-dialog__body">This cannot be undone.</div><div class="ndl-dialog__footer"><button class="ndl-button" value="cancel" autofocus>Cancel</button><button class="ndl-button" data-variant="danger" value="delete">Delete</button></div></form></dialog>
+<div class="ndl-toast-region" id="toasts" role="status" aria-live="polite"></div>
+<script type="module">
+import { initAppearance, APPEARANCE_BAR } from '../shared.mjs';
+document.getElementById('appearance').innerHTML = APPEARANCE_BAR; initAppearance();
+
+let tasks = [
+  { id: 1, title: 'Review design tokens', prio: 'High', done: true },
+  { id: 2, title: 'Write migration notes', prio: 'Normal', done: false },
+  { id: 3, title: 'Check keyboard navigation', prio: 'High', done: false },
+  { id: 4, title: 'Archive old mockups', prio: 'Low', done: false },
+];
+let filter = 'all', query = '', selected = null, next = 5;
+const $ = (id) => document.getElementById(id);
+const list = $('tasks');
+
+function toast(text) {
+  const t = document.createElement('div'); t.className = 'ndl-toast'; t.textContent = text;
+  $('toasts').append(t); setTimeout(() => t.remove(), 3500);
+}
+function render() {
+  const shown = tasks.filter((t) => (filter === 'all' || (filter === 'done') === t.done) && t.title.toLowerCase().includes(query.toLowerCase()));
+  list.replaceChildren(...shown.map((t) => {
+    const li = document.createElement('li');
+    li.className = 'ndl-list__item'; li.dataset.id = t.id;
+    const cb = Object.assign(document.createElement('input'), { type: 'checkbox', className: 'ndl-check', checked: t.done });
+    cb.setAttribute('aria-label', `Complete ${t.title}`);
+    cb.addEventListener('change', () => { t.done = cb.checked; render(); });
+    cb.addEventListener('click', (e) => e.stopPropagation());
+    const label = Object.assign(document.createElement('button'), { className: 'ndl-button ndl-list__grow', textContent: t.title });
+    label.dataset.variant = 'subtle'; label.style.justifyContent = 'flex-start';
+    if (t.id === selected) label.setAttribute('aria-current', 'true');
+    if (t.done) label.style.textDecoration = 'line-through';
+    const badge = Object.assign(document.createElement('span'), { className: 'ndl-badge', textContent: t.prio });
+    if (t.prio === 'High') badge.dataset.tone = 'warning';
+    li.append(cb, label, badge);
+    label.addEventListener('click', () => { selected = t.id; render(); });
+    return li;
+  }));
+  $('empty').hidden = shown.length > 0;
+  const done = tasks.filter((t) => t.done).length;
+  $('count').textContent = shown.length;
+  $('summary').textContent = `${done} of ${tasks.length} completed`;
+  const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+  $('prog').setAttribute('aria-valuenow', pct); $('prog').style.setProperty('--ndl-value', `${pct}%`);
+  const cur = tasks.find((t) => t.id === selected);
+  for (const id of ['d-title', 'd-prio', 'd-done', 'd-del']) $(id).disabled = !cur;
+  $('d-title').value = cur?.title ?? ''; $('d-prio').value = cur?.prio ?? 'Low'; $('d-done').checked = cur?.done ?? false;
+}
+$('q').addEventListener('input', (e) => { query = e.target.value; render(); });
+$('add').addEventListener('click', () => { tasks.push({ id: next, title: `New task ${next}`, prio: 'Normal', done: false }); selected = next++; render(); toast('Task added'); $('d-title').focus(); });
+$('d-title').addEventListener('input', (e) => { const t = tasks.find((x) => x.id === selected); if (t) { t.title = e.target.value; render(); $('d-title').focus(); } });
+$('d-prio').addEventListener('change', (e) => { tasks.find((x) => x.id === selected).prio = e.target.value; render(); });
+$('d-done').addEventListener('change', (e) => { tasks.find((x) => x.id === selected).done = e.target.checked; render(); });
+$('d-del').addEventListener('click', () => $('confirm').showModal());
+$('confirm').addEventListener('close', () => { if ($('confirm').returnValue === 'delete') { tasks = tasks.filter((t) => t.id !== selected); selected = null; render(); toast('Task deleted'); } });
+for (const a of document.querySelectorAll('[data-filter]')) a.addEventListener('click', (e) => {
+  e.preventDefault(); filter = a.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach((x) => x.toggleAttribute('aria-current', x === a));
+  $('list-title').textContent = a.textContent; render();
+});
+render();
+</script>
+</body></html>

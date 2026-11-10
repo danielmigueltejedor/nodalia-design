@@ -1,0 +1,27 @@
+{
+  "name": "@nodalia/web",
+  "version": "0.1.0-alpha.0",
+  "description": "Nodalia Design Language for the web: framework-free CSS components and ARIA behaviours.",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "exports": {
+    "./nodalia.css": "./dist/nodalia.css",
+    "./components.css": "./src/components.css",
+    "./behaviors": "./dist/behaviors.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test \"test/*.test.mjs\"",
+    "lint": "node scripts/lint.mjs"
+  },
+  "dependencies": {
+    "@nodalia/tokens": "0.1.0-alpha.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
