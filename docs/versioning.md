@@ -2,7 +2,7 @@
 
 ## Esquema
 
-[SemVer 2.0](https://semver.org/lang/es/). Los cuatro paquetes publicables (`tokens`, `web`, `gtk`, `qml`) comparten número de versión en esta etapa para evitar combinaciones ambiguas; el flujo de release comprueba que todos coinciden con la etiqueta.
+[SemVer 2.0](https://semver.org/lang/es/). Los cuatro paquetes publicables (`tokens`, `web`, `gtk`, `qml`) y el crate `nodalia-theme` comparten número de versión en esta etapa para evitar combinaciones ambiguas; el flujo de release comprueba que todos coinciden con la etiqueta.
 
 - `0.1.0-alpha.N`: pre-release. Cualquier cosa puede cambiar.
 - `0.x.0` (cuando haya beta/estable en `0.x`): un cambio de la `x` puede romper; el `CHANGELOG` lo dice.

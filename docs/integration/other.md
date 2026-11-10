@@ -1,6 +1,6 @@
-# Otros toolkits (egui, Qt Widgets, nativos…)
+# Otros toolkits (Qt Widgets, nativos…)
 
-La mayoría de las apps de Nodalia usan **egui (Rust)**; Vortia y Lienzo, **Qt 6 Widgets**. Ninguna tiene aún adaptador. Se pueden consumir los tokens hoy y generar el adaptador después.
+La mayoría de las apps de Nodalia usan **egui (Rust)**, que ya tiene adaptador: ver [egui](egui.md). Para el resto de toolkits se pueden consumir los tokens hoy y generar el adaptador después.
 
 ## Opción A: usar los tokens resueltos
 
@@ -10,11 +10,7 @@ La mayoría de las apps de Nodalia usan **egui (Rust)**; Vortia y Lienzo, **Qt 6
 import { loadTokens, resolve } from '@nodalia/tokens/lib';
 ```
 
-`packages/qml/scripts/build.mjs` y `packages/gtk/scripts/build.mjs` son ejemplos cortos de generadores completos (menos de 100 líneas cada uno).
-
-## egui (pendiente: generador oficial)
-
-Plan: un generador que produzca un módulo Rust con `const` de color por modo y una función que construya `egui::Visuals` y `egui::Style`. Hoy puede hacerse a mano desde `resolved.json`, con la advertencia de que habrá que migrar cuando salga el generador.
+`packages/qml/scripts/build.mjs`, `packages/gtk/scripts/build.mjs` y `packages/egui/scripts/build.mjs` son ejemplos cortos de generadores completos (menos de 100 líneas cada uno).
 
 ## Qt Widgets (pendiente: generador oficial)
 

@@ -12,6 +12,7 @@ Lenguaje de diseño de las aplicaciones de Nodalia: una especificación única, 
 | [`@nodalia/web`](packages/web) | Componentes CSS sin framework + comportamientos ARIA (pestañas, árbol, barra de herramientas, separador, menú contextual, tooltip) | Operativo |
 | [`@nodalia/gtk`](packages/gtk) | Hojas de estilo GTK4 / libadwaita (colores con nombre públicos) generadas desde los tokens | Generado y probado estructuralmente; **sin verificar en un runtime GTK real** |
 | [`@nodalia/qml`](packages/qml) | Singleton `NodaliaTheme` para Qt Quick generado desde los tokens | Generado y probado estructuralmente; **sin verificar en Qt** |
+| [`@nodalia/egui`](packages/egui) | Crate Rust `nodalia-theme`: tokens como constantes y un `egui::Style` generado desde ellos | Compilado y probado contra egui 0.37; **sin verificar visualmente en una app real** |
 | [`@nodalia/catalog`](apps/catalog) | Catálogo visual interactivo y tres demostraciones de referencia (productividad, editor creativo, ingeniería) | Operativo (no se publica) |
 
 ## Probarlo
@@ -32,6 +33,7 @@ El catálogo permite cambiar tema (sistema, claro, oscuro), contraste, densidad,
 npm run validate      # tokens: alias, capas, contraste WCAG; CSS: sin valores arbitrarios
 npm test              # compila y ejecuta los tests unitarios de todos los paquetes
 npm run check:repro   # dos compilaciones limpias deben producir ficheros idénticos
+npm run test:rust     # crate nodalia-theme, con y sin egui (necesita Rust)
 npm run test:browser  # Chromium: cascada de modos, axe-core, teclado, demostraciones
 npm run ci            # todo lo anterior
 ```
@@ -43,7 +45,8 @@ Para los tests de navegador hace falta Chromium (`npx playwright-core install ch
 - **Web:** `@import '@nodalia/web/nodalia.css'` y `class="ndl-button"`. Ver [docs/integration/web.md](docs/integration/web.md).
 - **GTK4 / libadwaita:** cargar `nodalia-light.css` o `nodalia-dark.css` según `AdwStyleManager`. Ver [docs/integration/gtk.md](docs/integration/gtk.md).
 - **Qt Quick:** importar el módulo `Nodalia` y enlazar `NodaliaTheme.mode`. Ver [docs/integration/qml.md](docs/integration/qml.md).
-- **Otros (egui, Qt Widgets…):** [docs/integration/other.md](docs/integration/other.md).
+- **Rust / egui:** crate `nodalia-theme` y `for_egui::apply_system(&ctx, …)`. Ver [docs/integration/egui.md](docs/integration/egui.md).
+- **Otros (Qt Widgets…):** [docs/integration/other.md](docs/integration/other.md).
 - **Adoptarlo en una app existente, sin migrar de golpe:** [docs/migration.md](docs/migration.md).
 
 ## Documentación

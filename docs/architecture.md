@@ -7,6 +7,7 @@ tokens (DTCG)  ──►  @nodalia/tokens  ──►  CSS de variables
                          │
                          ├──►  @nodalia/gtk   (hojas libadwaita)
                          ├──►  @nodalia/qml   (singleton Qt Quick)
+                         ├──►  @nodalia/egui  (crate Rust nodalia-theme)
                          └──►  @nodalia/web   (componentes + comportamientos)
                                        │
                                        └──►  @nodalia/catalog (catálogo y demos, no se publica)
@@ -19,10 +20,11 @@ tokens (DTCG)  ──►  @nodalia/tokens  ──►  CSS de variables
 | `@nodalia/tokens` | `src/*.tokens.json` (DTCG) | `dist/tokens.css`, `tokens.json`, `resolved.json` |
 | `@nodalia/gtk` | `mapping.json` + tokens resueltos | `dist/nodalia-{light,dark,light-hc,dark-hc}.css` |
 | `@nodalia/qml` | tokens resueltos | `dist/Nodalia/NodaliaTheme.qml` + `qmldir` |
+| `@nodalia/egui` | tokens resueltos | `crate/src/tokens.rs` (guardado en el repositorio) dentro del crate `nodalia-theme` |
 | `@nodalia/web` | `src/components.css`, `src/behaviors.mjs` | `dist/nodalia.css` (con capas), `dist/behaviors.mjs` |
 | `@nodalia/catalog` | `src/` | sitio estático en `dist/` |
 
-Dependencias: `gtk`, `qml` y `web` dependen solo de `tokens`. `tokens` no depende de nada. No hay dependencias de ejecución externas; las de desarrollo son `playwright-core` y `axe-core`, con versión exacta.
+Dependencias: `gtk`, `qml`, `egui` y `web` dependen solo de `tokens`. `tokens` no depende de nada. No hay dependencias de ejecución externas; las de desarrollo son `playwright-core` y `axe-core`, con versión exacta.
 
 ## Flujo de generación
 
