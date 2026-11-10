@@ -9,8 +9,7 @@
 /* ---------------------------------------------------------------- base */
 
 window,
-
-.background {
+window.background {
   background-color: var(--ndl-color-surface-window);
   color: var(--ndl-color-text-primary);
 }
@@ -422,6 +421,12 @@ scale.vertical > trough {
   min-height: 0;
 }
 
+scale > trough > highlight,
+scale > trough > fill {
+  /* GTK's built-in theme gives these a -1px margin, which measures as a negative size. */
+  margin: 0;
+}
+
 scale > trough > highlight {
   border-radius: var(--ndl-radius-full);
   border: none;
@@ -608,6 +613,14 @@ actionbar > revealer > box {
 
 /* ---------------------------------------------------------------- popovers, menus, tooltips */
 
+/* GTK gives popovers and tooltips the .background class too; their surface must stay clear so
+ * only the rounded contents, and their shadow, are drawn. */
+popover.background {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
 popover > contents {
   padding: var(--ndl-space-xs);
   border-radius: var(--ndl-component-panel-radius);
@@ -642,7 +655,9 @@ popover.menu separator {
   margin: var(--ndl-space-xs) 0;
 }
 
-tooltip {
+tooltip,
+tooltip.background {
+  border: none;
   padding: var(--ndl-space-xs) var(--ndl-space-sm);
   border-radius: var(--ndl-radius-md);
   background-color: var(--ndl-color-surface-inverse);

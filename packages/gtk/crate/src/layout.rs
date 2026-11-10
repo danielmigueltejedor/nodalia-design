@@ -276,11 +276,13 @@ impl OverlaySplitView {
 
     pub fn set_sidebar(&self, sidebar: Option<&impl IsA<gtk::Widget>>) {
         let imp = self.imp();
-        reparent(
-            &imp.sidebar,
-            &imp.sidebar_box,
-            sidebar.map(|s| s.as_ref().clone()),
-        );
+        let sidebar = sidebar.map(|s| s.as_ref().clone());
+        // The pane is as tall as the window; a child left at its natural height
+        // collapses a ScrolledWindow inside it to nothing.
+        if let Some(s) = &sidebar {
+            s.set_vexpand(true);
+        }
+        reparent(&imp.sidebar, &imp.sidebar_box, sidebar);
     }
 
     pub fn set_content(&self, content: Option<&impl IsA<gtk::Widget>>) {
