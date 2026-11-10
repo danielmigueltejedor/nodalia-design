@@ -4,7 +4,7 @@
 //   dist/nodalia-<mode>-<density>.qss   the template rendered, for apps without a template step
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { MODES, SOURCE_DIR, loadTokens, resolve, parseHex, px, ms } from '@nodalia/tokens/lib';
+import { MODES, SOURCE_DIR, accentSets, accentOverrides, loadTokens, resolve, parseHex, px, ms } from '@nodalia/tokens/lib';
 
 const tokens = loadTokens(SOURCE_DIR);
 const all = [...tokens.values()];
@@ -31,6 +31,9 @@ export function flatTokens() {
     densities: DENSITIES,
     // Looked up under the active mode: color.<name>
     color: Object.fromEntries(MODES.map((m) => [m, Object.fromEntries(colors.map((t) => [camel(t.path.slice('color.'.length)), qssColor(resolve(tokens, t.path, m))]))])),
+    // Per app and mode, the colours that replace those of `color` (empty for the default accent).
+    accent: Object.fromEntries([...accentOverrides(accentSets(tokens, SOURCE_DIR), MODES, resolve)].map(([name, modes]) => [name,
+      Object.fromEntries(Object.entries(modes).map(([m, values]) => [m, Object.fromEntries(Object.entries(values).map(([path, hex]) => [camel(path.slice('color.'.length)), qssColor(hex)]))]))])),
     // Looked up under the active density: density.<name>
     density: Object.fromEntries(DENSITIES.map((d) => [d, dims(`density.${d}`)])),
     space: dims('space'),
@@ -47,19 +50,20 @@ export function flatTokens() {
 
 const PLACEHOLDER = /\{\{([A-Za-z]+)\.([A-Za-z]+)\}\}/g;
 
-/** Value of `group.name` for a mode and density, or undefined. */
-export function tokenValue(flat, mode, density, groupName, name) {
+/** Value of `group.name` for a mode, density and app accent, or undefined. */
+export function tokenValue(flat, mode, density, groupName, name, accent = 'nodalia') {
   let source = flat[groupName];
-  if (groupName === 'color') source = source?.[mode];
+  if (groupName === 'color') source = { ...source?.[mode], ...flat.accent?.[accent]?.[mode] };
   if (groupName === 'density') source = source?.[density];
   const value = source?.[name];
   return value === undefined || typeof value === 'object' ? undefined : String(value);
 }
 
 /** Fills the template. Unknown references throw: a style sheet with a hole in it must not ship. */
-export function render(template, flat, mode, density) {
+export function render(template, flat, mode, density, accent = 'nodalia') {
+  if (!(accent in flat.accent)) throw new Error(`unknown accent "${accent}"`);
   return template.replace(PLACEHOLDER, (whole, groupName, name) => {
-    const value = tokenValue(flat, mode, density, groupName, name);
+    const value = tokenValue(flat, mode, density, groupName, name, accent);
     if (value === undefined) throw new Error(`unknown token ${groupName}.${name} in the style-sheet template`);
     return value;
   });

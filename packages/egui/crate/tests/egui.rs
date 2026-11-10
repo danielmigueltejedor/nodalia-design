@@ -130,3 +130,33 @@ fn apply_installs_the_style_in_a_context() {
     ctx.style_mut_of(egui::Theme::Dark, |s| dark = Some(s.visuals.panel_fill));
     assert_eq!(dark, Some(color(Mode::DarkHc.palette().surface_panel)));
 }
+
+#[test]
+fn an_app_accent_changes_the_accent_and_nothing_else() {
+    use nodalia_theme::Accent;
+    for mode in Mode::ALL {
+        let base = for_egui::visuals(mode);
+        let vortia = for_egui::visuals_with(mode, Accent::Vortia);
+        assert_ne!(
+            vortia.selection.bg_fill,
+            base.selection.bg_fill,
+            "{}",
+            mode.name()
+        );
+        assert_ne!(vortia.hyperlink_color, base.hyperlink_color);
+        assert_eq!(vortia.panel_fill, base.panel_fill);
+        assert_eq!(
+            vortia.widgets.inactive.bg_fill,
+            base.widgets.inactive.bg_fill
+        );
+        assert_eq!(vortia.error_fg_color, base.error_fg_color);
+    }
+    let style = for_egui::style(&Appearance {
+        accent: Accent::Luz,
+        ..Appearance::default()
+    });
+    assert_eq!(
+        style.visuals.selection.bg_fill,
+        color(Mode::Light.palette_with(Accent::Luz).selection_bg)
+    );
+}

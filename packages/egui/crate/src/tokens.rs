@@ -288,6 +288,750 @@ pub const DARK_HC: Palette = Palette {
     elevation_overlay: Shadow { color: Rgba::new(0, 0, 0, 166), offset_x: 0.0, offset_y: 8.0, blur: 24.0, spread: 0.0 },
 };
 
+/// The accent of an app. `Nodalia` is the default; the others take the colour of the app icon.
+/// Every accent has the luminance of the default one step by step, so contrast is the same.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum Accent {
+    #[default]
+    Nodalia,
+    Nodalix,
+    Vortia,
+    Brujula,
+    Vinilo,
+    Buzon,
+    Letra,
+    Celdas,
+    Lamina,
+    Papel,
+    Pliego,
+    Pluma,
+    Lienzo,
+    Luz,
+    Toma,
+    Pulso,
+    Forja,
+    Torno,
+}
+
+impl Accent {
+    pub const ALL: [Accent; 18] = [Accent::Nodalia, Accent::Nodalix, Accent::Vortia, Accent::Brujula, Accent::Vinilo, Accent::Buzon, Accent::Letra, Accent::Celdas, Accent::Lamina, Accent::Papel, Accent::Pliego, Accent::Pluma, Accent::Lienzo, Accent::Luz, Accent::Toma, Accent::Pulso, Accent::Forja, Accent::Torno];
+
+    /// The name used by the other NDL adapters (`data-accent` on the web).
+    pub const fn name(self) -> &'static str {
+        match self {
+            Accent::Nodalia => "nodalia",
+            Accent::Nodalix => "nodalix",
+            Accent::Vortia => "vortia",
+            Accent::Brujula => "brujula",
+            Accent::Vinilo => "vinilo",
+            Accent::Buzon => "buzon",
+            Accent::Letra => "letra",
+            Accent::Celdas => "celdas",
+            Accent::Lamina => "lamina",
+            Accent::Papel => "papel",
+            Accent::Pliego => "pliego",
+            Accent::Pluma => "pluma",
+            Accent::Lienzo => "lienzo",
+            Accent::Luz => "luz",
+            Accent::Toma => "toma",
+            Accent::Pulso => "pulso",
+            Accent::Forja => "forja",
+            Accent::Torno => "torno",
+        }
+    }
+}
+
+impl Mode {
+    /// The palette of this mode with the accent of an app.
+    pub const fn palette_with(self, accent: Accent) -> Palette {
+        let mut p = *self.palette();
+        match (accent, self) {
+            (Accent::Nodalia, _) => {}
+            (Accent::Nodalix, Mode::Light) => {
+                p.text_link = Rgba::new(5, 102, 129, 255);
+                p.border_focus = Rgba::new(8, 128, 161, 255);
+                p.accent_default = Rgba::new(8, 128, 161, 255);
+                p.accent_hover = Rgba::new(5, 102, 129, 255);
+                p.accent_pressed = Rgba::new(6, 77, 98, 255);
+                p.accent_subtle = Rgba::new(230, 243, 248, 255);
+                p.accent_text = Rgba::new(5, 102, 129, 255);
+                p.selection_bg = Rgba::new(230, 243, 248, 255);
+            }
+            (Accent::Nodalix, Mode::Dark) => {
+                p.text_link = Rgba::new(163, 214, 233, 255);
+                p.border_focus = Rgba::new(163, 214, 233, 255);
+                p.accent_default = Rgba::new(163, 214, 233, 255);
+                p.accent_hover = Rgba::new(206, 230, 239, 255);
+                p.accent_pressed = Rgba::new(92, 194, 230, 255);
+                p.accent_subtle = Rgba::new(6, 57, 73, 255);
+                p.accent_text = Rgba::new(163, 214, 233, 255);
+                p.selection_bg = Rgba::new(6, 57, 73, 255);
+            }
+            (Accent::Nodalix, Mode::LightHc) => {
+                p.text_link = Rgba::new(6, 77, 98, 255);
+                p.border_focus = Rgba::new(6, 77, 98, 255);
+                p.accent_default = Rgba::new(6, 77, 98, 255);
+                p.accent_hover = Rgba::new(6, 57, 73, 255);
+                p.accent_pressed = Rgba::new(4, 42, 55, 255);
+                p.accent_subtle = Rgba::new(230, 243, 248, 255);
+                p.accent_text = Rgba::new(6, 77, 98, 255);
+                p.selection_bg = Rgba::new(230, 243, 248, 255);
+            }
+            (Accent::Nodalix, Mode::DarkHc) => {
+                p.text_link = Rgba::new(206, 230, 239, 255);
+                p.border_focus = Rgba::new(206, 230, 239, 255);
+                p.accent_default = Rgba::new(206, 230, 239, 255);
+                p.accent_hover = Rgba::new(230, 243, 248, 255);
+                p.accent_pressed = Rgba::new(163, 214, 233, 255);
+                p.accent_subtle = Rgba::new(6, 57, 73, 255);
+                p.accent_text = Rgba::new(206, 230, 239, 255);
+                p.selection_bg = Rgba::new(6, 77, 98, 255);
+            }
+            (Accent::Vortia, Mode::Light) => {
+                p.text_link = Rgba::new(10, 83, 214, 255);
+                p.border_focus = Rgba::new(36, 109, 249, 255);
+                p.accent_default = Rgba::new(36, 109, 249, 255);
+                p.accent_hover = Rgba::new(10, 83, 214, 255);
+                p.accent_pressed = Rgba::new(8, 63, 165, 255);
+                p.accent_subtle = Rgba::new(237, 241, 248, 255);
+                p.accent_text = Rgba::new(10, 83, 214, 255);
+                p.selection_bg = Rgba::new(237, 241, 248, 255);
+            }
+            (Accent::Vortia, Mode::Dark) => {
+                p.text_link = Rgba::new(191, 207, 233, 255);
+                p.border_focus = Rgba::new(191, 207, 233, 255);
+                p.accent_default = Rgba::new(191, 207, 233, 255);
+                p.accent_hover = Rgba::new(218, 226, 239, 255);
+                p.accent_pressed = Rgba::new(153, 182, 235, 255);
+                p.accent_subtle = Rgba::new(6, 46, 123, 255);
+                p.accent_text = Rgba::new(191, 207, 233, 255);
+                p.selection_bg = Rgba::new(6, 46, 123, 255);
+            }
+            (Accent::Vortia, Mode::LightHc) => {
+                p.text_link = Rgba::new(8, 63, 165, 255);
+                p.border_focus = Rgba::new(8, 63, 165, 255);
+                p.accent_default = Rgba::new(8, 63, 165, 255);
+                p.accent_hover = Rgba::new(6, 46, 123, 255);
+                p.accent_pressed = Rgba::new(4, 34, 93, 255);
+                p.accent_subtle = Rgba::new(237, 241, 248, 255);
+                p.accent_text = Rgba::new(8, 63, 165, 255);
+                p.selection_bg = Rgba::new(237, 241, 248, 255);
+            }
+            (Accent::Vortia, Mode::DarkHc) => {
+                p.text_link = Rgba::new(218, 226, 239, 255);
+                p.border_focus = Rgba::new(218, 226, 239, 255);
+                p.accent_default = Rgba::new(218, 226, 239, 255);
+                p.accent_hover = Rgba::new(237, 241, 248, 255);
+                p.accent_pressed = Rgba::new(191, 207, 233, 255);
+                p.accent_subtle = Rgba::new(6, 46, 123, 255);
+                p.accent_text = Rgba::new(218, 226, 239, 255);
+                p.selection_bg = Rgba::new(8, 63, 165, 255);
+            }
+            (Accent::Brujula, Mode::Light) => {
+                p.text_link = Rgba::new(6, 108, 60, 255);
+                p.border_focus = Rgba::new(9, 136, 77, 255);
+                p.accent_default = Rgba::new(9, 136, 77, 255);
+                p.accent_hover = Rgba::new(6, 108, 60, 255);
+                p.accent_pressed = Rgba::new(6, 82, 45, 255);
+                p.accent_subtle = Rgba::new(220, 247, 228, 255);
+                p.accent_text = Rgba::new(6, 108, 60, 255);
+                p.selection_bg = Rgba::new(220, 247, 228, 255);
+            }
+            (Accent::Brujula, Mode::Dark) => {
+                p.text_link = Rgba::new(136, 225, 168, 255);
+                p.border_focus = Rgba::new(136, 225, 168, 255);
+                p.accent_default = Rgba::new(136, 225, 168, 255);
+                p.accent_hover = Rgba::new(180, 239, 199, 255);
+                p.accent_pressed = Rgba::new(92, 202, 136, 255);
+                p.accent_subtle = Rgba::new(6, 60, 32, 255);
+                p.accent_text = Rgba::new(136, 225, 168, 255);
+                p.selection_bg = Rgba::new(6, 60, 32, 255);
+            }
+            (Accent::Brujula, Mode::LightHc) => {
+                p.text_link = Rgba::new(6, 82, 45, 255);
+                p.border_focus = Rgba::new(6, 82, 45, 255);
+                p.accent_default = Rgba::new(6, 82, 45, 255);
+                p.accent_hover = Rgba::new(6, 60, 32, 255);
+                p.accent_pressed = Rgba::new(4, 45, 23, 255);
+                p.accent_subtle = Rgba::new(220, 247, 228, 255);
+                p.accent_text = Rgba::new(6, 82, 45, 255);
+                p.selection_bg = Rgba::new(220, 247, 228, 255);
+            }
+            (Accent::Brujula, Mode::DarkHc) => {
+                p.text_link = Rgba::new(180, 239, 199, 255);
+                p.border_focus = Rgba::new(180, 239, 199, 255);
+                p.accent_default = Rgba::new(180, 239, 199, 255);
+                p.accent_hover = Rgba::new(220, 247, 228, 255);
+                p.accent_pressed = Rgba::new(136, 225, 168, 255);
+                p.accent_subtle = Rgba::new(6, 60, 32, 255);
+                p.accent_text = Rgba::new(180, 239, 199, 255);
+                p.selection_bg = Rgba::new(6, 82, 45, 255);
+            }
+            (Accent::Vinilo, Mode::Light) => {
+                p.text_link = Rgba::new(102, 49, 237, 255);
+                p.border_focus = Rgba::new(119, 94, 240, 255);
+                p.accent_default = Rgba::new(119, 94, 240, 255);
+                p.accent_hover = Rgba::new(102, 49, 237, 255);
+                p.accent_pressed = Rgba::new(78, 35, 185, 255);
+                p.accent_subtle = Rgba::new(240, 240, 247, 255);
+                p.accent_text = Rgba::new(102, 49, 237, 255);
+                p.selection_bg = Rgba::new(240, 240, 247, 255);
+            }
+            (Accent::Vinilo, Mode::Dark) => {
+                p.text_link = Rgba::new(204, 204, 232, 255);
+                p.border_focus = Rgba::new(204, 204, 232, 255);
+                p.accent_default = Rgba::new(204, 204, 232, 255);
+                p.accent_hover = Rgba::new(225, 225, 238, 255);
+                p.accent_pressed = Rgba::new(178, 176, 232, 255);
+                p.accent_subtle = Rgba::new(57, 26, 138, 255);
+                p.accent_text = Rgba::new(204, 204, 232, 255);
+                p.selection_bg = Rgba::new(57, 26, 138, 255);
+            }
+            (Accent::Vinilo, Mode::LightHc) => {
+                p.text_link = Rgba::new(78, 35, 185, 255);
+                p.border_focus = Rgba::new(78, 35, 185, 255);
+                p.accent_default = Rgba::new(78, 35, 185, 255);
+                p.accent_hover = Rgba::new(57, 26, 138, 255);
+                p.accent_pressed = Rgba::new(42, 18, 106, 255);
+                p.accent_subtle = Rgba::new(240, 240, 247, 255);
+                p.accent_text = Rgba::new(78, 35, 185, 255);
+                p.selection_bg = Rgba::new(240, 240, 247, 255);
+            }
+            (Accent::Vinilo, Mode::DarkHc) => {
+                p.text_link = Rgba::new(225, 225, 238, 255);
+                p.border_focus = Rgba::new(225, 225, 238, 255);
+                p.accent_default = Rgba::new(225, 225, 238, 255);
+                p.accent_hover = Rgba::new(240, 240, 247, 255);
+                p.accent_pressed = Rgba::new(204, 204, 232, 255);
+                p.accent_subtle = Rgba::new(57, 26, 138, 255);
+                p.accent_text = Rgba::new(225, 225, 238, 255);
+                p.selection_bg = Rgba::new(78, 35, 185, 255);
+            }
+            (Accent::Buzon, Mode::Light) => {
+                p.text_link = Rgba::new(183, 30, 22, 255);
+                p.border_focus = Rgba::new(228, 40, 30, 255);
+                p.accent_default = Rgba::new(228, 40, 30, 255);
+                p.accent_hover = Rgba::new(183, 30, 22, 255);
+                p.accent_pressed = Rgba::new(141, 23, 16, 255);
+                p.accent_subtle = Rgba::new(248, 239, 237, 255);
+                p.accent_text = Rgba::new(183, 30, 22, 255);
+                p.selection_bg = Rgba::new(248, 239, 237, 255);
+            }
+            (Accent::Buzon, Mode::Dark) => {
+                p.text_link = Rgba::new(234, 198, 192, 255);
+                p.border_focus = Rgba::new(234, 198, 192, 255);
+                p.accent_default = Rgba::new(234, 198, 192, 255);
+                p.accent_hover = Rgba::new(239, 222, 219, 255);
+                p.accent_pressed = Rgba::new(235, 164, 152, 255);
+                p.accent_subtle = Rgba::new(105, 17, 12, 255);
+                p.accent_text = Rgba::new(234, 198, 192, 255);
+                p.selection_bg = Rgba::new(105, 17, 12, 255);
+            }
+            (Accent::Buzon, Mode::LightHc) => {
+                p.text_link = Rgba::new(141, 23, 16, 255);
+                p.border_focus = Rgba::new(141, 23, 16, 255);
+                p.accent_default = Rgba::new(141, 23, 16, 255);
+                p.accent_hover = Rgba::new(105, 17, 12, 255);
+                p.accent_pressed = Rgba::new(80, 11, 7, 255);
+                p.accent_subtle = Rgba::new(248, 239, 237, 255);
+                p.accent_text = Rgba::new(141, 23, 16, 255);
+                p.selection_bg = Rgba::new(248, 239, 237, 255);
+            }
+            (Accent::Buzon, Mode::DarkHc) => {
+                p.text_link = Rgba::new(239, 222, 219, 255);
+                p.border_focus = Rgba::new(239, 222, 219, 255);
+                p.accent_default = Rgba::new(239, 222, 219, 255);
+                p.accent_hover = Rgba::new(248, 239, 237, 255);
+                p.accent_pressed = Rgba::new(234, 198, 192, 255);
+                p.accent_subtle = Rgba::new(105, 17, 12, 255);
+                p.accent_text = Rgba::new(239, 222, 219, 255);
+                p.selection_bg = Rgba::new(141, 23, 16, 255);
+            }
+            (Accent::Letra, Mode::Light) => {
+                p.text_link = Rgba::new(18, 97, 155, 255);
+                p.border_focus = Rgba::new(25, 123, 193, 255);
+                p.accent_default = Rgba::new(25, 123, 193, 255);
+                p.accent_hover = Rgba::new(18, 97, 155, 255);
+                p.accent_pressed = Rgba::new(14, 74, 119, 255);
+                p.accent_subtle = Rgba::new(235, 241, 247, 255);
+                p.accent_text = Rgba::new(18, 97, 155, 255);
+                p.selection_bg = Rgba::new(235, 241, 247, 255);
+            }
+            (Accent::Letra, Mode::Dark) => {
+                p.text_link = Rgba::new(183, 209, 232, 255);
+                p.border_focus = Rgba::new(183, 209, 232, 255);
+                p.accent_default = Rgba::new(183, 209, 232, 255);
+                p.accent_hover = Rgba::new(214, 227, 239, 255);
+                p.accent_pressed = Rgba::new(134, 187, 234, 255);
+                p.accent_subtle = Rgba::new(10, 54, 88, 255);
+                p.accent_text = Rgba::new(183, 209, 232, 255);
+                p.selection_bg = Rgba::new(10, 54, 88, 255);
+            }
+            (Accent::Letra, Mode::LightHc) => {
+                p.text_link = Rgba::new(14, 74, 119, 255);
+                p.border_focus = Rgba::new(14, 74, 119, 255);
+                p.accent_default = Rgba::new(14, 74, 119, 255);
+                p.accent_hover = Rgba::new(10, 54, 88, 255);
+                p.accent_pressed = Rgba::new(6, 40, 67, 255);
+                p.accent_subtle = Rgba::new(235, 241, 247, 255);
+                p.accent_text = Rgba::new(14, 74, 119, 255);
+                p.selection_bg = Rgba::new(235, 241, 247, 255);
+            }
+            (Accent::Letra, Mode::DarkHc) => {
+                p.text_link = Rgba::new(214, 227, 239, 255);
+                p.border_focus = Rgba::new(214, 227, 239, 255);
+                p.accent_default = Rgba::new(214, 227, 239, 255);
+                p.accent_hover = Rgba::new(235, 241, 247, 255);
+                p.accent_pressed = Rgba::new(183, 209, 232, 255);
+                p.accent_subtle = Rgba::new(10, 54, 88, 255);
+                p.accent_text = Rgba::new(214, 227, 239, 255);
+                p.selection_bg = Rgba::new(14, 74, 119, 255);
+            }
+            (Accent::Celdas, Mode::Light) => {
+                p.text_link = Rgba::new(29, 107, 59, 255);
+                p.border_focus = Rgba::new(39, 134, 76, 255);
+                p.accent_default = Rgba::new(39, 134, 76, 255);
+                p.accent_hover = Rgba::new(29, 107, 59, 255);
+                p.accent_pressed = Rgba::new(22, 81, 44, 255);
+                p.accent_subtle = Rgba::new(223, 247, 228, 255);
+                p.accent_text = Rgba::new(29, 107, 59, 255);
+                p.selection_bg = Rgba::new(223, 247, 228, 255);
+            }
+            (Accent::Celdas, Mode::Dark) => {
+                p.text_link = Rgba::new(145, 223, 166, 255);
+                p.border_focus = Rgba::new(145, 223, 166, 255);
+                p.accent_default = Rgba::new(145, 223, 166, 255);
+                p.accent_hover = Rgba::new(188, 237, 200, 255);
+                p.accent_pressed = Rgba::new(105, 201, 135, 255);
+                p.accent_subtle = Rgba::new(16, 60, 32, 255);
+                p.accent_text = Rgba::new(145, 223, 166, 255);
+                p.selection_bg = Rgba::new(16, 60, 32, 255);
+            }
+            (Accent::Celdas, Mode::LightHc) => {
+                p.text_link = Rgba::new(22, 81, 44, 255);
+                p.border_focus = Rgba::new(22, 81, 44, 255);
+                p.accent_default = Rgba::new(22, 81, 44, 255);
+                p.accent_hover = Rgba::new(16, 60, 32, 255);
+                p.accent_pressed = Rgba::new(10, 44, 22, 255);
+                p.accent_subtle = Rgba::new(223, 247, 228, 255);
+                p.accent_text = Rgba::new(22, 81, 44, 255);
+                p.selection_bg = Rgba::new(223, 247, 228, 255);
+            }
+            (Accent::Celdas, Mode::DarkHc) => {
+                p.text_link = Rgba::new(188, 237, 200, 255);
+                p.border_focus = Rgba::new(188, 237, 200, 255);
+                p.accent_default = Rgba::new(188, 237, 200, 255);
+                p.accent_hover = Rgba::new(223, 247, 228, 255);
+                p.accent_pressed = Rgba::new(145, 223, 166, 255);
+                p.accent_subtle = Rgba::new(16, 60, 32, 255);
+                p.accent_text = Rgba::new(188, 237, 200, 255);
+                p.selection_bg = Rgba::new(22, 81, 44, 255);
+            }
+            (Accent::Lamina, Mode::Light) => {
+                p.text_link = Rgba::new(169, 46, 91, 255);
+                p.border_focus = Rgba::new(211, 59, 115, 255);
+                p.accent_default = Rgba::new(211, 59, 115, 255);
+                p.accent_hover = Rgba::new(169, 46, 91, 255);
+                p.accent_pressed = Rgba::new(130, 34, 69, 255);
+                p.accent_subtle = Rgba::new(247, 239, 240, 255);
+                p.accent_text = Rgba::new(169, 46, 91, 255);
+                p.selection_bg = Rgba::new(247, 239, 240, 255);
+            }
+            (Accent::Lamina, Mode::Dark) => {
+                p.text_link = Rgba::new(231, 198, 205, 255);
+                p.border_focus = Rgba::new(231, 198, 205, 255);
+                p.accent_default = Rgba::new(231, 198, 205, 255);
+                p.accent_hover = Rgba::new(238, 222, 225, 255);
+                p.accent_pressed = Rgba::new(230, 163, 179, 255);
+                p.accent_subtle = Rgba::new(96, 25, 50, 255);
+                p.accent_text = Rgba::new(231, 198, 205, 255);
+                p.selection_bg = Rgba::new(96, 25, 50, 255);
+            }
+            (Accent::Lamina, Mode::LightHc) => {
+                p.text_link = Rgba::new(130, 34, 69, 255);
+                p.border_focus = Rgba::new(130, 34, 69, 255);
+                p.accent_default = Rgba::new(130, 34, 69, 255);
+                p.accent_hover = Rgba::new(96, 25, 50, 255);
+                p.accent_pressed = Rgba::new(73, 17, 37, 255);
+                p.accent_subtle = Rgba::new(247, 239, 240, 255);
+                p.accent_text = Rgba::new(130, 34, 69, 255);
+                p.selection_bg = Rgba::new(247, 239, 240, 255);
+            }
+            (Accent::Lamina, Mode::DarkHc) => {
+                p.text_link = Rgba::new(238, 222, 225, 255);
+                p.border_focus = Rgba::new(238, 222, 225, 255);
+                p.accent_default = Rgba::new(238, 222, 225, 255);
+                p.accent_hover = Rgba::new(247, 239, 240, 255);
+                p.accent_pressed = Rgba::new(231, 198, 205, 255);
+                p.accent_subtle = Rgba::new(96, 25, 50, 255);
+                p.accent_text = Rgba::new(238, 222, 225, 255);
+                p.selection_bg = Rgba::new(130, 34, 69, 255);
+            }
+            (Accent::Papel, Mode::Light) => {
+                p.text_link = Rgba::new(82, 94, 114, 255);
+                p.border_focus = Rgba::new(104, 119, 143, 255);
+                p.accent_default = Rgba::new(104, 119, 143, 255);
+                p.accent_hover = Rgba::new(82, 94, 114, 255);
+                p.accent_pressed = Rgba::new(62, 71, 87, 255);
+                p.accent_subtle = Rgba::new(240, 240, 242, 255);
+                p.accent_text = Rgba::new(82, 94, 114, 255);
+                p.selection_bg = Rgba::new(240, 240, 242, 255);
+            }
+            (Accent::Papel, Mode::Dark) => {
+                p.text_link = Rgba::new(203, 206, 211, 255);
+                p.border_focus = Rgba::new(203, 206, 211, 255);
+                p.accent_default = Rgba::new(203, 206, 211, 255);
+                p.accent_hover = Rgba::new(224, 226, 228, 255);
+                p.accent_pressed = Rgba::new(175, 182, 192, 255);
+                p.accent_subtle = Rgba::new(45, 52, 64, 255);
+                p.accent_text = Rgba::new(203, 206, 211, 255);
+                p.selection_bg = Rgba::new(45, 52, 64, 255);
+            }
+            (Accent::Papel, Mode::LightHc) => {
+                p.text_link = Rgba::new(62, 71, 87, 255);
+                p.border_focus = Rgba::new(62, 71, 87, 255);
+                p.accent_default = Rgba::new(62, 71, 87, 255);
+                p.accent_hover = Rgba::new(45, 52, 64, 255);
+                p.accent_pressed = Rgba::new(33, 38, 47, 255);
+                p.accent_subtle = Rgba::new(240, 240, 242, 255);
+                p.accent_text = Rgba::new(62, 71, 87, 255);
+                p.selection_bg = Rgba::new(240, 240, 242, 255);
+            }
+            (Accent::Papel, Mode::DarkHc) => {
+                p.text_link = Rgba::new(224, 226, 228, 255);
+                p.border_focus = Rgba::new(224, 226, 228, 255);
+                p.accent_default = Rgba::new(224, 226, 228, 255);
+                p.accent_hover = Rgba::new(240, 240, 242, 255);
+                p.accent_pressed = Rgba::new(203, 206, 211, 255);
+                p.accent_subtle = Rgba::new(45, 52, 64, 255);
+                p.accent_text = Rgba::new(224, 226, 228, 255);
+                p.selection_bg = Rgba::new(62, 71, 87, 255);
+            }
+            (Accent::Pliego, Mode::Light) => {
+                p.text_link = Rgba::new(59, 78, 211, 255);
+                p.border_focus = Rgba::new(86, 110, 218, 255);
+                p.accent_default = Rgba::new(86, 110, 218, 255);
+                p.accent_hover = Rgba::new(59, 78, 211, 255);
+                p.accent_pressed = Rgba::new(42, 54, 176, 255);
+                p.accent_subtle = Rgba::new(239, 240, 246, 255);
+                p.accent_text = Rgba::new(59, 78, 211, 255);
+                p.selection_bg = Rgba::new(239, 240, 246, 255);
+            }
+            (Accent::Pliego, Mode::Dark) => {
+                p.text_link = Rgba::new(198, 206, 227, 255);
+                p.border_focus = Rgba::new(198, 206, 227, 255);
+                p.accent_default = Rgba::new(198, 206, 227, 255);
+                p.accent_hover = Rgba::new(222, 225, 236, 255);
+                p.accent_pressed = Rgba::new(167, 181, 222, 255);
+                p.accent_subtle = Rgba::new(30, 40, 131, 255);
+                p.accent_text = Rgba::new(198, 206, 227, 255);
+                p.selection_bg = Rgba::new(30, 40, 131, 255);
+            }
+            (Accent::Pliego, Mode::LightHc) => {
+                p.text_link = Rgba::new(42, 54, 176, 255);
+                p.border_focus = Rgba::new(42, 54, 176, 255);
+                p.accent_default = Rgba::new(42, 54, 176, 255);
+                p.accent_hover = Rgba::new(30, 40, 131, 255);
+                p.accent_pressed = Rgba::new(21, 29, 100, 255);
+                p.accent_subtle = Rgba::new(239, 240, 246, 255);
+                p.accent_text = Rgba::new(42, 54, 176, 255);
+                p.selection_bg = Rgba::new(239, 240, 246, 255);
+            }
+            (Accent::Pliego, Mode::DarkHc) => {
+                p.text_link = Rgba::new(222, 225, 236, 255);
+                p.border_focus = Rgba::new(222, 225, 236, 255);
+                p.accent_default = Rgba::new(222, 225, 236, 255);
+                p.accent_hover = Rgba::new(239, 240, 246, 255);
+                p.accent_pressed = Rgba::new(198, 206, 227, 255);
+                p.accent_subtle = Rgba::new(30, 40, 131, 255);
+                p.accent_text = Rgba::new(222, 225, 236, 255);
+                p.selection_bg = Rgba::new(42, 54, 176, 255);
+            }
+            (Accent::Pluma, Mode::Light) => {
+                p.text_link = Rgba::new(164, 60, 10, 255);
+                p.border_focus = Rgba::new(205, 76, 16, 255);
+                p.accent_default = Rgba::new(205, 76, 16, 255);
+                p.accent_hover = Rgba::new(164, 60, 10, 255);
+                p.accent_pressed = Rgba::new(125, 45, 8, 255);
+                p.accent_subtle = Rgba::new(248, 239, 235, 255);
+                p.accent_text = Rgba::new(164, 60, 10, 255);
+                p.selection_bg = Rgba::new(248, 239, 235, 255);
+            }
+            (Accent::Pluma, Mode::Dark) => {
+                p.text_link = Rgba::new(235, 198, 185, 255);
+                p.border_focus = Rgba::new(235, 198, 185, 255);
+                p.accent_default = Rgba::new(235, 198, 185, 255);
+                p.accent_hover = Rgba::new(240, 222, 215, 255);
+                p.accent_pressed = Rgba::new(238, 164, 137, 255);
+                p.accent_subtle = Rgba::new(93, 33, 7, 255);
+                p.accent_text = Rgba::new(235, 198, 185, 255);
+                p.selection_bg = Rgba::new(93, 33, 7, 255);
+            }
+            (Accent::Pluma, Mode::LightHc) => {
+                p.text_link = Rgba::new(125, 45, 8, 255);
+                p.border_focus = Rgba::new(125, 45, 8, 255);
+                p.accent_default = Rgba::new(125, 45, 8, 255);
+                p.accent_hover = Rgba::new(93, 33, 7, 255);
+                p.accent_pressed = Rgba::new(71, 23, 4, 255);
+                p.accent_subtle = Rgba::new(248, 239, 235, 255);
+                p.accent_text = Rgba::new(125, 45, 8, 255);
+                p.selection_bg = Rgba::new(248, 239, 235, 255);
+            }
+            (Accent::Pluma, Mode::DarkHc) => {
+                p.text_link = Rgba::new(240, 222, 215, 255);
+                p.border_focus = Rgba::new(240, 222, 215, 255);
+                p.accent_default = Rgba::new(240, 222, 215, 255);
+                p.accent_hover = Rgba::new(248, 239, 235, 255);
+                p.accent_pressed = Rgba::new(235, 198, 185, 255);
+                p.accent_subtle = Rgba::new(93, 33, 7, 255);
+                p.accent_text = Rgba::new(240, 222, 215, 255);
+                p.selection_bg = Rgba::new(125, 45, 8, 255);
+            }
+            (Accent::Lienzo, Mode::Light) => {
+                p.text_link = Rgba::new(174, 41, 76, 255);
+                p.border_focus = Rgba::new(217, 53, 97, 255);
+                p.accent_default = Rgba::new(217, 53, 97, 255);
+                p.accent_hover = Rgba::new(174, 41, 76, 255);
+                p.accent_pressed = Rgba::new(133, 31, 58, 255);
+                p.accent_subtle = Rgba::new(247, 239, 239, 255);
+                p.accent_text = Rgba::new(174, 41, 76, 255);
+                p.selection_bg = Rgba::new(247, 239, 239, 255);
+            }
+            (Accent::Lienzo, Mode::Dark) => {
+                p.text_link = Rgba::new(232, 198, 201, 255);
+                p.border_focus = Rgba::new(232, 198, 201, 255);
+                p.accent_default = Rgba::new(232, 198, 201, 255);
+                p.accent_hover = Rgba::new(238, 222, 223, 255);
+                p.accent_pressed = Rgba::new(232, 163, 172, 255);
+                p.accent_subtle = Rgba::new(99, 22, 42, 255);
+                p.accent_text = Rgba::new(232, 198, 201, 255);
+                p.selection_bg = Rgba::new(99, 22, 42, 255);
+            }
+            (Accent::Lienzo, Mode::LightHc) => {
+                p.text_link = Rgba::new(133, 31, 58, 255);
+                p.border_focus = Rgba::new(133, 31, 58, 255);
+                p.accent_default = Rgba::new(133, 31, 58, 255);
+                p.accent_hover = Rgba::new(99, 22, 42, 255);
+                p.accent_pressed = Rgba::new(76, 15, 30, 255);
+                p.accent_subtle = Rgba::new(247, 239, 239, 255);
+                p.accent_text = Rgba::new(133, 31, 58, 255);
+                p.selection_bg = Rgba::new(247, 239, 239, 255);
+            }
+            (Accent::Lienzo, Mode::DarkHc) => {
+                p.text_link = Rgba::new(238, 222, 223, 255);
+                p.border_focus = Rgba::new(238, 222, 223, 255);
+                p.accent_default = Rgba::new(238, 222, 223, 255);
+                p.accent_hover = Rgba::new(247, 239, 239, 255);
+                p.accent_pressed = Rgba::new(232, 198, 201, 255);
+                p.accent_subtle = Rgba::new(99, 22, 42, 255);
+                p.accent_text = Rgba::new(238, 222, 223, 255);
+                p.selection_bg = Rgba::new(133, 31, 58, 255);
+            }
+            (Accent::Luz, Mode::Light) => {
+                p.text_link = Rgba::new(138, 80, 0, 255);
+                p.border_focus = Rgba::new(172, 101, 0, 255);
+                p.accent_default = Rgba::new(172, 101, 0, 255);
+                p.accent_hover = Rgba::new(138, 80, 0, 255);
+                p.accent_pressed = Rgba::new(105, 60, 3, 255);
+                p.accent_subtle = Rgba::new(248, 239, 230, 255);
+                p.accent_text = Rgba::new(138, 80, 0, 255);
+                p.selection_bg = Rgba::new(248, 239, 230, 255);
+            }
+            (Accent::Luz, Mode::Dark) => {
+                p.text_link = Rgba::new(236, 200, 166, 255);
+                p.border_focus = Rgba::new(236, 200, 166, 255);
+                p.accent_default = Rgba::new(236, 200, 166, 255);
+                p.accent_hover = Rgba::new(240, 223, 207, 255);
+                p.accent_pressed = Rgba::new(239, 166, 91, 255);
+                p.accent_subtle = Rgba::new(78, 44, 4, 255);
+                p.accent_text = Rgba::new(236, 200, 166, 255);
+                p.selection_bg = Rgba::new(78, 44, 4, 255);
+            }
+            (Accent::Luz, Mode::LightHc) => {
+                p.text_link = Rgba::new(105, 60, 3, 255);
+                p.border_focus = Rgba::new(105, 60, 3, 255);
+                p.accent_default = Rgba::new(105, 60, 3, 255);
+                p.accent_hover = Rgba::new(78, 44, 4, 255);
+                p.accent_pressed = Rgba::new(59, 32, 2, 255);
+                p.accent_subtle = Rgba::new(248, 239, 230, 255);
+                p.accent_text = Rgba::new(105, 60, 3, 255);
+                p.selection_bg = Rgba::new(248, 239, 230, 255);
+            }
+            (Accent::Luz, Mode::DarkHc) => {
+                p.text_link = Rgba::new(240, 223, 207, 255);
+                p.border_focus = Rgba::new(240, 223, 207, 255);
+                p.accent_default = Rgba::new(240, 223, 207, 255);
+                p.accent_hover = Rgba::new(248, 239, 230, 255);
+                p.accent_pressed = Rgba::new(236, 200, 166, 255);
+                p.accent_subtle = Rgba::new(78, 44, 4, 255);
+                p.accent_text = Rgba::new(240, 223, 207, 255);
+                p.selection_bg = Rgba::new(105, 60, 3, 255);
+            }
+            (Accent::Toma, Mode::Light) => {
+                p.text_link = Rgba::new(174, 20, 128, 255);
+                p.border_focus = Rgba::new(217, 28, 161, 255);
+                p.accent_default = Rgba::new(217, 28, 161, 255);
+                p.accent_hover = Rgba::new(174, 20, 128, 255);
+                p.accent_pressed = Rgba::new(133, 16, 98, 255);
+                p.accent_subtle = Rgba::new(248, 238, 243, 255);
+                p.accent_text = Rgba::new(174, 20, 128, 255);
+                p.selection_bg = Rgba::new(248, 238, 243, 255);
+            }
+            (Accent::Toma, Mode::Dark) => {
+                p.text_link = Rgba::new(235, 195, 216, 255);
+                p.border_focus = Rgba::new(235, 195, 216, 255);
+                p.accent_default = Rgba::new(235, 195, 216, 255);
+                p.accent_hover = Rgba::new(240, 220, 230, 255);
+                p.accent_pressed = Rgba::new(238, 156, 203, 255);
+                p.accent_subtle = Rgba::new(99, 13, 72, 255);
+                p.accent_text = Rgba::new(235, 195, 216, 255);
+                p.selection_bg = Rgba::new(99, 13, 72, 255);
+            }
+            (Accent::Toma, Mode::LightHc) => {
+                p.text_link = Rgba::new(133, 16, 98, 255);
+                p.border_focus = Rgba::new(133, 16, 98, 255);
+                p.accent_default = Rgba::new(133, 16, 98, 255);
+                p.accent_hover = Rgba::new(99, 13, 72, 255);
+                p.accent_pressed = Rgba::new(75, 8, 54, 255);
+                p.accent_subtle = Rgba::new(248, 238, 243, 255);
+                p.accent_text = Rgba::new(133, 16, 98, 255);
+                p.selection_bg = Rgba::new(248, 238, 243, 255);
+            }
+            (Accent::Toma, Mode::DarkHc) => {
+                p.text_link = Rgba::new(240, 220, 230, 255);
+                p.border_focus = Rgba::new(240, 220, 230, 255);
+                p.accent_default = Rgba::new(240, 220, 230, 255);
+                p.accent_hover = Rgba::new(248, 238, 243, 255);
+                p.accent_pressed = Rgba::new(235, 195, 216, 255);
+                p.accent_subtle = Rgba::new(99, 13, 72, 255);
+                p.accent_text = Rgba::new(240, 220, 230, 255);
+                p.selection_bg = Rgba::new(133, 16, 98, 255);
+            }
+            (Accent::Pulso, Mode::Light) => {
+                p.text_link = Rgba::new(63, 104, 6, 255);
+                p.border_focus = Rgba::new(80, 132, 10, 255);
+                p.accent_default = Rgba::new(80, 132, 10, 255);
+                p.accent_hover = Rgba::new(63, 104, 6, 255);
+                p.accent_pressed = Rgba::new(47, 79, 6, 255);
+                p.accent_subtle = Rgba::new(226, 248, 210, 255);
+                p.accent_text = Rgba::new(63, 104, 6, 255);
+                p.selection_bg = Rgba::new(226, 248, 210, 255);
+            }
+            (Accent::Pulso, Mode::Dark) => {
+                p.text_link = Rgba::new(171, 221, 129, 255);
+                p.border_focus = Rgba::new(171, 221, 129, 255);
+                p.accent_default = Rgba::new(171, 221, 129, 255);
+                p.accent_hover = Rgba::new(194, 239, 157, 255);
+                p.accent_pressed = Rgba::new(140, 198, 86, 255);
+                p.accent_subtle = Rgba::new(34, 58, 5, 255);
+                p.accent_text = Rgba::new(171, 221, 129, 255);
+                p.selection_bg = Rgba::new(34, 58, 5, 255);
+            }
+            (Accent::Pulso, Mode::LightHc) => {
+                p.text_link = Rgba::new(47, 79, 6, 255);
+                p.border_focus = Rgba::new(47, 79, 6, 255);
+                p.accent_default = Rgba::new(47, 79, 6, 255);
+                p.accent_hover = Rgba::new(34, 58, 5, 255);
+                p.accent_pressed = Rgba::new(24, 43, 3, 255);
+                p.accent_subtle = Rgba::new(226, 248, 210, 255);
+                p.accent_text = Rgba::new(47, 79, 6, 255);
+                p.selection_bg = Rgba::new(226, 248, 210, 255);
+            }
+            (Accent::Pulso, Mode::DarkHc) => {
+                p.text_link = Rgba::new(194, 239, 157, 255);
+                p.border_focus = Rgba::new(194, 239, 157, 255);
+                p.accent_default = Rgba::new(194, 239, 157, 255);
+                p.accent_hover = Rgba::new(226, 248, 210, 255);
+                p.accent_pressed = Rgba::new(171, 221, 129, 255);
+                p.accent_subtle = Rgba::new(34, 58, 5, 255);
+                p.accent_text = Rgba::new(194, 239, 157, 255);
+                p.selection_bg = Rgba::new(47, 79, 6, 255);
+            }
+            (Accent::Forja, Mode::Light) => {
+                p.text_link = Rgba::new(143, 76, 29, 255);
+                p.border_focus = Rgba::new(179, 96, 39, 255);
+                p.accent_default = Rgba::new(179, 96, 39, 255);
+                p.accent_hover = Rgba::new(143, 76, 29, 255);
+                p.accent_pressed = Rgba::new(109, 57, 22, 255);
+                p.accent_subtle = Rgba::new(247, 239, 234, 255);
+                p.accent_text = Rgba::new(143, 76, 29, 255);
+                p.selection_bg = Rgba::new(247, 239, 234, 255);
+            }
+            (Accent::Forja, Mode::Dark) => {
+                p.text_link = Rgba::new(232, 200, 181, 255);
+                p.border_focus = Rgba::new(232, 200, 181, 255);
+                p.accent_default = Rgba::new(232, 200, 181, 255);
+                p.accent_hover = Rgba::new(238, 223, 214, 255);
+                p.accent_pressed = Rgba::new(232, 167, 128, 255);
+                p.accent_subtle = Rgba::new(81, 42, 15, 255);
+                p.accent_text = Rgba::new(232, 200, 181, 255);
+                p.selection_bg = Rgba::new(81, 42, 15, 255);
+            }
+            (Accent::Forja, Mode::LightHc) => {
+                p.text_link = Rgba::new(109, 57, 22, 255);
+                p.border_focus = Rgba::new(109, 57, 22, 255);
+                p.accent_default = Rgba::new(109, 57, 22, 255);
+                p.accent_hover = Rgba::new(81, 42, 15, 255);
+                p.accent_pressed = Rgba::new(61, 30, 10, 255);
+                p.accent_subtle = Rgba::new(247, 239, 234, 255);
+                p.accent_text = Rgba::new(109, 57, 22, 255);
+                p.selection_bg = Rgba::new(247, 239, 234, 255);
+            }
+            (Accent::Forja, Mode::DarkHc) => {
+                p.text_link = Rgba::new(238, 223, 214, 255);
+                p.border_focus = Rgba::new(238, 223, 214, 255);
+                p.accent_default = Rgba::new(238, 223, 214, 255);
+                p.accent_hover = Rgba::new(247, 239, 234, 255);
+                p.accent_pressed = Rgba::new(232, 200, 181, 255);
+                p.accent_subtle = Rgba::new(81, 42, 15, 255);
+                p.accent_text = Rgba::new(238, 223, 214, 255);
+                p.selection_bg = Rgba::new(109, 57, 22, 255);
+            }
+            (Accent::Torno, Mode::Light) => {
+                p.text_link = Rgba::new(112, 92, 18, 255);
+                p.border_focus = Rgba::new(140, 116, 25, 255);
+                p.accent_default = Rgba::new(140, 116, 25, 255);
+                p.accent_hover = Rgba::new(112, 92, 18, 255);
+                p.accent_pressed = Rgba::new(85, 69, 13, 255);
+                p.accent_subtle = Rgba::new(247, 241, 218, 255);
+                p.accent_text = Rgba::new(112, 92, 18, 255);
+                p.selection_bg = Rgba::new(247, 241, 218, 255);
+            }
+            (Accent::Torno, Mode::Dark) => {
+                p.text_link = Rgba::new(226, 205, 134, 255);
+                p.border_focus = Rgba::new(226, 205, 134, 255);
+                p.accent_default = Rgba::new(226, 205, 134, 255);
+                p.accent_hover = Rgba::new(239, 225, 183, 255);
+                p.accent_pressed = Rgba::new(205, 180, 93, 255);
+                p.accent_subtle = Rgba::new(63, 51, 10, 255);
+                p.accent_text = Rgba::new(226, 205, 134, 255);
+                p.selection_bg = Rgba::new(63, 51, 10, 255);
+            }
+            (Accent::Torno, Mode::LightHc) => {
+                p.text_link = Rgba::new(85, 69, 13, 255);
+                p.border_focus = Rgba::new(85, 69, 13, 255);
+                p.accent_default = Rgba::new(85, 69, 13, 255);
+                p.accent_hover = Rgba::new(63, 51, 10, 255);
+                p.accent_pressed = Rgba::new(46, 37, 6, 255);
+                p.accent_subtle = Rgba::new(247, 241, 218, 255);
+                p.accent_text = Rgba::new(85, 69, 13, 255);
+                p.selection_bg = Rgba::new(247, 241, 218, 255);
+            }
+            (Accent::Torno, Mode::DarkHc) => {
+                p.text_link = Rgba::new(239, 225, 183, 255);
+                p.border_focus = Rgba::new(239, 225, 183, 255);
+                p.accent_default = Rgba::new(239, 225, 183, 255);
+                p.accent_hover = Rgba::new(247, 241, 218, 255);
+                p.accent_pressed = Rgba::new(226, 205, 134, 255);
+                p.accent_subtle = Rgba::new(63, 51, 10, 255);
+                p.accent_text = Rgba::new(239, 225, 183, 255);
+                p.selection_bg = Rgba::new(85, 69, 13, 255);
+            }
+        }
+        p
+    }
+}
+
 /// Control metrics of one density, in logical pixels.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Density {

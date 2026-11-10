@@ -13,6 +13,7 @@ Versión: `0.1.0-alpha.1`. Este documento es la fuente de verdad sobre qué est�
 | Salida CSS | Operativo | Matriz de 12 combinaciones de cascada en Chromium |
 | Componentes web (`@nodalia/web`) | Operativo en Chromium | 53 tests de navegador, 16 ejecuciones de axe-core sin violaciones, teclado |
 | Catálogo y 3 demostraciones | Operativo | Tests de navegador (humo, interacción y axe) |
+| Acento por app (17 apps) | Operativo en tokens, web (CSS), Rust y Qt Widgets | Cada acento pasa la validación completa de contraste en los 4 modos; tests de luminancia, tono y alcance |
 | Iconos (`@nodalia/icons`, 247) | Operativo; 55 en uso en Vortia 0.5.0, el resto solo revisados en hoja de contactos | 7 tests: solo formas simples, sin color propio, dentro de la rejilla, *sprite* e índice completos |
 | Qt Widgets (`@nodalia/qtwidgets`) | En uso en Vortia 0.5.0 (Qt 6, Fusion, macOS, claro y oscuro) | 8 tests: cada marcador resuelve en los 4 modos y 3 densidades, sin literales en la plantilla, contraste de los pares que dibuja; revisión visual con capturas de Vortia |
 | Crate Rust `nodalia-theme` (`@nodalia/egui`) | Compila y pasa sus tests con egui 0.37 | 6 tests del generador (incluye que `tokens.rs` coincide con los tokens); 12 tests Rust: contraste de los pares que dibuja egui, métricas por densidad, movimiento reducido, aplicación a un `Context` |
@@ -20,10 +21,11 @@ Versión: `0.1.0-alpha.1`. Este documento es la fuente de verdad sobre qué est�
 | Linter de CSS (sin literales de color ni de tamaño, sin variables desconocidas) | Operativo | Tests unitarios del linter y ejecución sobre el CSS real |
 | Presupuesto de tamaño | Operativo | CSS y comportamientos comprobados en gzip |
 
-Totales en la última ejecución completa: 59 tests unitarios, 12 tests Rust y 53 de navegador, todos correctos.
+Totales en la última ejecución completa: 66 tests unitarios, 14 tests Rust y 53 de navegador, todos correctos.
 
 ## Qué NO está verificado
 
+- **Los acentos por app en una interfaz.** Están validados por contraste y vistos como rampas de color, pero ninguna app se ha mostrado todavía con su acento. GTK y Qt Quick no los tienen.
 - **Qt Widgets fuera de macOS.** Solo se ha visto en Vortia sobre macOS; Linux, Windows y los modos de alto contraste están sin revisar.
 - **egui en una app real.** El estilo se construye y se comprueba por valores, pero nadie ha revisado visualmente una app con él. La primera integración (Vortia en Rust) dirá qué hay que ajustar.
 - **GTK4 / libadwaita.** `@nodalia/gtk` genera hojas con `@define-color` y solo nombres de color públicos de libadwaita. Se prueba que el contenido es el esperado, que solo se usan nombres documentados y que los pares críticos cumplen contraste. **No se ha cargado en un runtime GTK real** (no había libadwaita en el entorno de desarrollo). Hay que comprobarlo con una app de verdad antes de darlo por bueno.

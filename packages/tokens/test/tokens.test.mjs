@@ -119,3 +119,53 @@ test('validate flags insufficient contrast', () => {
   };
   assert.ok(mk('#777777', '#FFFFFF').some((p) => p.includes('color.text.primary on color.surface.panel')));
 });
+
+// --- App accents ---
+import { accentCss, cssName as accentCssName } from '../lib/index.mjs';
+import { DEFAULT_ACCENT, accentSets, accentRamp, luminance, parseHex, toOklch, validate as validateAll } from '../lib/index.mjs';
+
+const accentTokens = loadTokens(SOURCE_DIR);
+const accents = accentSets(accentTokens, SOURCE_DIR);
+
+test('every app accent passes the full validation, contrast included, in the four modes', () => {
+  assert.ok(accents.size >= 18);
+  assert.equal([...accents.keys()][0], DEFAULT_ACCENT);
+  for (const [name, set] of accents) assert.deepEqual(validateAll(set.tokens), [], name);
+});
+
+test('an accent ramp keeps the luminance of the default ramp, step by step', () => {
+  const reference = accents.get(DEFAULT_ACCENT).ramp;
+  for (const [name, set] of accents) for (const [step, hex] of Object.entries(set.ramp)) {
+    const want = luminance(parseHex(reference[step]));
+    const got = luminance(parseHex(hex));
+    assert.ok(Math.abs(got - want) <= 0.012, `${name} ${step}: ${got.toFixed(4)} vs ${want.toFixed(4)}`);
+  }
+});
+
+test('an accent ramp keeps the hue of its key colour and a grey key stays grey', () => {
+  const hue = (hex) => ((toOklch(hex).h * 180) / Math.PI + 360) % 360;
+  for (const [name, set] of accents) {
+    if (!set.key) continue;
+    const delta = Math.abs(hue(set.ramp['600']) - hue(set.key));
+    assert.ok(Math.min(delta, 360 - delta) < 6, `${name}: hue drifted ${delta.toFixed(1)} degrees`);
+  }
+  assert.ok(toOklch(accents.get('papel').ramp['600']).c < toOklch(accents.get('vortia').ramp['600']).c / 2);
+});
+
+test('an accent only changes the accent ramp and what aliases it', () => {
+  const set = accents.get('vortia');
+  const changed = [...accentTokens.keys()].filter((p) => MODES.some((m) => JSON.stringify(resolve(set.tokens, p, m)) !== JSON.stringify(resolve(accentTokens, p, m))));
+  assert.ok(changed.length > 11);
+  for (const path of changed) assert.match(path, /^(palette\.accent\.|color\.(accent|selection\.bg$|border\.focus$|text\.link$))/, path);
+});
+
+test('ramp generation is deterministic', () => {
+  assert.deepEqual(accentRamp(accentTokens, '#0B55DB'), accentRamp(accentTokens, '#0B55DB'));
+});
+
+test('the accent CSS switches the ramp by attribute and leaves the default alone', () => {
+  const css = accentCss(accents, accentCssName);
+  assert.ok(css.includes(':root[data-accent="vortia"] {') && !css.includes('data-accent="nodalia"'));
+  assert.equal((css.match(/:root\[data-accent=/g) ?? []).length, accents.size - 1);
+  assert.equal((css.match(/--ndl-palette-accent-600:/g) ?? []).length, accents.size - 1);
+});

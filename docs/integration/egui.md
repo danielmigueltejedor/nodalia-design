@@ -40,6 +40,17 @@ let fill = color(palette.status_success_bg);
 let padding = space::MD;
 ```
 
+## Acento de la app
+
+```rust
+use nodalia_theme::Accent;
+
+for_egui::apply_system(&ctx, &Appearance { accent: Accent::Vortia, ..Appearance::default() });
+let palette = Mode::Dark.palette_with(Accent::Vortia);   // para widgets propios
+```
+
+Solo cambian los colores de acento; el resto de la paleta es el mismo en todas las apps.
+
 ## Qué se aplica a egui
 
 | egui | Token |

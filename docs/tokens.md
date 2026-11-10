@@ -25,6 +25,32 @@ El generador emite bloques completos para cada modo (no deltas), con selectores 
 - El contraste se elige por par, no por escala: ver `CONTRAST_PAIRS` en `packages/tokens/lib/validate.mjs`. Texto normal 4,5:1 y componentes 3:1; en alto contraste 7:1 y 4,5:1. `npm run validate` falla si un par no cumple.
 - Los estados nunca se distinguen solo por color: los componentes añaden forma o texto (icono de marca, subrayado, etiqueta).
 
+## Acento por app
+
+Cada app puede tener su propio acento, el color de su icono, sin salirse del sistema. La app solo aporta **un color clave** en `packages/tokens/src/accents.json`; NDL deriva de él la rampa completa:
+
+- **Mismo tono** que el color clave.
+- **Misma luminancia, paso a paso, que la rampa por defecto.** El contraste depende solo de la luminancia, así que cualquier acento cumple exactamente el contraste que cumple el cian por defecto. No hay que comprobarlo a mano: la compilación valida cada acento en los cuatro modos y falla si alguno no pasa.
+- **Saturación relativa a la del color clave.** Un color clave gris (Papel) da un acento gris; uno intenso da un acento intenso.
+
+Un acento solo cambia `color.accent.*`, `color.selection.bg`, `color.border.focus` y `color.text.link`. Superficies, texto, bordes y estados son iguales en todas las apps: eso es lo que las hace reconocerse como familia.
+
+| Acento | Color clave | | Acento | Color clave |
+| --- | --- | --- | --- | --- |
+| `nodalia` (por defecto) | cian de marca | | `pliego` | `#3340D0` |
+| `nodalix` | `#0A93B8` | | `pluma` | `#EE5A14` |
+| `vortia` | `#0B55DB` | | `lienzo` | `#EE3B6B` |
+| `brujula` | `#0C9A58` | | `luz` | `#F59300` |
+| `vinilo` | `#5A27D6` | | `toma` | `#C2188F` |
+| `buzon` | `#D4241B` | | `pulso` | `#6FB312` |
+| `letra` | `#1C86D2` | | `forja` | `#96501F` |
+| `celdas` | `#1D6B3B` | | `torno` | `#8C7419` |
+| `lamina` | `#7C1F41` | | `papel` | `#68778F` |
+
+Cómo se activa: `<html data-accent="vortia">` en web, `Accent::Vortia` en Rust, el grupo `accent` de `nodalia-qt.json` en Qt Widgets. GTK y Qt Quick no tienen acentos todavía.
+
+Añadir una app: una línea en `accents.json` y `npm run build`.
+
 ## Tipografía
 
 Familia de interfaz `Inter` con respaldo en la pila del sistema (`system-ui`, Segoe UI, Cantarell, Roboto…); familia de títulos `Sora` con respaldo en `Inter` y el sistema. **No se incluye ninguna fuente**: si Inter o Sora no están instaladas se usa el respaldo, así que el aspecto exacto depende de la máquina. Cuerpo 13 px (escritorio denso); estilos `display`, `headline`, `title`, `large`, `label`, `small`, `caption`, `code`.
