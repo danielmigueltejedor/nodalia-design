@@ -10,7 +10,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @nodalia/tokens && npm run build -w @nodalia/gtk -w @nodalia/qml -w @nodalia/egui -w @nodalia/web -w @nodalia/catalog",
+    "build": "npm run build -w @nodalia/tokens && npm run build -w @nodalia/gtk -w @nodalia/qml -w @nodalia/egui -w @nodalia/qtwidgets -w @nodalia/web -w @nodalia/catalog",
     "validate": "npm run validate -w @nodalia/tokens && npm run lint -w @nodalia/web",
     "test": "npm run build && npm test --workspaces --if-present",
     "test:rust": "cargo test --manifest-path packages/egui/crate/Cargo.toml && cargo test --manifest-path packages/egui/crate/Cargo.toml --features egui",

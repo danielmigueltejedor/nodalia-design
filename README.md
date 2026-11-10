@@ -12,6 +12,7 @@ Lenguaje de diseño de las aplicaciones de Nodalia: una especificación única, 
 | [`@nodalia/web`](packages/web) | Componentes CSS sin framework + comportamientos ARIA (pestañas, árbol, barra de herramientas, separador, menú contextual, tooltip) | Operativo |
 | [`@nodalia/gtk`](packages/gtk) | Hojas de estilo GTK4 / libadwaita (colores con nombre públicos) generadas desde los tokens | Generado y probado estructuralmente; **sin verificar en un runtime GTK real** |
 | [`@nodalia/qml`](packages/qml) | Singleton `NodaliaTheme` para Qt Quick generado desde los tokens | Generado y probado estructuralmente; **sin verificar en Qt** |
+| [`@nodalia/qtwidgets`](packages/qtwidgets) | Tokens aplanados, plantilla de hoja de estilos y hojas rellenas para Qt Widgets | En uso en Vortia 0.5.0 (Qt 6, macOS); **sin probar en Linux ni Windows** |
 | [`@nodalia/egui`](packages/egui) | Crate Rust `nodalia-theme`: tokens como constantes y un `egui::Style` generado desde ellos | Compilado y probado contra egui 0.37; **sin verificar visualmente en una app real** |
 | [`@nodalia/catalog`](apps/catalog) | Catálogo visual interactivo y tres demostraciones de referencia (productividad, editor creativo, ingeniería) | Operativo (no se publica) |
 
@@ -46,7 +47,8 @@ Para los tests de navegador hace falta Chromium (`npx playwright-core install ch
 - **GTK4 / libadwaita:** cargar `nodalia-light.css` o `nodalia-dark.css` según `AdwStyleManager`. Ver [docs/integration/gtk.md](docs/integration/gtk.md).
 - **Qt Quick:** importar el módulo `Nodalia` y enlazar `NodaliaTheme.mode`. Ver [docs/integration/qml.md](docs/integration/qml.md).
 - **Rust / egui:** crate `nodalia-theme` y `for_egui::apply_system(&ctx, …)`. Ver [docs/integration/egui.md](docs/integration/egui.md).
-- **Otros (Qt Widgets…):** [docs/integration/other.md](docs/integration/other.md).
+- **Qt Widgets:** estilo Fusion + `nodalia-<modo>-<densidad>.qss`. Ver [docs/integration/qt-widgets.md](docs/integration/qt-widgets.md).
+- **Otros:** [docs/integration/other.md](docs/integration/other.md).
 - **Adoptarlo en una app existente, sin migrar de golpe:** [docs/migration.md](docs/migration.md).
 
 ## Documentación

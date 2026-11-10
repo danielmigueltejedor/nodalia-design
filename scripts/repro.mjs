@@ -5,7 +5,7 @@ import { readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = new URL('../', import.meta.url).pathname;
-const outputs = ['packages/tokens/dist', 'packages/gtk/dist', 'packages/qml/dist', 'packages/web/dist', 'apps/catalog/dist'];
+const outputs = ['packages/tokens/dist', 'packages/gtk/dist', 'packages/qml/dist', 'packages/qtwidgets/dist', 'packages/web/dist', 'apps/catalog/dist'];
 
 const files = (dir) => readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? files(join(dir, f)) : [join(dir, f)]));
 function build() {

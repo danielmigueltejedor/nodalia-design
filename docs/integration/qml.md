@@ -2,7 +2,7 @@
 
 > **Sin verificar con Qt.** El singleton se genera y se prueba estructuralmente. No se ha ejecutado en una app Qt.
 
-> **Aplica solo a apps Qt Quick.** Vortia y Lienzo usan Qt Widgets, para los que este adaptador no sirve directamente; falta un generador de `QPalette`/QSS (ver [estado](../status.md)).
+> **Aplica solo a apps Qt Quick.** Vortia y Lienzo usan Qt Widgets, para los que este adaptador no sirve directamente; para esas existe [`@nodalia/qtwidgets`](qt-widgets.md).
 
 ## Uso
 

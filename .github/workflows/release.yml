@@ -23,7 +23,7 @@ jobs:
       - name: The tag must match the package versions
         run: |
           v="${GITHUB_REF_NAME#v}"
-          for p in tokens gtk qml web; do
+          for p in tokens gtk qml qtwidgets web; do
             [ "$(node -p "require('./packages/$p/package.json').version")" = "$v" ] || { echo "packages/$p version does not match $GITHUB_REF_NAME"; exit 1; }
           done
       - run: npm run validate
@@ -34,7 +34,7 @@ jobs:
       - name: Pack
         run: |
           mkdir -p release
-          for p in tokens gtk qml web; do npm pack -w "@nodalia/$p" --pack-destination release; done
+          for p in tokens gtk qml qtwidgets web; do npm pack -w "@nodalia/$p" --pack-destination release; done
           tar -czf "release/nodalia-design-catalog-${GITHUB_REF_NAME}.tar.gz" -C apps/catalog/dist .
           (cd release && sha256sum * > SHA256SUMS)
       - name: Create draft release
