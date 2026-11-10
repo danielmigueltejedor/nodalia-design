@@ -6,6 +6,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 
 ### Añadido
 - `@nodalia/icons`: 192 iconos nuevos (247 en total) en diez grupos más: general, medios, texto, datos, diapositivas, diseño, foto, correo, modelado y documento. Mismas normas de dibujo. `dist/preview.html` muestra el conjunto completo.
+- `@nodalia/gtk`: hojas de métricas `nodalia-metrics-{compact,regular,comfortable}.css` con espaciado, radios, tipografía, movimiento y tamaños de componente como variables `--ndl-*` (requiere GTK 4.16+), y `--ndl-elevation-raised` / `--ndl-elevation-overlay` en las hojas de cada modo. Siguen sin selectores de widgets: la app decide qué widget usa cada valor.
+- `@nodalia/gtk`: `nodalia-gtk.css`, hoja de widgets para GTK 4 que solo lee variables `--ndl-*`.
+- `nodalia-gtk`: crate de Rust para GTK 4.20 sin libadwaita. Instala las hojas, sigue las preferencias de claro, oscuro y contraste, y aporta navegación, barras, panel lateral, hoja inferior, diálogos, puntos de ruptura, filas de preferencias, páginas de estado y avisos con la API de libadwaita.
+- `@nodalia/gtk`: `tools/check-gtk.py` carga todas las hojas en un GTK 4 real, estiliza widgets con ellas y falla con cualquier error; corre en CI.
+
+### Cambiado
+- NDL en GTK ya no se apoya en libadwaita (principio 9 y regla 4 de `AGENTS.md`). Las hojas siguen emitiendo sus colores con nombre.
 
 ## [0.1.0-alpha.1]
 

@@ -1,7 +1,7 @@
 {
   "name": "@nodalia/gtk",
   "version": "0.1.0-alpha.1",
-  "description": "Nodalia Design Language for GTK4 / libadwaita: named-colour stylesheets generated from the tokens.",
+  "description": "Nodalia Design Language for GTK 4: colour, metric and widget stylesheets generated from the tokens.",
   "license": "MIT",
   "type": "module",
   "files": ["mapping.json", "dist"],

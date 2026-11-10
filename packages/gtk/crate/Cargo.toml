@@ -1,0 +1,15 @@
+[package]
+name = "nodalia-gtk"
+version = "0.1.0-alpha.1"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+description = "Nodalia Design Language for GTK 4 without libadwaita: the theme and the widgets an app needs."
+repository = "https://github.com/danielmigueltejedor/nodalia-design"
+publish = false
+
+[dependencies]
+gtk = { package = "gtk4", version = "0.11", features = ["v4_20"] }
+
+# Standalone on purpose: apps take this crate as a git dependency into their own workspace.
+[workspace]

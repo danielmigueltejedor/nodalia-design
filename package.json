@@ -13,7 +13,7 @@
     "build": "npm run build -w @nodalia/tokens -w @nodalia/icons && npm run build -w @nodalia/gtk -w @nodalia/qml -w @nodalia/egui -w @nodalia/qtwidgets -w @nodalia/web -w @nodalia/catalog",
     "validate": "npm run validate -w @nodalia/tokens && npm run lint -w @nodalia/web",
     "test": "npm run build && npm test --workspaces --if-present",
-    "test:rust": "cargo test --manifest-path packages/egui/crate/Cargo.toml && cargo test --manifest-path packages/egui/crate/Cargo.toml --features egui",
+    "test:rust": "cargo test --manifest-path packages/egui/crate/Cargo.toml && cargo test --manifest-path packages/egui/crate/Cargo.toml --features egui && cargo test --manifest-path packages/gtk/crate/Cargo.toml",
     "test:browser": "node --test \"tests/browser/*.test.mjs\"",
     "ci": "npm run validate && npm test && npm run check:repro && npm run test:browser",
     "check:repro": "node scripts/repro.mjs"
