@@ -133,31 +133,9 @@ fn fill(
     color: Color32,
     edge: Option<Stroke>,
 ) {
-    let usable: Vec<&[Pt]> = outlines
-        .iter()
-        .map(|o| o.pts.as_slice())
-        .filter(|pts| pts.len() >= 3)
-        .collect();
-    let hole = |k: usize, of: Option<usize>| {
-        let first = usable.get(k).and_then(|pts| pts.first().copied());
-        usable.iter().enumerate().any(|(j, other)| {
-            j != k && of.is_none_or(|o| o == j) && first.is_some_and(|f| inside(f, other))
-        })
-    };
-    for (k, outer) in usable.iter().enumerate() {
-        if hole(k, None) {
-            continue;
-        }
-        let mut poly = oriented(outer, true);
-        let mut holes = 0;
-        for (h, pts) in usable.iter().enumerate() {
-            if h != k && hole(h, Some(k)) {
-                bridge(&mut poly, &oriented(pts, false));
-                holes += 1;
-            }
-        }
+    for (poly, holes, outer) in regions(outlines) {
         let screen: Vec<Pos2> = poly.iter().copied().map(at).collect();
-        if holes == 0 && convex(&poly) {
+        if !holes && convex(&poly) {
             p.add(Shape::convex_polygon(screen, color, Stroke::NONE));
             continue;
         }
@@ -176,6 +154,41 @@ fn fill(
             ));
         }
     }
+}
+
+/// The filled regions of an element's outlines under the even-odd rule: an outline nested at an
+/// even depth is filled, with the outlines directly inside it bridged in as holes. Each region is
+/// its positively oriented outline, whether it has holes, and its outer outline alone.
+fn regions(outlines: &[Outline]) -> Vec<(Vec<Pt>, bool, &[Pt])> {
+    let usable: Vec<&[Pt]> = outlines
+        .iter()
+        .map(|o| o.pts.as_slice())
+        .filter(|pts| pts.len() >= 3)
+        .collect();
+    let contains = |j: usize, k: usize| {
+        let first = usable.get(k).and_then(|pts| pts.first().copied());
+        j != k && first.is_some_and(|f| usable.get(j).is_some_and(|o| inside(f, o)))
+    };
+    let depth: Vec<usize> = (0..usable.len())
+        .map(|k| (0..usable.len()).filter(|&j| contains(j, k)).count())
+        .collect();
+    let depth_of = |k: usize| depth.get(k).copied().unwrap_or(0);
+    let mut out = Vec::new();
+    for (k, &outer) in usable.iter().enumerate() {
+        if depth_of(k) % 2 == 1 {
+            continue;
+        }
+        let mut poly = oriented(outer, true);
+        let mut holes = false;
+        for (h, pts) in usable.iter().enumerate() {
+            if depth_of(h) == depth_of(k) + 1 && contains(k, h) {
+                bridge(&mut poly, &oriented(pts, false));
+                holes = true;
+            }
+        }
+        out.push((poly, holes, outer));
+    }
+    out
 }
 
 /// Twice the signed area; positive when the outline turns the way `cross` calls convex.
@@ -690,6 +703,15 @@ mod tests {
         assert!(concave >= 8, "{concave}");
     }
 
+    fn filled_at(outlines: &[Outline], q: Pt) -> bool {
+        regions(outlines).iter().any(|(poly, _, _)| {
+            triangulate(poly).iter().any(|t| {
+                let [a, b, c] = t.map(|i| poly[i as usize]);
+                in_triangle(q, a, b, c)
+            })
+        })
+    }
+
     #[test]
     fn a_hole_stays_open() {
         let disc = super::super::get("disc").unwrap();
@@ -700,15 +722,25 @@ mod tests {
             .find(|el| el.fill && el.outlines.len() == 2)
             .unwrap();
         let (outer, hole) = (&el.outlines[0].pts, &el.outlines[1].pts);
-        assert!(inside(hole[0], outer) && !inside(outer[0], hole));
-        let mut poly = oriented(outer, true);
-        bridge(&mut poly, &oriented(hole, false));
         let want = (area(outer).abs() - area(hole).abs()) / 2.0;
-        assert!(
-            (covered(&poly) - want).abs() < 0.02 * want,
-            "{} vs {want}",
-            covered(&poly)
-        );
+        let got: f32 = regions(&el.outlines)
+            .iter()
+            .map(|(p, _, _)| covered(p))
+            .sum();
+        assert!((got - want).abs() < 0.02 * want, "{got} vs {want}");
+        assert!(!filled_at(&el.outlines, (12.0, 12.0)));
+        assert!(filled_at(&el.outlines, (12.0, 6.0)));
+    }
+
+    #[test]
+    fn an_island_inside_a_hole_is_filled() {
+        let squares = parse_path("M2 2h20v20H2zM6 6h12v12H6zM10 10h4v4h-4z").unwrap();
+        assert_eq!(squares.len(), 3);
+        assert!(filled_at(&squares, (4.0, 12.0)));
+        assert!(!filled_at(&squares, (8.0, 12.0)));
+        assert!(filled_at(&squares, (12.0, 12.0)));
+        let got: f32 = regions(&squares).iter().map(|(p, _, _)| covered(p)).sum();
+        assert!((got - (400.0 - 144.0 + 16.0)).abs() < 0.5, "{got}");
     }
 
     #[test]
