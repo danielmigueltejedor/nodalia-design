@@ -18,7 +18,7 @@ Vinilo 2.0 (GTK) es la primera app con la identidad completa. Esta nota lista lo
 - El acento (cian) se reserva para el progreso, el foco y la acción principal de una vista (`Reproducir`).
 - La fila activa de la barra lateral se **invierte**: fondo del color del texto, texto del color del marco.
 - El botón de reproducir es un círculo sólido en el color del texto.
-- Cerrar la ventana se vuelve coral (`component.window.close`) bajo el puntero; minimizar y maximizar usan `color.control.bg-hover`.
+- Bajo el puntero, cerrar se vuelve coral (`component.window.close`), minimizar amarillo anaranjado (`component.window.minimize`) y maximizar cian (`component.window.maximize`, sigue al acento de la app).
 - Una acción peligrosa en un menú (cerrar sesión) va en `color.status.danger.fg`.
 
 ## Tipografía

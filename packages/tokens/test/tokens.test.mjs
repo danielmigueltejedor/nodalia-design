@@ -156,7 +156,7 @@ test('an accent only changes the accent ramp and what aliases it', () => {
   const set = accents.get('vortia');
   const changed = [...accentTokens.keys()].filter((p) => MODES.some((m) => JSON.stringify(resolve(set.tokens, p, m)) !== JSON.stringify(resolve(accentTokens, p, m))));
   assert.ok(changed.length > 11);
-  for (const path of changed) assert.match(path, /^(palette\.accent\.|color\.(accent|selection\.bg$|border\.focus$|text\.link$)|component\.window\.minimize)/, path);
+  for (const path of changed) assert.match(path, /^(palette\.accent\.|color\.(accent|selection\.bg$|border\.focus$|text\.link$)|component\.window\.maximize)/, path);
 });
 
 test('ramp generation is deterministic', () => {

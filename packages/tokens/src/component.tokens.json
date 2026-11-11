@@ -44,10 +44,10 @@
       "radius": { "$type": "dimension", "$value": "{radius.xxl}" },
       "gap": { "$type": "dimension", "$value": "8px", "$description": "Between islands, and between them and the window's edge." },
       "close": { "$type": "color", "$value": "{palette.red.500}" },
-      "minimize": { "$type": "color", "$value": "{color.accent.text}", "$description": "The minimise glyph under the pointer." },
-      "minimize-tint": { "$type": "color", "$value": "{color.accent.subtle}", "$description": "The minimise button under the pointer: a cyan tint." },
-      "maximize": { "$type": "color", "$value": "{color.status.warning.fg}", "$description": "The maximise glyph under the pointer." },
-      "maximize-tint": { "$type": "color", "$value": "{color.status.warning.bg}", "$description": "The maximise button under the pointer: an amber tint." }
+      "minimize": { "$type": "color", "$value": "{color.status.warning.fg}", "$description": "The minimise glyph under the pointer." },
+      "minimize-tint": { "$type": "color", "$value": "{color.status.warning.bg}", "$description": "The minimise button under the pointer: an amber tint." },
+      "maximize": { "$type": "color", "$value": "{color.accent.text}", "$description": "The maximise glyph under the pointer." },
+      "maximize-tint": { "$type": "color", "$value": "{color.accent.subtle}", "$description": "The maximise button under the pointer: a cyan tint." }
     },
     "splitter": {
       "hit": { "$type": "dimension", "$value": "8px" }
