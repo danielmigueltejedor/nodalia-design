@@ -3,7 +3,7 @@
 //   dist/nodalia-metrics-<density>.css  spacing, radii, type, motion and component sizes as --ndl-* variables
 // Both contain variables only (plus libadwaita's documented named colours); which widget wears which
 // value is the app's call, in its own sheet, because widget selectors here would tie NDL to GTK internals.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { MODES, SOURCE_DIR, loadTokens, resolve, cssName, gtkColor } from '@nodalia/tokens/lib';
 import { ICONS } from '@nodalia/icons/src';
@@ -130,6 +130,9 @@ export function iconsRs() {
   ].join('\n');
 }
 
+/** The typefaces nodalia-gtk registers: Sora for display, Inter for the interface. */
+export const FONTS = [['sora', 'Sora[wght].ttf'], ['inter', 'Inter[opsz,wght].ttf']];
+
 /** The hand-written widget sheet. It only reads variables, so it is the same for every mode and density. */
 export const WIDGETS = readFileSync(new URL('../src/nodalia-gtk.css', import.meta.url), 'utf8');
 
@@ -153,5 +156,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     writeFileSync(join(CRATE_CSS, name), css);
   }
   writeFileSync(new URL('../crate/src/icons_generated.rs', import.meta.url), iconsRs());
+  // The fonts travel inside the crate: a Flatpak build vendors this directory alone.
+  const fonts = new URL('../../fonts/', import.meta.url).pathname;
+  const crateFonts = new URL('../crate/fonts/', import.meta.url).pathname;
+  for (const [family, file] of FONTS) {
+    mkdirSync(join(crateFonts, family), { recursive: true });
+    copyFileSync(join(fonts, family, file), join(crateFonts, family, file));
+    copyFileSync(join(fonts, family, 'OFL.txt'), join(crateFonts, family, 'OFL.txt'));
+  }
   console.log(`@nodalia/gtk: ${MODES.length} colour, ${DENSITIES.length} metric and 1 widget stylesheet -> dist/ and crate/src/css/; ${iconTheme().length} icons -> crate/src/icons_generated.rs`);
 }

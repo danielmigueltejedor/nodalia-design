@@ -10,6 +10,9 @@ publish = false
 
 [dependencies]
 gtk = { package = "gtk4", version = "0.11", features = ["v4_20"] }
+# For FontMap::add_font_file: the bundled fonts register for this app alone. GTK 4.20 already
+# requires Pango 1.56.
+pango = { version = "0.22", features = ["v1_56"] }
 
 # Standalone on purpose: apps take this crate as a git dependency into their own workspace.
 [workspace]

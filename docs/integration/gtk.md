@@ -59,6 +59,7 @@ Diferencias con libadwaita que conviene conocer:
 - `PreferencesDialog`, `AboutDialog`, `ShortcutsDialog`, `AlertDialog` y `Toast` son tipos de Rust, no GObject: no se meten en un `view!` de relm4, se crean en código.
 - `ToastOverlay` no implementa los rasgos de contenedor de relm4; en un `view!` se usa `set_child`.
 - Los iconos son los de NDL: `init` instala el tema de iconos **Nodalia** y lo hace el de la app; los nombres estándar responden con dibujos de NDL. Ver [iconografía](../iconography.md).
+- `init` registra Sora (títulos) e Inter (texto), que el crate lleva dentro con sus licencias OFL (`crate/fonts/`), en el mapa de fuentes de la app: se ven igual aunque el sistema no las tenga, sin instalar nada al usuario.
 - `init` sustituye también el tema base de GTK (el Adwaita que GTK lleva dentro) por el tema vacío que GTK incluye, así que todo lo que se ve es de NDL: no queda ningún widget a medio camino entre dos lenguajes.
 
 ### La forma: islas

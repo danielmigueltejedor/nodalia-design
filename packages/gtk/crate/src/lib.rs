@@ -15,6 +15,7 @@ mod about;
 mod animation;
 mod breakpoint;
 mod dialog;
+mod fonts;
 mod global_menu;
 mod icons;
 mod layout;

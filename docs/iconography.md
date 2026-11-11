@@ -80,11 +80,10 @@ Los tests del paquete comprueban las cuatro primeras reglas.
 
 ## Fuentes
 
-Los tokens nombran `Inter` y `Sora` con respaldo en la pila del sistema, pero **no se distribuyen**. Si se decide incluirlas, irán como paquete independiente con su licencia OFL y un registro de atribución.
+Los tokens nombran `Inter` y `Sora`. Se distribuyen sin modificar en `packages/fonts/` con su licencia OFL-1.1 (ver su README); `nodalia-gtk` las lleva dentro y las registra para la app.
 
 ## Pendiente
 
 - Revisar los iconos nuevos en contexto, dentro de cada app.
 - Mostrar los iconos en el catálogo.
 - Pipeline que convierta SVG a recurso Qt (`qrc`) sin copiar a mano. GTK ya tiene el suyo (el tema Nodalia) y la web el *sprite*.
-- Decisión sobre fuente propia.

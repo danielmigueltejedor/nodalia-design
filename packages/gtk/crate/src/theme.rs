@@ -166,6 +166,7 @@ impl StyleManager {
         imp.widgets.borrow().load_from_string(WIDGETS_CSS);
         replace_base_theme(&gtk::Settings::for_display(&display));
         crate::icons::install(&display);
+        crate::fonts::install();
         imp.metrics
             .borrow()
             .load_from_string(density_css(imp.density.get()));
