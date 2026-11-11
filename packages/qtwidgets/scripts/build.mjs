@@ -23,6 +23,7 @@ export const DENSITIES = [...new Set(all.filter((t) => t.path.startsWith('densit
 
 export function flatTokens() {
   const colors = all.filter((t) => t.type === 'color' && t.path.startsWith('color.'));
+  const componentColors = all.filter((t) => t.type === 'color' && t.path.startsWith('component.'));
   const version = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
   return {
     name: 'Nodalia Design Language',
@@ -30,7 +31,11 @@ export function flatTokens() {
     modes: MODES,
     densities: DENSITIES,
     // Looked up under the active mode: color.<name>
-    color: Object.fromEntries(MODES.map((m) => [m, Object.fromEntries(colors.map((t) => [camel(t.path.slice('color.'.length)), qssColor(resolve(tokens, t.path, m))]))])),
+    // Component colours (the window's close) join them under their component name: color.windowClose.
+    color: Object.fromEntries(MODES.map((m) => [m, Object.fromEntries([
+      ...colors.map((t) => [camel(t.path.slice('color.'.length)), qssColor(resolve(tokens, t.path, m))]),
+      ...componentColors.map((t) => [camel(t.path.slice('component.'.length)), qssColor(resolve(tokens, t.path, m))]),
+    ])])),
     // Per app and mode, the colours that replace those of `color` (empty for the default accent).
     accent: Object.fromEntries([...accentOverrides(accentSets(tokens, SOURCE_DIR), MODES, resolve)].map(([name, modes]) => [name,
       Object.fromEntries(Object.entries(modes).map(([m, values]) => [m, Object.fromEntries(Object.entries(values).map(([path, hex]) => [camel(path.slice('color.'.length)), qssColor(hex)]))]))])),

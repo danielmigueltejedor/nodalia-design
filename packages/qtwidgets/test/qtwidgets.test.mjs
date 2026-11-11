@@ -8,12 +8,13 @@ const flat = flatTokens();
 const source = template();
 
 test('flat tokens carry every colour for every mode, in a form Qt accepts', () => {
-  const colours = [...tokens.values()].filter((t) => t.type === 'color' && t.path.startsWith('color.'));
+  const colours = [...tokens.values()].filter((t) => t.type === 'color' && /^(color|component)\./.test(t.path));
   for (const mode of MODES) {
     assert.equal(Object.keys(flat.color[mode]).length, colours.length, mode);
     for (const value of Object.values(flat.color[mode])) assert.match(value, /^(#[0-9A-F]{6}|rgba\(\d+, \d+, \d+, \d+\))$/);
   }
   assert.equal(flat.color.dark.surfaceWindow, resolve(tokens, 'color.surface.window', 'dark').toUpperCase());
+  assert.equal(flat.color.dark.windowClose, resolve(tokens, 'component.window.close', 'dark').toUpperCase());
 });
 
 test('translucent colours become rgba with alpha 0-255', () => {
