@@ -37,7 +37,7 @@ DIST = pathlib.Path(__file__).resolve().parent.parent / "crate" / "src" / "css"
 # Which property each kind of variable is probed with. A variable is only useful if GTK accepts
 # it where an app would put it, so the probe uses the same property.
 PROBES = [
-    (re.compile(r"--ndl-(color|palette)-"), "color"),
+    (re.compile(r"--ndl-(color|palette)-|--ndl-component-window-close"), "color"),
     (re.compile(r"--ndl-elevation-"), "box-shadow"),
     (re.compile(r"--ndl-(radius|component-.*radius)"), "border-radius"),
     (re.compile(r"--ndl-font-family-"), "font-family"),

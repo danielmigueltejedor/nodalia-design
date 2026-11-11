@@ -1142,17 +1142,16 @@ export const ICONS = {
   ] },
   // --- window ---
   "window-minimize": { group: "general", body: [
-    '<path d="M7 12h10"/>',
+    '<path d="M7.5 12h9" stroke-width="2.75"/>',
   ] },
   "window-maximize": { group: "general", body: [
-    '<rect x="7" y="7" width="10" height="10" rx="2"/>',
+    '<rect x="7" y="7" width="10" height="10" rx="3" stroke-width="2.25"/>',
   ] },
-  "window-restore": { group: "general", body: [
-    '<rect x="6" y="9" width="9" height="9" rx="1.75"/>',
-    '<path d="M9 6h7.25A1.75 1.75 0 0 1 18 7.75V15"/>',
+  "window-restore": { group: "general", fill: [0], body: [
+    '<rect x="7" y="7" width="10" height="10" rx="3" stroke-width="2.25"/>',
   ] },
   "window-close": { group: "general", body: [
-    '<path d="M7.5 7.5l9 9M16.5 7.5l-9 9"/>',
+    '<path d="M7.75 7.75l8.5 8.5M16.25 7.75l-8.5 8.5" stroke-width="2.75"/>',
   ] },
   "offline": { group: "general", body: [
     '<path d="M3.5 9.5a12.5 12.5 0 0 1 4.25-2.75"/>',

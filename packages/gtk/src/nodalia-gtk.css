@@ -712,47 +712,57 @@ headerbar .subtitle {
   color: var(--ndl-color-text-secondary);
 }
 
-/* One capsule holding three pills, with NDL's own glyphs. Close is the only one that takes a
- * colour, and only under the pointer. */
+/* Three round buttons of the header's own size, each standing on its own: a flat raised disc at
+ * rest. Minimise and maximise take a cyan tint under the pointer, close turns coral. The glyphs are
+ * NDL's (window-minimize, window-maximize, window-restore, window-close). */
 windowcontrols {
-  padding: 2px;
-  border-spacing: 0;
-  border-radius: var(--ndl-radius-full);
-  background-color: var(--ndl-color-control-bg);
+  border-spacing: var(--ndl-space-xs);
+  /* The header stretches its window controls to its own height; the padding brings them back to a
+   * button's, centred. */
+  padding: calc(var(--ndl-space-lg) / 2) 0;
+  background-color: transparent;
 }
 
 windowcontrols:not(.empty) {
   margin: 0 var(--ndl-space-xxs);
 }
 
-windowcontrols.empty {
-  padding: 0;
-  background-color: transparent;
-}
-
-/* Exactly as tall as the header's other buttons: the capsule is the control-height, the pills
- * inside it fill it but for the padding. */
-windowcontrols > button {
-  min-width: calc(var(--ndl-density-control-height) - 4px);
-  min-height: calc(var(--ndl-density-control-height) - 4px);
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action) {
+  min-width: var(--ndl-density-control-height);
+  min-height: var(--ndl-density-control-height);
   padding: 0;
   margin: 0;
   border: none;
   border-radius: var(--ndl-radius-full);
-  background-color: transparent;
+  background-color: var(--ndl-color-control-bg);
   color: var(--ndl-color-text-secondary);
   -gtk-icon-size: var(--ndl-size-icon-medium);
+  transition: background-color 120ms var(--ndl-easing-standard),
+    color 120ms var(--ndl-easing-standard);
 }
 
-windowcontrols > button:hover {
-  background-color: var(--ndl-color-control-bg-hover);
-  color: var(--ndl-color-text-primary);
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action):hover {
+  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 18%, var(--ndl-color-control-bg));
+  color: var(--ndl-color-accent-text);
 }
 
-windowcontrols > button.close:hover,
-windowcontrols > button.close:active {
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action):active {
+  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 30%, var(--ndl-color-control-bg));
+}
+
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).close:hover {
   background-color: var(--ndl-component-window-close);
   color: var(--ndl-palette-neutral-0);
+}
+
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).close:active {
+  background-color: color-mix(in srgb, var(--ndl-component-window-close) 82%, var(--ndl-palette-neutral-1000));
+  color: var(--ndl-palette-neutral-0);
+}
+
+windowcontrols > button:focus-visible {
+  outline: var(--ndl-border-width-thick) solid var(--ndl-color-border-focus);
+  outline-offset: 1px;
 }
 
 windowcontrols > button.minimize > image {
