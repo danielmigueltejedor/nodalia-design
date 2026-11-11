@@ -835,6 +835,32 @@ popover.menu modelbutton radio:checked {
   border-radius: var(--ndl-radius-full);
 }
 
+/* NDL's own menu rows (menu_item): an icon on every entry. */
+popover.menu .ndl-menu-row {
+  min-height: var(--ndl-density-row-height);
+  padding: 0 var(--ndl-space-sm);
+  border-radius: var(--ndl-component-control-radius);
+  font-weight: var(--ndl-font-weight-regular);
+}
+
+popover.menu .ndl-menu-row > box {
+  border-spacing: var(--ndl-space-sm);
+}
+
+popover.menu .ndl-menu-row image {
+  color: var(--ndl-color-text-secondary);
+}
+
+popover.menu .ndl-menu-row .accelerator {
+  color: var(--ndl-color-text-tertiary);
+  margin-left: var(--ndl-space-lg);
+}
+
+popover.menu .ndl-menu-row.danger,
+popover.menu .ndl-menu-row.danger image {
+  color: var(--ndl-color-status-danger-fg);
+}
+
 popover.menu modelbutton:hover,
 popover.menu modelbutton:selected {
   background-color: var(--ndl-color-control-bg-hover);

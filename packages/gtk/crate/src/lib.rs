@@ -17,6 +17,7 @@ mod breakpoint;
 mod dialog;
 mod icons;
 mod layout;
+mod menu;
 mod misc;
 mod navigation;
 mod prefs;
@@ -36,6 +37,7 @@ pub use animation::{AnimationState, CallbackAnimationTarget, Easing, TimedAnimat
 pub use breakpoint::{Breakpoint, BreakpointCondition, ConditionError};
 pub use dialog::{AlertDialog, Dialog, DialogBuilder, ResponseAppearance};
 pub use layout::{BottomSheet, OverlaySplitView};
+pub use menu::{menu_item, menu_item_danger, menu_rows};
 pub use misc::{
     Avatar, AvatarBuilder, Clamp, ClampBuilder, ClampScrollable, Spinner, SpinnerBuilder,
     StatusPage, StatusPageBuilder, Toast, ToastOverlay,
