@@ -79,3 +79,10 @@ test('the bold style fills only elements that exist, and its own bodies follow t
   // The style's character: the media controls and the library's own icons are solid.
   assert.ok(solid >= 25, `${solid} solid icons`);
 });
+
+test('accents name elements that exist, and the CAD set is complete', () => {
+  for (const name of names()) for (const i of ICONS[name].accent ?? []) assert.ok(Number.isInteger(i) && i >= 0 && i < ICONS[name].body.length, `${name}: accent ${i}`);
+  const cad = names().filter((n) => ICONS[n].group === 'cad');
+  assert.ok(cad.length >= 90, `${cad.length} CAD icons`);
+  for (const shared of ['line', 'circle', 'rectangle', 'fillet', 'chamfer', 'dimension']) assert.ok(ICONS[shared].accent, shared);
+});

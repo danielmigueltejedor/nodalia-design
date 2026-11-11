@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { MODES, SOURCE_DIR, loadTokens, resolve, parseHex } from '@nodalia/tokens/lib';
-import { OUTPUT, rustSource } from '../scripts/build.mjs';
+import { ICONS_OUTPUT, OUTPUT, iconsSource, rustSource } from '../scripts/build.mjs';
 
 const tokens = loadTokens(SOURCE_DIR);
 const src = rustSource();
@@ -46,4 +46,11 @@ test('output is balanced, has unique items per scope and no undefined/NaN', () =
   assert.ok(!/undefined|NaN|\[object/.test(src));
   const fields = /pub struct Palette \{\n([\s\S]*?)\n\}/.exec(src)[1].match(/pub (\w+):/g);
   assert.equal(new Set(fields).size, fields.length);
+});
+
+test('the committed icons/data.rs matches the icon set (run `npm run build -w @nodalia/egui`)', () => {
+  assert.equal(readFileSync(ICONS_OUTPUT, 'utf8'), iconsSource());
+  const names = [...iconsSource().matchAll(/^ {8}name: "([a-z-]+)",$/gm)].map((m) => m[1]);
+  assert.deepEqual(names, [...names].sort());
+  assert.ok(names.includes('line') && names.includes('dim-continue'));
 });
