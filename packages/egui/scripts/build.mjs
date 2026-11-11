@@ -214,7 +214,8 @@ export function rustSource() {
 export function iconsSource() {
   const raw = (text) => `r#"${text}"#`;
   const list = (items) => `&[${items.join(', ')}]`;
-  const names = Object.keys(ICONS).sort();
+  // Code-unit order, which is the byte order Rust's str comparison uses (names are unique).
+  const names = Object.keys(ICONS).sort((a, b) => (a < b ? -1 : 1));
   // The bold body is stored only where it differs; Icon::bold_body falls back to the regular one.
   const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
   const entry = (name) => {
