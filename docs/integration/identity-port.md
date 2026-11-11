@@ -53,4 +53,6 @@ Vinilo 2.0 (GTK) es la primera app con la identidad completa. Esta nota lista lo
 
 ## Menú global
 
-En Linux, cada app exporta su menú a la barra superior del shell (`org.gtk.Menus` / `org.gtk.Actions`): un menú con el nombre de la app (Acerca de, Preferencias, Atajos, Cerrar sesión, Salir) y luego los de su trabajo (Reproducción, Ver, Ventana, Ayuda). El menú principal dentro de la ventana se mantiene. En GTK lo hace `nodalia_gtk::global_menu`; en Qt, el equivalente es exportar el `QMenuBar` por D-Bus (`QT_QPA_PLATFORMTHEME` con soporte de *appmenu*, o `dbusmenu`).
+En Linux, cada app exporta su menú a la barra superior del shell (`org.gtk.Menus` / `org.gtk.Actions`): un menú con el nombre de la app (Acerca de, Preferencias, Atajos, Cerrar sesión, Salir) y luego los de su trabajo (Reproducción, Ver, Ventana, Ayuda). El menú principal dentro de la ventana se mantiene. En GTK lo hace `nodalia_gtk::global_menu` y la barra lo lee por Mutter (`gtk_menubar_object_path`), también en Wayland.
+
+En Qt hay que ayudar: Qt registra su barra de menús en `com.canonical.AppMenu.Registrar` solo en X11. En Wayland la app exporta su `QMenuBar` por `com.canonical.dbusmenu` en una ruta propia (no `/MenuBar/N`, que Qt ya usa sin registrar) y la registra con el **pid del proceso** como id de ventana; la barra de Nodalix la empareja con la ventana por ese pid. La implementación de referencia es `ndl::exportGlobalMenu` en Vortia (`src/ui/src/GlobalMenu.cpp`): unos cientos de líneas sobre la API pública de QtDBus, sin cabeceras privadas.
