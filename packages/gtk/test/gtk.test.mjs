@@ -101,4 +101,5 @@ test('window controls fill as a whole: the glyph paints no disc of its own over 
     assert.ok(rule.includes(reset), `windowcontrols > button > image needs ${reset}`);
   }
   assert.match(sheet, /windowcontrols > button:not\(\.suggested-action\):not\(\.destructive-action\)\.close:hover \{\s*background-color: var\(--ndl-component-window-close\);/);
+  assert.match(sheet, /\.maximize:hover \{\s*background-color: var\(--ndl-component-window-maximize-tint\);/);
 });

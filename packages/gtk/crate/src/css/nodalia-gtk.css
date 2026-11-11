@@ -712,14 +712,14 @@ headerbar .subtitle {
   color: var(--ndl-color-text-secondary);
 }
 
-/* Three round buttons of the header's own size, each standing on its own: a flat raised disc at
- * rest. Minimise and maximise take a cyan tint under the pointer, close turns coral. The glyphs are
- * NDL's (window-minimize, window-maximize, window-restore, window-close). */
+/* Three round buttons, each standing on its own: a flat raised disc at rest. Under the pointer
+ * minimise takes a cyan tint, maximise an amber one, close turns coral. The glyphs are NDL's
+ * (window-minimize, window-maximize, window-restore, window-close). */
 windowcontrols {
   border-spacing: var(--ndl-space-xs);
-  /* The header stretches its window controls to its own height; the padding brings them back to a
-   * button's, centred. */
-  padding: calc(var(--ndl-space-lg) / 2) 0;
+  /* The header stretches its window controls to its own height; the padding brings them back to
+   * 28 px, centred on the header's 32 px buttons. */
+  padding: calc(var(--ndl-space-lg) / 2 + 2px) 0;
   background-color: transparent;
 }
 
@@ -728,8 +728,8 @@ windowcontrols:not(.empty) {
 }
 
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action) {
-  min-width: var(--ndl-density-control-height);
-  min-height: var(--ndl-density-control-height);
+  min-width: calc(var(--ndl-density-control-height) - 4px);
+  min-height: calc(var(--ndl-density-control-height) - 4px);
   padding: 0;
   margin: 0;
   border: none;
@@ -745,12 +745,17 @@ headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action
 }
 
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action):hover {
-  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 28%, var(--ndl-color-control-bg));
-  color: var(--ndl-color-accent-text);
+  background-color: var(--ndl-component-window-minimize-tint);
+  color: var(--ndl-component-window-minimize);
+}
+
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).maximize:hover {
+  background-color: var(--ndl-component-window-maximize-tint);
+  color: var(--ndl-component-window-maximize);
 }
 
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action):active {
-  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 40%, var(--ndl-color-control-bg));
+  filter: brightness(90%);
 }
 
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).close:hover {

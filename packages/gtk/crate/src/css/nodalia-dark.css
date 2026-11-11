@@ -69,6 +69,10 @@
   --popover-bg-color: #1d2029;
   --popover-fg-color: #eef0f4;
   --ndl-component-window-close: #ff5c4d;
+  --ndl-component-window-minimize: #2cc5d3;
+  --ndl-component-window-minimize-tint: #083a40;
+  --ndl-component-window-maximize: #f2c14e;
+  --ndl-component-window-maximize-tint: #33240a;
   --ndl-palette-neutral-0: #ffffff;
   --ndl-palette-neutral-50: #eef0f4;
   --ndl-palette-neutral-100: #eceef2;
