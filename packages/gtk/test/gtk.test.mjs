@@ -93,3 +93,12 @@ test('the widget sheet hard-codes no colour', () => {
   const literals = stripped.match(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\b(white|black)\b/g) ?? [];
   assert.deepEqual(literals, []);
 });
+
+test('window controls fill as a whole: the glyph paints no disc of its own over the button', () => {
+  const sheet = readFileSync(new URL('../src/nodalia-gtk.css', import.meta.url), 'utf8');
+  const rule = /windowcontrols > button > image \{([^}]*)\}/.exec(sheet)?.[1] ?? '';
+  for (const reset of ['background: none', 'padding: 0', 'border-radius: 0', 'box-shadow: none']) {
+    assert.ok(rule.includes(reset), `windowcontrols > button > image needs ${reset}`);
+  }
+  assert.match(sheet, /windowcontrols > button:not\(\.suggested-action\):not\(\.destructive-action\)\.close:hover \{\s*background-color: var\(--ndl-component-window-close\);/);
+});

@@ -768,6 +768,18 @@ windowcontrols > button:focus-visible {
   outline-offset: 1px;
 }
 
+/* GTK paints a disc of its own on the glyph (a padded, round, dark `image`), which sat over the
+ * button's fill and left only a ring of the hover colour showing. The button is the shape; the
+ * glyph is only the glyph. */
+windowcontrols > button > image {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
 windowcontrols > button.minimize > image {
   -gtk-icon-source: -gtk-icontheme("ndl-window-minimize-symbolic");
 }
