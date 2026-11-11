@@ -74,14 +74,14 @@ label link {
 .ndl-view-title {
   font-family: var(--ndl-font-family-display);
   font-size: 44px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.04em;
 }
 
 /* Section labels: small capitals that order a column without competing with it. */
 .ndl-micro {
   font-size: 10.5px;
-  font-weight: var(--ndl-font-weight-semibold);
+  font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--ndl-color-text-tertiary);
@@ -274,8 +274,8 @@ button.destructive-action:disabled {
 
 button.osd,
 .osd button {
-  background-color: var(--ndl-color-scrim-default);
-  color: var(--ndl-palette-neutral-0);
+  background-color: var(--ndl-color-surface-overlay);
+  color: var(--ndl-color-text-primary);
 }
 
 button.osd:hover,
@@ -620,10 +620,16 @@ list.navigation-sidebar {
 
 /* The row you are on is inverted, not tinted: the strongest mark the palette has, kept for the one
  * thing that is current. */
+.navigation-sidebar > row,
+.navigation-sidebar > listview > row {
+  font-weight: var(--ndl-font-weight-medium);
+}
+
 .navigation-sidebar > row:selected,
 .navigation-sidebar > listview > row:selected {
   background-color: var(--ndl-color-text-primary);
   color: var(--ndl-color-surface-window);
+  font-weight: 700;
 }
 
 .navigation-sidebar > row:selected .ndl-count,
@@ -698,7 +704,7 @@ headerbar > windowhandle > box {
 }
 
 headerbar .title {
-  font-weight: var(--ndl-font-weight-semibold);
+  font-weight: 700;
 }
 
 headerbar .subtitle {
@@ -709,8 +715,8 @@ headerbar .subtitle {
 /* One capsule holding three pills, with NDL's own glyphs. Close is the only one that takes a
  * colour, and only under the pointer. */
 windowcontrols {
-  padding: 3px;
-  border-spacing: 2px;
+  padding: 2px;
+  border-spacing: 0;
   border-radius: var(--ndl-radius-full);
   background-color: var(--ndl-color-control-bg);
 }
@@ -724,16 +730,18 @@ windowcontrols.empty {
   background-color: transparent;
 }
 
+/* Exactly as tall as the header's other buttons: the capsule is the control-height, the pills
+ * inside it fill it but for the padding. */
 windowcontrols > button {
-  min-width: 30px;
-  min-height: 22px;
+  min-width: calc(var(--ndl-density-control-height) - 4px);
+  min-height: calc(var(--ndl-density-control-height) - 4px);
   padding: 0;
   margin: 0;
   border: none;
   border-radius: var(--ndl-radius-full);
   background-color: transparent;
   color: var(--ndl-color-text-secondary);
-  -gtk-icon-size: 14px;
+  -gtk-icon-size: var(--ndl-size-icon-medium);
 }
 
 windowcontrols > button:hover {
@@ -1091,8 +1099,52 @@ ndl-spinner {
   border: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
 }
 
+/* An on-screen readout (volume, brightness) floats like a popover: a raised island with a hairline
+ * and the one shadow floating things get, not a translucent slab. */
 .osd {
-  background-color: var(--ndl-color-scrim-default);
-  color: var(--ndl-palette-neutral-0);
+  background-color: var(--ndl-color-surface-overlay);
+  color: var(--ndl-color-text-primary);
+  border: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
   border-radius: var(--ndl-component-panel-radius);
+  box-shadow: var(--ndl-elevation-overlay);
+}
+
+.osd levelbar > trough {
+  min-height: 6px;
+  border-radius: var(--ndl-radius-full);
+  background-color: var(--ndl-color-control-track);
+}
+
+.osd levelbar > trough > block {
+  border-radius: var(--ndl-radius-full);
+}
+
+.osd levelbar > trough > block.filled {
+  background-color: var(--ndl-color-text-primary);
+}
+
+/* The level popup of a scale button (volume): an island holding one thick slider. */
+scalebutton > popover > contents {
+  min-width: 0;
+  padding: var(--ndl-space-md) var(--ndl-space-sm);
+}
+
+scalebutton > popover scale.vertical {
+  min-height: 160px;
+  padding: var(--ndl-space-xs) var(--ndl-space-sm);
+}
+
+scalebutton > popover scale.vertical > trough {
+  min-width: 6px;
+}
+
+scalebutton > popover scale > trough > highlight {
+  background-color: var(--ndl-color-text-primary);
+}
+
+scalebutton > popover button {
+  min-width: var(--ndl-density-control-height);
+  min-height: var(--ndl-density-control-height);
+  border-radius: var(--ndl-radius-full);
+  background-color: transparent;
 }

@@ -7,6 +7,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { MODES, SOURCE_DIR, loadTokens, resolve, cssName, gtkColor } from '@nodalia/tokens/lib';
 import { ICONS } from '@nodalia/icons/src';
+import { BOLD_STROKE, boldBody } from '@nodalia/icons/bold';
 
 const mapping = Object.entries(JSON.parse(readFileSync(new URL('../mapping.json', import.meta.url), 'utf8')))
   .filter(([k]) => !k.startsWith('$'));
@@ -86,7 +87,7 @@ export function metricsCss(density) {
 }
 
 /**
- * One NDL icon as a GTK symbolic SVG. GTK recolours symbolic icons through classes rather than
+ * One NDL icon, in the bold style, as a GTK symbolic SVG. GTK recolours symbolic icons through classes rather than
  * currentColor: `foreground-stroke` takes the text colour on the stroke, `foreground-fill` on the
  * fill, and `transparent-fill` keeps an open path from being filled in.
  */
@@ -95,14 +96,14 @@ export function gtkSymbolic(name) {
     const filled = /fill="currentColor"/.test(part);
     const stroked = !/stroke="none"/.test(part);
     const classes = [filled ? 'foreground-fill' : 'transparent-fill', ...(stroked ? ['foreground-stroke'] : [])];
-    const width = /stroke-width=/.test(part) ? '' : ' stroke-width="1.75"';
+    const width = /stroke-width=/.test(part) ? '' : ` stroke-width="${BOLD_STROKE}"`;
     const paint = `fill="${filled ? 'rgb(0,0,0)' : 'none'}" stroke="${stroked ? 'rgb(0,0,0)' : 'none'}"`
       + (stroked ? `${width} stroke-linecap="round" stroke-linejoin="round"` : '');
     return part
       .replace(/ (fill|stroke)="(currentColor|none)"/g, '')
       .replace(/^<(\w+)/, `<$1 class="${classes.join(' ')}" ${paint}`);
   };
-  const body = ICONS[name].body.map(element).join('');
+  const body = boldBody(name).map(element).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">${body}</svg>\n`;
 }
 

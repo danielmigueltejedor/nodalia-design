@@ -72,6 +72,8 @@
   "document-open-symbolic": "open",
   "document-save-symbolic": "save",
   "document-new-symbolic": "new",
+  "emblem-documents-symbolic": "file-text",
+  "text-x-generic-symbolic": "file-text",
   "web-browser-symbolic": "globe",
   "network-offline-symbolic": "offline",
   "network-wireless-symbolic": "wifi",

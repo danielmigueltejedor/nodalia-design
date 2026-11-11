@@ -15,6 +15,7 @@ mod about;
 mod animation;
 mod breakpoint;
 mod dialog;
+mod global_menu;
 mod icons;
 mod layout;
 mod menu;
@@ -28,7 +29,7 @@ mod window;
 
 pub use gtk;
 
-pub use icons::THEME as ICON_THEME;
+pub use icons::{has_icon, THEME as ICON_THEME};
 
 pub use about::{
     AboutDialog, AboutDialogBuilder, ShortcutsDialog, ShortcutsItem, ShortcutsSection,
@@ -36,6 +37,7 @@ pub use about::{
 pub use animation::{AnimationState, CallbackAnimationTarget, Easing, TimedAnimation};
 pub use breakpoint::{Breakpoint, BreakpointCondition, ConditionError};
 pub use dialog::{AlertDialog, Dialog, DialogBuilder, ResponseAppearance};
+pub use global_menu::{global_menu, MenuEntry, TopMenu};
 pub use layout::{BottomSheet, OverlaySplitView};
 pub use menu::{menu_item, menu_item_danger, menu_rows};
 pub use misc::{

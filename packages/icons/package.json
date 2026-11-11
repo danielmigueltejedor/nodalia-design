@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "files": ["dist", "src"],
-  "exports": { ".": "./dist/icons.json", "./sprite": "./dist/sprite.svg", "./svg/*": "./dist/svg/*", "./mono/*": "./dist/mono/*", "./src": "./src/icons.mjs" },
+  "exports": { ".": "./dist/icons.json", "./sprite": "./dist/sprite.svg", "./svg/*": "./dist/svg/*", "./mono/*": "./dist/mono/*", "./src": "./src/icons.mjs", "./bold": "./src/bold.mjs" },
   "scripts": { "build": "node scripts/build.mjs", "test": "node --test \"test/*.test.mjs\"" },
   "engines": { "node": ">=20" }
 }

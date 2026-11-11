@@ -23,6 +23,12 @@ use generated::ICONS;
 /// The theme's name, as `gtk-icon-theme-name` reads it.
 pub const THEME: &str = "Nodalia";
 
+/// Whether the Nodalia icon theme draws `name` itself (rather than leaving it to the
+/// inherited theme). Apps use it in a test so no icon of another set reaches the screen.
+pub fn has_icon(name: &str) -> bool {
+    ICONS.iter().any(|(icon, _)| *icon == name)
+}
+
 /// Makes the Nodalia icon theme the display's, inheriting from the theme it replaces. Keeps it
 /// in place if the system changes its icon theme later.
 pub(crate) fn install(display: &gtk::gdk::Display) {

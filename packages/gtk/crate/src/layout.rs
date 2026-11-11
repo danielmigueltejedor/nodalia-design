@@ -309,6 +309,11 @@ impl OverlaySplitView {
 mod sheet_imp {
     use super::*;
 
+    /// How far the pointer moves, in px, before a press on the bar or sheet becomes a drag.
+    const DRAG_START: f64 = 8.0;
+    /// The share of the sheet's height a drag has to cover to open or close it.
+    const SETTLE_AFTER: f64 = 1.0 / 3.0;
+
     #[derive(glib::Properties)]
     #[properties(wrapper_type = super::BottomSheet)]
     pub struct BottomSheet {
@@ -337,6 +342,10 @@ mod sheet_imp {
         pub anim: RefCell<Option<TimedAnimation>>,
         pub bar_anim: RefCell<Option<TimedAnimation>>,
         pub reported: Cell<i32>,
+        /// Where a drag started from, while one is following the pointer.
+        pub drag_from: Cell<Option<f64>>,
+        /// Set once the press became a drag, so its release is not also taken as a click.
+        pub dragged: Cell<bool>,
     }
 
     impl Default for BottomSheet {
@@ -364,6 +373,8 @@ mod sheet_imp {
                 anim: RefCell::default(),
                 bar_anim: RefCell::default(),
                 reported: Cell::new(-1),
+                drag_from: Cell::new(None),
+                dragged: Cell::new(false),
             }
         }
     }
@@ -381,6 +392,12 @@ mod sheet_imp {
             if self.open.replace(open) == open {
                 return;
             }
+            self.settle(open);
+        }
+
+        /// Moves to `open` from wherever the sheet is now, which after a drag is in between.
+        fn settle(&self, open: bool) {
+            self.open.set(open);
             let obj = self.obj();
             if open {
                 obj.add_css_class("open");
@@ -391,6 +408,76 @@ mod sheet_imp {
             if open {
                 self.sheet_box.grab_focus();
             }
+        }
+
+        /// A vertical drag on the bar or the sheet moves the sheet with the pointer; let go, it
+        /// opens or closes by how far it travelled. Claimed only once the pointer has moved
+        /// mostly up or down, so a click on a button inside still is one.
+        fn follow_drag(&self) -> gtk::GestureDrag {
+            let drag = gtk::GestureDrag::new();
+            // Capture: the sheet's own content would take the press first. Nothing is lost by
+            // it, since a horizontal drag (a scrubber) or a click is never claimed here.
+            drag.set_propagation_phase(gtk::PropagationPhase::Capture);
+            // On the sheet itself, not on the bar or the sheet: those move with the pointer,
+            // and an offset measured in their coordinates would fall behind it.
+            let weak = self.obj().downgrade();
+            drag.connect_drag_begin(move |gesture, x, y| {
+                let Some(this) = weak.upgrade() else { return };
+                let imp = this.imp();
+                imp.dragged.set(false);
+                let point = gtk::graphene::Point::new(x as f32, y as f32);
+                let over = |w: &gtk::Box| {
+                    w.is_child_visible()
+                        && w.compute_bounds(&this)
+                            .is_some_and(|b| b.contains_point(&point))
+                };
+                if !over(&imp.sheet_box) && !over(&imp.bar_box) {
+                    gesture.set_state(gtk::EventSequenceState::Denied);
+                }
+            });
+            let weak = self.obj().downgrade();
+            drag.connect_drag_update(move |gesture, dx, dy| {
+                let Some(this) = weak.upgrade() else { return };
+                let imp = this.imp();
+                if imp.drag_from.get().is_none() {
+                    if dy.abs() < DRAG_START || dy.abs() < dx.abs() {
+                        return;
+                    }
+                    gesture.set_state(gtk::EventSequenceState::Claimed);
+                    if let Some(anim) = imp.anim.borrow().as_ref() {
+                        anim.pause();
+                    }
+                    imp.sheet_box.set_child_visible(true);
+                    imp.drag_from.set(Some(imp.progress.get()));
+                    imp.dragged.set(true);
+                }
+                let from = imp.drag_from.get().unwrap_or_default();
+                // What shows of the sheet, so it moves with the pointer one to one.
+                let height = f64::from(imp.sheet_box.height().min(this.height()).max(1));
+                imp.progress.set((from - dy / height).clamp(0.0, 1.0));
+                this.queue_allocate();
+            });
+            let weak = self.obj().downgrade();
+            drag.connect_drag_end(move |_, _, _| {
+                let Some(this) = weak.upgrade() else { return };
+                let imp = this.imp();
+                let Some(from) = imp.drag_from.take() else {
+                    return;
+                };
+                let travelled = (imp.progress.get() - from).abs();
+                let was_open = imp.open.get();
+                let open = if travelled >= SETTLE_AFTER {
+                    !was_open
+                } else {
+                    was_open
+                };
+                imp.settle(open);
+                // A property setter notifies by itself; this path does not go through one.
+                if open != was_open {
+                    this.notify_open();
+                }
+            });
+            drag
         }
 
         fn set_reveal(&self, reveal: bool) {
@@ -487,7 +574,7 @@ mod sheet_imp {
             let handle_click = gtk::GestureClick::new();
             let weak = obj.downgrade();
             handle_click.connect_released(move |_, _, _, _| {
-                if let Some(this) = weak.upgrade() {
+                if let Some(this) = weak.upgrade().filter(|t| !t.imp().dragged.get()) {
                     this.set_open(false);
                 }
             });
@@ -497,11 +584,12 @@ mod sheet_imp {
             let open_click = gtk::GestureClick::new();
             let weak = obj.downgrade();
             open_click.connect_released(move |_, _, _, _| {
-                if let Some(this) = weak.upgrade() {
+                if let Some(this) = weak.upgrade().filter(|t| !t.imp().dragged.get()) {
                     this.set_open(true);
                 }
             });
             self.bar_box.add_controller(open_click);
+            obj.add_controller(self.follow_drag());
             let keys = gtk::EventControllerKey::new();
             let weak = obj.downgrade();
             keys.connect_key_pressed(move |_, key, _, _| {

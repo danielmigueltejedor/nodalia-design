@@ -52,6 +52,8 @@ Una app de Nodalia se reconoce también por sus iconos, así que en GTK los icon
 
 Por eso una app GTK sigue pidiendo nombres estándar: no hay que tocar cada llamada para que sus iconos sean los de NDL. Para un icono de NDL sin nombre estándar se pide `ndl-<nombre>-symbolic`.
 
+En GTK los iconos van en el estilo **bold** de NDL: trazo de 2,25 y, en los iconos que lo indican con `fill` en `icons.mjs`, formas sólidas trazadas con el mismo color para que conserven las esquinas redondas (reproducir, pausa, estrella, nota musical, disco, persona, altavoz…). Es lo que da a las apps de Nodalia su carácter; el estilo regular (1,75, solo contornos) queda para documentos y herramientas densas. `@nodalia/icons/bold` produce el cuerpo bold de cada icono.
+
 Los SVG para GTK se generan desde `icons.mjs` con las clases de recoloreado de GTK (`foreground-stroke`, `foreground-fill`, `transparent-fill`), de modo que el trazo toma el color del texto. El tema se escribe en la caché del usuario, porque GTK solo lee temas de iconos desde directorios.
 
 Los iconos de aplicación y los cursores siguen siendo del sistema: Nodalix OS conserva su tema de iconos de aplicación y su tema de cursores.
@@ -61,6 +63,7 @@ Los iconos de aplicación y los cursores siguen siendo del sistema: Nodalix OS c
 - Rejilla de 24 px con 3 px de margen libre; coordenadas en múltiplos de 0,25 px.
 - Trazo de 1,75 px, extremos y uniones redondeados, siempre `currentColor`: el icono hereda el color del texto y el contraste lo gobierna el token.
 - Solo `path`, `circle` y `rect`. Sin transformaciones, clases ni estilos en línea.
+- En el estilo bold, `fill` lista los elementos que se rellenan; un icono puede dar un cuerpo `bold` propio cuando rellenar sus formas no se lee (un disco necesita su agujero).
 - Los nodos (vértices, puntos de control) son círculos rellenos.
 - Línea discontinua solo para lo que no es geometría real: ejes, guías, el segmento que falta.
 - Relleno suave (18 %) solo para indicar una cara o un plano.
