@@ -22,6 +22,39 @@ fn widgets() {
     toolbar_reports_its_bars();
     navigation_pops_back_to_the_root();
     window_title_stacks_its_subtitle();
+    window_controls_are_not_stretched();
+}
+
+/// A header taller than the window controls centres them: stretched, the circles became pills.
+fn window_controls_are_not_stretched() {
+    let header = ndl::HeaderBar::new();
+    let tall = gtk::Box::new(gtk::Orientation::Horizontal, 0);
+    tall.set_size_request(10, 60);
+    header.pack_start(&tall);
+    header.measure(gtk::Orientation::Vertical, 400);
+    header.allocate(400, 80, -1, None);
+    let mut controls = Vec::new();
+    collect_window_controls(header.upcast_ref(), &mut controls);
+    assert_eq!(controls.len(), 2);
+    for control in controls {
+        assert_eq!(control.valign(), gtk::Align::Center);
+        assert!(
+            control.height() < 60,
+            "window controls stretched to {}",
+            control.height()
+        );
+    }
+}
+
+fn collect_window_controls(widget: &gtk::Widget, found: &mut Vec<gtk::WindowControls>) {
+    let mut child = widget.first_child();
+    while let Some(current) = child {
+        if let Ok(controls) = current.clone().downcast::<gtk::WindowControls>() {
+            found.push(controls);
+        }
+        collect_window_controls(&current, found);
+        child = current.next_sibling();
+    }
 }
 
 /// A title and subtitle read top to bottom, never "Cola1 canción" on one line.

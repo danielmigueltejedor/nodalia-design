@@ -280,6 +280,10 @@ mod header_imp {
             bar.set_show_title_buttons(false);
             let start = gtk::WindowControls::new(gtk::PackType::Start);
             let end = gtk::WindowControls::new(gtk::PackType::End);
+            // Centred at their own 28 px: a header taller than that (a field, a subtitle) would
+            // otherwise stretch the round buttons into pills.
+            start.set_valign(gtk::Align::Center);
+            end.set_valign(gtk::Align::Center);
             let back = gtk::Button::from_icon_name("go-previous-symbolic");
             back.add_css_class("back");
             back.set_tooltip_text(Some("Back"));

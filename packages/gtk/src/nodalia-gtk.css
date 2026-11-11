@@ -731,7 +731,7 @@ headerbar .subtitle {
  * (window-minimize, window-maximize, window-restore, window-close). */
 windowcontrols {
   border-spacing: var(--ndl-space-xs);
-  /* The header already holds them at 28 px, like its other buttons. */
+  /* Centred by the header (ndl::HeaderBar), never stretched: each stays a 28 px circle. */
   padding: 0;
   background-color: transparent;
 }

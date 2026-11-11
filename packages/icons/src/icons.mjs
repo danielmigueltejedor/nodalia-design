@@ -448,8 +448,15 @@ export const ICONS = {
     '<circle cx="6.5" cy="6.75" r="0.8" fill="currentColor" stroke="none"/>',
     '<circle cx="9" cy="6.75" r="0.8" fill="currentColor" stroke="none"/>',
   ] },
+  // Two corners on one diagonal, no shafts: open outwards to fill the screen, turned to the
+  // centre to leave it.
   "fullscreen": { group: "general", body: [
-    '<path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/>',
+    '<path d="M14 4h6v6"/>',
+    '<path d="M10 20H4v-6"/>',
+  ] },
+  "fullscreen-exit": { group: "general", body: [
+    '<path d="M14 4v6h6"/>',
+    '<path d="M10 20v-6H4"/>',
   ] },
   "user": { group: "general", fill: [0,1], body: [
     '<circle cx="12" cy="8" r="4"/>',
@@ -1146,11 +1153,13 @@ export const ICONS = {
   "window-minimize": { group: "general", body: [
     '<path d="M8 12h8" stroke-width="2"/>',
   ] },
+  // The fullscreen corners on the window glyphs' grid: open outwards to maximise, turned to the
+  // centre to restore.
   "window-maximize": { group: "general", body: [
-    '<rect x="8" y="8" width="8" height="8" rx="2" stroke-width="2"/>',
+    '<path d="M12 7h5v5M12 17H7v-5" stroke-width="2"/>',
   ] },
-  "window-restore": { group: "general", fill: [0], body: [
-    '<rect x="8" y="8" width="8" height="8" rx="2" stroke-width="2"/>',
+  "window-restore": { group: "general", body: [
+    '<path d="M14 7v3h3M10 17v-3H7" stroke-width="2"/>',
   ] },
   "window-close": { group: "general", body: [
     '<path d="M8 8l8 8M16 8l-8 8" stroke-width="2"/>',

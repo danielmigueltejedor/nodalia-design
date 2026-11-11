@@ -42,7 +42,7 @@ Vinilo 2.0 (GTK) es la primera app con la identidad completa. Esta nota lista lo
 
 | Componente | Comportamiento |
 | --- | --- |
-| Controles de ventana | Una cápsula de la altura de un botón de la cabecera con tres píldoras dentro; glifos `window-minimize`, `window-maximize`/`window-restore`, `window-close` |
+| Controles de ventana | Una cápsula de la altura de un botón de la cabecera con tres píldoras dentro; glifos `window-minimize`, `window-maximize`/`window-restore` (dos esquinas en diagonal: hacia fuera para maximizar, hacia el centro para restaurar), `window-close`. Círculos de 28 px, centrados en la cabecera, nunca estirados |
 | Menús y *popovers* | Isla elevada, radio 16, borde de 1 px, sombra; icono en cada fila y atajo a la derecha |
 | Lectura de volumen | Isla elevada con borde y sombra; barra gruesa en el color del texto |
 | Ventana emergente de nivel (volumen) | Solo el deslizador vertical grueso, sin botones de paso |

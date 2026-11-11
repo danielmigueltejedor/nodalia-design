@@ -102,6 +102,7 @@
   "zoom-in-symbolic": "zoom",
   "zoom-out-symbolic": "zoom-out",
   "view-fullscreen-symbolic": "fullscreen",
+  "view-restore-symbolic": "fullscreen-exit",
   "printer-symbolic": "print",
   "bookmark-new-symbolic": "bookmark",
   "tag-symbolic": "tag",
