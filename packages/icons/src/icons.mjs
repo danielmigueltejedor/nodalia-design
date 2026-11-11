@@ -2,6 +2,7 @@
 // Rules (docs/iconography.md): 3 px of clear margin, 1.75 px stroke with round caps and joins,
 // filled circles for nodes, dashes only for what is not real geometry, a soft fill only for a face.
 // Colours are always currentColor. Edit here and rebuild; never retouch a generated file.
+// `fill` lists the elements the bold style draws solid (see bold.mjs); the regular style ignores it.
 
 export const ICONS = {
   // --- edit ---
@@ -47,7 +48,7 @@ export const ICONS = {
     '<circle cx="10.5" cy="10.5" r="6.5"/>',
     '<path d="M15.5 15.5l5 5"/>',
   ] },
-  "settings": { group: "edit", body: [
+  "settings": { group: "edit", fill: [1,3], body: [
     '<path d="M4 7h8M18 7h2"/>',
     '<circle cx="15" cy="7" r="2.5"/>',
     '<path d="M4 17h2M12 17h8"/>',
@@ -89,10 +90,10 @@ export const ICONS = {
     '<path d="M20 4l-8 8"/>',
   ] },
   // --- run ---
-  "run": { group: "run", body: [
+  "run": { group: "run", fill: [0], body: [
     '<path d="M7.5 4.5v15L20 12z"/>',
   ] },
-  "stop": { group: "run", body: [
+  "stop": { group: "run", fill: [0], body: [
     '<rect x="5.5" y="5.5" width="13" height="13" rx="2"/>',
   ] },
   // --- view ---
@@ -338,7 +339,7 @@ export const ICONS = {
     '<path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8"/>',
     '<circle cx="12" cy="16.75" r="1.15" fill="currentColor" stroke="none"/>',
   ] },
-  "lock": { group: "general", body: [
+  "lock": { group: "general", fill: [0], body: [
     '<rect x="5" y="11" width="14" height="9.5" rx="1.5"/>',
     '<path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   ] },
@@ -352,16 +353,16 @@ export const ICONS = {
     '<path d="M6.3 7.3A16.5 16.5 0 0 0 2.5 12S6 18.5 12 18.5a9 9 0 0 0 3.8-.8"/>',
     '<path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
   ] },
-  "star": { group: "general", body: [
+  "star": { group: "general", fill: [0], body: [
     '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1.05 5.85L12 16.9l-5.25 2.75 1.05-5.85L3.5 9.7l5.9-.8z"/>',
   ] },
-  "heart": { group: "general", body: [
+  "heart": { group: "general", fill: [0], body: [
     '<path d="M12 20s-7.5-4.5-7.5-10A4.25 4.25 0 0 1 12 7.3 4.25 4.25 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z"/>',
   ] },
-  "bookmark": { group: "general", body: [
+  "bookmark": { group: "general", fill: [0], body: [
     '<path d="M7 4h10a1 1 0 0 1 1 1v15.5l-6-4-6 4V5a1 1 0 0 1 1-1z"/>',
   ] },
-  "flag": { group: "general", body: [
+  "flag": { group: "general", fill: [1], body: [
     '<path d="M6 21V4"/>',
     '<path d="M6 4.5h11l-2 4 2 4H6"/>',
   ] },
@@ -369,7 +370,7 @@ export const ICONS = {
     '<path d="M4 5.5v6l8.5 8.5a1.5 1.5 0 0 0 2.1 0l5.4-5.4a1.5 1.5 0 0 0 0-2.1L11.5 4h-6A1.5 1.5 0 0 0 4 5.5z"/>',
     '<circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none"/>',
   ] },
-  "pin": { group: "general", body: [
+  "pin": { group: "general", fill: [1], body: [
     '<path d="M12 21v-6"/>',
     '<path d="M8 4h8l-1 6 3 3.5V15H6v-1.5L9 10z"/>',
   ] },
@@ -417,7 +418,7 @@ export const ICONS = {
     '<path d="M17 19V5"/>',
     '<path d="M13.5 8.5 17 5l3.5 3.5"/>',
   ] },
-  "grid-view": { group: "general", body: [
+  "grid-view": { group: "general", fill: [0,1,2,3], body: [
     '<rect x="4" y="4" width="6.5" height="6.5" rx="1"/>',
     '<rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/>',
     '<rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/>',
@@ -447,20 +448,27 @@ export const ICONS = {
     '<circle cx="6.5" cy="6.75" r="0.8" fill="currentColor" stroke="none"/>',
     '<circle cx="9" cy="6.75" r="0.8" fill="currentColor" stroke="none"/>',
   ] },
+  // Two corners on one diagonal, no shafts: open outwards to fill the screen, turned to the
+  // centre to leave it.
   "fullscreen": { group: "general", body: [
-    '<path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/>',
+    '<path d="M14 4h6v6"/>',
+    '<path d="M10 20H4v-6"/>',
   ] },
-  "user": { group: "general", body: [
+  "fullscreen-exit": { group: "general", body: [
+    '<path d="M14 4v6h6"/>',
+    '<path d="M10 20v-6H4"/>',
+  ] },
+  "user": { group: "general", fill: [0,1], body: [
     '<circle cx="12" cy="8" r="4"/>',
     '<path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
   ] },
-  "users": { group: "general", body: [
+  "users": { group: "general", fill: [0,1], body: [
     '<circle cx="9" cy="8.5" r="3.5"/>',
     '<path d="M2.5 19.5a6.5 6.5 0 0 1 13 0"/>',
     '<path d="M16 5.3a3.5 3.5 0 0 1 0 6.4"/>',
     '<path d="M18 14.2a6.5 6.5 0 0 1 3.5 5.3"/>',
   ] },
-  "bell": { group: "general", body: [
+  "bell": { group: "general", fill: [0], body: [
     '<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/>',
     '<path d="M10 20.5a2 2 0 0 0 4 0"/>',
   ] },
@@ -473,7 +481,7 @@ export const ICONS = {
     '<path d="M13.5 3v4.5H18"/>',
     '<path d="M9 12h6M9 16h4"/>',
   ] },
-  "folder": { group: "general", body: [
+  "folder": { group: "general", fill: [0], body: [
     '<path d="M3.5 18.5v-12A1.5 1.5 0 0 1 5 5h4l2 2.5h8A1.5 1.5 0 0 1 20.5 9v9.5A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5z"/>',
   ] },
   "folder-plus": { group: "general", body: [
@@ -541,7 +549,7 @@ export const ICONS = {
     '<path d="M12 3.5l7 2.5v5.5c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6z"/>',
     '<path d="M9 12l2.2 2.2 4-4.4"/>',
   ] },
-  "key": { group: "general", body: [
+  "key": { group: "general", fill: [0], body: [
     '<circle cx="7.5" cy="16.5" r="3.5"/>',
     '<path d="M10 14l9.5-9.5"/>',
     '<path d="M16.5 7.5 19 10M14 10l2 2"/>',
@@ -581,23 +589,37 @@ export const ICONS = {
     '<path d="M8 10.5h5"/>',
   ] },
   // --- media ---
-  "pause": { group: "media", body: [
+  "play": { group: "media", fill: [0], body: [
+    '<path d="M8 5.5v13l10.5-6.5z"/>',
+  ] },
+  "repeat-one": { group: "media", body: [
+    '<path d="M17 3.5l3 3-3 3"/>',
+    '<path d="M4 11V9.5a3 3 0 0 1 3-3h13"/>',
+    '<path d="M7 20.5l-3-3 3-3"/>',
+    '<path d="M20 13v1.5a3 3 0 0 1-3 3H4"/>',
+    '<path d="M11 11l1.5-1v4.5"/>',
+  ] },
+  "volume-low": { group: "media", fill: [0], body: [
+    '<path d="M4 9.5h3.5l4.5-4v13l-4.5-4H4z"/>',
+    '<path d="M15.5 9a4.25 4.25 0 0 1 0 6"/>',
+  ] },
+  "pause": { group: "media", fill: [0,1], body: [
     '<rect x="6.5" y="5" width="3.5" height="14" rx="1"/>',
     '<rect x="14" y="5" width="3.5" height="14" rx="1"/>',
   ] },
-  "skip-next": { group: "media", body: [
+  "skip-next": { group: "media", fill: [0], body: [
     '<path d="M6 5v14l10-7z"/>',
     '<path d="M18 5v14"/>',
   ] },
-  "skip-previous": { group: "media", body: [
+  "skip-previous": { group: "media", fill: [0], body: [
     '<path d="M18 5v14L8 12z"/>',
     '<path d="M6 5v14"/>',
   ] },
-  "fast-forward": { group: "media", body: [
+  "fast-forward": { group: "media", fill: [0,1], body: [
     '<path d="M4 6v12l8-6z"/>',
     '<path d="M12 6v12l8-6z"/>',
   ] },
-  "rewind": { group: "media", body: [
+  "rewind": { group: "media", fill: [0,1], body: [
     '<path d="M20 6v12l-8-6z"/>',
     '<path d="M12 6v12l-8-6z"/>',
   ] },
@@ -605,26 +627,26 @@ export const ICONS = {
     '<circle cx="12" cy="12" r="8.5"/>',
     '<circle cx="12" cy="12" r="4.5" fill="currentColor"/>',
   ] },
-  "volume": { group: "media", body: [
+  "volume": { group: "media", fill: [0], body: [
     '<path d="M4 9.5h3.5l4.5-4v13l-4.5-4H4z"/>',
     '<path d="M15.5 9a4.25 4.25 0 0 1 0 6"/>',
     '<path d="M18 6.5a8 8 0 0 1 0 11"/>',
   ] },
-  "mute": { group: "media", body: [
+  "mute": { group: "media", fill: [0], body: [
     '<path d="M4 9.5h3.5l4.5-4v13l-4.5-4H4z"/>',
     '<path d="M16 9.5l5 5M21 9.5l-5 5"/>',
   ] },
-  "microphone": { group: "media", body: [
+  "microphone": { group: "media", fill: [0], body: [
     '<rect x="9" y="3.5" width="6" height="10.5" rx="3"/>',
     '<path d="M5.5 11a6.5 6.5 0 0 0 13 0"/>',
     '<path d="M12 17.5v3"/>',
   ] },
-  "headphones": { group: "media", body: [
+  "headphones": { group: "media", fill: [1,2], body: [
     '<path d="M4.5 14v-2a7.5 7.5 0 0 1 15 0v2"/>',
     '<rect x="3.5" y="13.5" width="4" height="6.5" rx="1.5"/>',
     '<rect x="16.5" y="13.5" width="4" height="6.5" rx="1.5"/>',
   ] },
-  "music": { group: "media", body: [
+  "music": { group: "media", fill: [0,1], body: [
     '<circle cx="7.5" cy="17.5" r="2.5"/>',
     '<circle cx="17.5" cy="15.5" r="2.5"/>',
     '<path d="M10 17.5V6l10-2v11.5"/>',
@@ -632,6 +654,8 @@ export const ICONS = {
   "disc": { group: "media", body: [
     '<circle cx="12" cy="12" r="8.5"/>',
     '<circle cx="12" cy="12" r="2.5"/>',
+  ], bold: [
+    '<path fill="currentColor" fill-rule="evenodd" d="M12 3.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>',
   ] },
   "repeat": { group: "media", body: [
     '<path d="M17 3.5l3 3-3 3"/>',
@@ -646,7 +670,7 @@ export const ICONS = {
     '<path d="M18 4.5 20.5 7 18 9.5"/>',
     '<path d="M18 14.5l2.5 2.5-2.5 2.5"/>',
   ] },
-  "playlist": { group: "media", body: [
+  "playlist": { group: "media", fill: [1], body: [
     '<path d="M4 6.5h12M4 11.5h12M4 16.5h7"/>',
     '<path d="M15.5 14v6l5-3z"/>',
   ] },
@@ -1122,5 +1146,30 @@ export const ICONS = {
   "book": { group: "document", body: [
     '<path d="M12 6.5C10 5 7.5 4.5 4 4.5V18c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2V4.5c-3.5 0-6 .5-8 2z"/>',
     '<path d="M12 6.5V20"/>',
+  ] },
+  // --- window ---
+  // Window glyphs are drawn for 1:1 at 24 px: 2 px strokes centred on whole pixels, so every
+  // straight edge lands on the pixel grid.
+  "window-minimize": { group: "general", body: [
+    '<path d="M8 12h8" stroke-width="2"/>',
+  ] },
+  // The fullscreen corners on the window glyphs' grid: open outwards to maximise, turned to the
+  // centre to restore.
+  "window-maximize": { group: "general", body: [
+    '<path d="M12 7h5v5M12 17H7v-5" stroke-width="2"/>',
+  ] },
+  "window-restore": { group: "general", body: [
+    '<path d="M14 7v3h3M10 17v-3H7" stroke-width="2"/>',
+  ] },
+  "window-close": { group: "general", body: [
+    '<path d="M8 8l8 8M16 8l-8 8" stroke-width="2"/>',
+  ] },
+  "offline": { group: "general", body: [
+    '<path d="M3.5 9.5a12.5 12.5 0 0 1 4.25-2.75"/>',
+    '<path d="M12.5 5.5a12.5 12.5 0 0 1 8 4"/>',
+    '<path d="M6.5 13a8 8 0 0 1 3-1.75"/>',
+    '<path d="M15.25 11.75a8 8 0 0 1 2.25 1.25"/>',
+    '<path d="M9.5 16.5a3.5 3.5 0 0 1 5 0"/>',
+    '<path d="M4 4l16 16"/>',
   ] },
 };

@@ -63,3 +63,19 @@ test('the preview page shows every icon and loads nothing from outside', () => {
   assert.equal((page.match(/<figure>/g) ?? []).length, names().length);
   assert.ok(!/https?:\/\/(?!www\.w3\.org)/.test(page) && !/<script|<link|<img/.test(page));
 });
+
+test('the bold style fills only elements that exist, and its own bodies follow the same rules', async () => {
+  const { boldBody } = await import('../src/bold.mjs');
+  let solid = 0;
+  for (const name of names()) {
+    const icon = ICONS[name];
+    for (const i of icon.fill ?? []) assert.ok(Number.isInteger(i) && i >= 0 && i < icon.body.length, `${name}: fill ${i}`);
+    for (const part of boldBody(name)) {
+      assert.match(part, /^<(path|circle|rect) [^<>]*\/>$/, `${name}: ${part}`);
+      assert.ok(!/#[0-9a-fA-F]{3,8}|rgb|style=|class=|transform=/.test(part), `${name}: ${part}`);
+    }
+    if (boldBody(name).some((p) => /fill="currentColor"/.test(p) && !/stroke="none"/.test(p))) solid += 1;
+  }
+  // The style's character: the media controls and the library's own icons are solid.
+  assert.ok(solid >= 25, `${solid} solid icons`);
+});

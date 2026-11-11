@@ -51,3 +51,22 @@ jobs:
           path: apps/catalog/dist/
           retention-days: 7
           if-no-files-found: error
+
+  gtk-crate:
+    name: Rust crate nodalia-gtk (GTK 4.20)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Ubuntu's GTK is older than the 4.20 the crate needs; Fedora 43 ships it.
+    container: fedora:43
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GTK 4 and Rust
+        run: dnf install -y --setopt=install_weak_deps=False gtk4-devel gcc cargo clippy rustfmt python3-gobject python3-cairo gobject-introspection xorg-x11-server-Xvfb
+      - name: Format, lints and tests
+        working-directory: packages/gtk/crate
+        run: |
+          cargo fmt --check
+          cargo clippy --all-targets -- -D warnings
+          xvfb-run -a cargo test
+      - name: GTK parses every stylesheet and resolves every variable
+        run: xvfb-run -a python3 packages/gtk/tools/check-gtk.py

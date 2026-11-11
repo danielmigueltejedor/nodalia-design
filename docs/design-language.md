@@ -12,7 +12,7 @@ NDL describe cómo se ve y cómo se comporta una app de Nodalia. Es una identida
 6. **Accesibilidad.** Contraste verificado, foco visible, objetivos de pulsación de 24 px o más, teclado completo, alto contraste, escala de texto. No es una fase posterior.
 7. **Adaptabilidad.** Claro, oscuro, sistema, alto contraste, tres densidades, escalado.
 8. **Coherencia.** Un único conjunto de tokens para web, GTK y Qt.
-9. **Integración nativa.** En GTK, NDL se apoya en libadwaita y no la sustituye; en cada escritorio respeta el comportamiento del sistema (preferencias de tema, contraste y movimiento).
+9. **Integración nativa.** NDL respeta en cada escritorio el comportamiento del sistema (preferencias de tema, contraste y movimiento). En GTK no depende de libadwaita: el crate `nodalia-gtk` aporta el tema y los widgets adaptativos sobre GTK 4 puro, para que las apps se vean igual en GNOME, en otros escritorios y en macOS. Las hojas siguen definiendo los colores con nombre de libadwaita para las apps que aún la usan.
 
 ## Lo que NDL evita
 

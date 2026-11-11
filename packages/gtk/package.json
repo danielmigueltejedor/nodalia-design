@@ -1,12 +1,12 @@
 {
   "name": "@nodalia/gtk",
   "version": "0.1.0-alpha.1",
-  "description": "Nodalia Design Language for GTK4 / libadwaita: named-colour stylesheets generated from the tokens.",
+  "description": "Nodalia Design Language for GTK 4: colour, metric and widget stylesheets generated from the tokens.",
   "license": "MIT",
   "type": "module",
-  "files": ["mapping.json", "dist"],
+  "files": ["mapping.json", "icon-aliases.json", "dist"],
   "exports": { "./*.css": "./dist/*.css", "./mapping.json": "./mapping.json" },
   "scripts": { "build": "node scripts/build.mjs", "test": "node --test \"test/*.test.mjs\"" },
-  "dependencies": { "@nodalia/tokens": "0.1.0-alpha.1" },
+  "dependencies": { "@nodalia/icons": "0.1.0-alpha.1", "@nodalia/tokens": "0.1.0-alpha.1" },
   "engines": { "node": ">=20" }
 }

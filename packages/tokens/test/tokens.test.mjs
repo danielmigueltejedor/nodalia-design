@@ -28,7 +28,7 @@ test('dark and high-contrast modes really differ from light', () => {
 });
 
 test('brand cyan is the dark accent', () => {
-  assert.equal(resolve(tokens, 'color.accent.default', 'dark'), '#8ADBE0');
+  assert.equal(resolve(tokens, 'color.accent.default', 'dark'), '#2CC5D3');
 });
 
 test('every text role meets WCAG AA on every surface in every mode', () => {
@@ -156,7 +156,7 @@ test('an accent only changes the accent ramp and what aliases it', () => {
   const set = accents.get('vortia');
   const changed = [...accentTokens.keys()].filter((p) => MODES.some((m) => JSON.stringify(resolve(set.tokens, p, m)) !== JSON.stringify(resolve(accentTokens, p, m))));
   assert.ok(changed.length > 11);
-  for (const path of changed) assert.match(path, /^(palette\.accent\.|color\.(accent|selection\.bg$|border\.focus$|text\.link$))/, path);
+  for (const path of changed) assert.match(path, /^(palette\.accent\.|color\.(accent|selection\.bg$|border\.focus$|text\.link$)|component\.window\.minimize)/, path);
 });
 
 test('ramp generation is deterministic', () => {

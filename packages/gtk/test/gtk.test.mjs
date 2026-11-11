@@ -1,8 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { MODES, SOURCE_DIR, loadTokens, resolve } from '@nodalia/tokens/lib';
-import { gtkCss } from '../scripts/build.mjs';
+import { gtkCss, metricsCss, DENSITIES, allSheets, CRATE_CSS, WIDGETS } from '../scripts/build.mjs';
 
 const mapping = Object.entries(JSON.parse(readFileSync(new URL('../mapping.json', import.meta.url), 'utf8'))).filter(([k]) => !k.startsWith('$'));
 const tokens = loadTokens(SOURCE_DIR);
@@ -29,14 +30,76 @@ test('each mode stylesheet defines every mapped colour as @define-color and as a
   }
 });
 
+const selectorsOf = (css) => css.split('\n').filter((l) => /\{\s*$/.test(l) && !l.startsWith('/*') && !l.includes('*'));
+
 test('stylesheets contain no widget selectors, so they cannot depend on libadwaita internals', () => {
-  for (const mode of MODES) {
-    const selectors = gtkCss(mode).split('\n').filter((l) => /\{\s*$/.test(l) && !l.startsWith('/*') && !l.includes('*'));
-    assert.deepEqual(selectors, [':root {']);
+  for (const mode of MODES) assert.deepEqual(selectorsOf(gtkCss(mode)), [':root {']);
+  for (const density of DENSITIES) assert.deepEqual(selectorsOf(metricsCss(density)), [':root {']);
+});
+
+test('metric sheets exist for every density and differ only in the density block', () => {
+  assert.deepEqual(DENSITIES, ['compact', 'regular', 'comfortable']);
+  const strip = (css) => css.split('\n').filter((l) => !l.includes('--ndl-density-') && !l.includes('density.')).join('\n');
+  assert.equal(strip(metricsCss('compact')), strip(metricsCss('comfortable')));
+  assert.match(metricsCss('regular'), /--ndl-density-control-height: 32px;/);
+  assert.match(metricsCss('compact'), /--ndl-density-control-height: 24px;/);
+});
+
+test('metric sheets carry no colours and use only units GTK understands', () => {
+  for (const density of DENSITIES) {
+    const css = metricsCss(density);
+    assert.doesNotMatch(css, /--ndl-color-|#[0-9a-f]{3,8}\b/i);
+    assert.doesNotMatch(css, /\brem\b|system-ui|-apple-system/);
+    for (const name of ['radius-md', 'space-md', 'font-size-body', 'font-weight-semibold', 'component-button-radius', 'font-family-ui']) {
+      assert.match(css, new RegExp(`--ndl-${name}: [^;]+;`), `${density}: ${name}`);
+    }
   }
 });
 
 test('dark accent is brand cyan and light and dark differ', () => {
-  assert.match(gtkCss('dark'), /@define-color accent_bg_color #8adbe0;/);
+  assert.match(gtkCss('dark'), /@define-color accent_bg_color #2cc5d3;/);
   assert.notEqual(gtkCss('light'), gtkCss('dark'));
+});
+
+test('each mode sheet carries both elevations as box-shadow values', () => {
+  for (const mode of MODES) {
+    for (const level of ['raised', 'overlay']) {
+      assert.match(gtkCss(mode), new RegExp(`--ndl-elevation-${level}: \\S+ \\S+ \\S+ \\S+ (#[0-9a-f]{6}|rgba\\([^)]+\\));`), `${mode}: ${level}`);
+    }
+  }
+});
+
+test('the crate embeds exactly what the generator writes', () => {
+  for (const [name, css] of allSheets()) {
+    const committed = readFileSync(join(CRATE_CSS, name), 'utf8');
+    assert.equal(committed, css, `crate/src/css/${name} is stale: run npm run build -w @nodalia/gtk`);
+  }
+});
+
+test('the widget sheet takes every value from a variable the other sheets define', () => {
+  const defined = new Set();
+  for (const [name, css] of allSheets()) {
+    if (name === 'nodalia-gtk.css') continue;
+    for (const m of css.matchAll(/^\s*(--ndl-[a-z0-9-]+):/gm)) defined.add(m[1]);
+  }
+  const used = [...WIDGETS.matchAll(/var\((--ndl-[a-z0-9-]+)\)/g)].map((m) => m[1]);
+  assert.ok(used.length > 50);
+  const missing = [...new Set(used)].filter((v) => !defined.has(v));
+  assert.deepEqual(missing, []);
+});
+
+test('the widget sheet hard-codes no colour', () => {
+  const stripped = WIDGETS.replace(/\/\*[\s\S]*?\*\//g, '');
+  const literals = stripped.match(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\b(white|black)\b/g) ?? [];
+  assert.deepEqual(literals, []);
+});
+
+test('window controls fill as a whole: the glyph paints no disc of its own over the button', () => {
+  const sheet = readFileSync(new URL('../src/nodalia-gtk.css', import.meta.url), 'utf8');
+  const rule = /windowcontrols > button > image \{([^}]*)\}/.exec(sheet)?.[1] ?? '';
+  for (const reset of ['background: none', 'padding: 0', 'border-radius: 0', 'box-shadow: none']) {
+    assert.ok(rule.includes(reset), `windowcontrols > button > image needs ${reset}`);
+  }
+  assert.match(sheet, /windowcontrols > button:not\(\.suggested-action\):not\(\.destructive-action\)\.close:hover \{\s*background-color: var\(--ndl-component-window-close\);/);
+  assert.match(sheet, /\.maximize:hover \{\s*background-color: var\(--ndl-component-window-maximize-tint\);/);
 });
