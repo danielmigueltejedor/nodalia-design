@@ -28,7 +28,7 @@ test('dark and high-contrast modes really differ from light', () => {
 });
 
 test('brand cyan is the dark accent', () => {
-  assert.equal(resolve(tokens, 'color.accent.default', 'dark'), '#8ADBE0');
+  assert.equal(resolve(tokens, 'color.accent.default', 'dark'), '#2CC5D3');
 });
 
 test('every text role meets WCAG AA on every surface in every mode', () => {

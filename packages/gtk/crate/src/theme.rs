@@ -164,6 +164,8 @@ impl StyleManager {
             );
         }
         imp.widgets.borrow().load_from_string(WIDGETS_CSS);
+        replace_base_theme(&gtk::Settings::for_display(&display));
+        crate::icons::install(&display);
         imp.metrics
             .borrow()
             .load_from_string(density_css(imp.density.get()));
@@ -302,6 +304,19 @@ impl StyleManager {
             None
         })
     }
+}
+
+/// GTK's built-in theme draws everything NDL does not, and in Adwaita's look. The empty theme
+/// GTK also ships draws nothing, so what is on screen is NDL's or unstyled, never a mix.
+const BASE_THEME: &str = "Empty";
+
+fn replace_base_theme(settings: &gtk::Settings) {
+    settings.set_gtk_theme_name(Some(BASE_THEME));
+    settings.connect_gtk_theme_name_notify(|settings| {
+        if settings.gtk_theme_name().as_deref() != Some(BASE_THEME) {
+            settings.set_gtk_theme_name(Some(BASE_THEME));
+        }
+    });
 }
 
 #[cfg(test)]

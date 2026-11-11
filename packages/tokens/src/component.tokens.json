@@ -2,12 +2,12 @@
   "$description": "Component tokens: the only tokens components.css may read besides semantic ones. They alias semantic tokens so a component can be re-themed without touching the roles.",
   "component": {
     "button": {
-      "radius": { "$type": "dimension", "$value": "{radius.md}" },
+      "radius": { "$type": "dimension", "$value": "{radius.full}" },
       "border-width": { "$type": "dimension", "$value": "{border-width.thin}" },
       "font": { "$type": "typography", "$value": "{typography.label}" }
     },
     "field": {
-      "radius": { "$type": "dimension", "$value": "{radius.md}" },
+      "radius": { "$type": "dimension", "$value": "{radius.full}" },
       "border-width": { "$type": "dimension", "$value": "{border-width.thin}" }
     },
     "switch": {
@@ -35,7 +35,15 @@
       "font": { "$type": "typography", "$value": "{typography.small}" }
     },
     "panel": {
+      "radius": { "$type": "dimension", "$value": "{radius.xl}" }
+    },
+    "control": {
       "radius": { "$type": "dimension", "$value": "{radius.lg}" }
+    },
+    "window": {
+      "radius": { "$type": "dimension", "$value": "{radius.xxl}" },
+      "gap": { "$type": "dimension", "$value": "8px", "$description": "Between islands, and between them and the window's edge." },
+      "close": { "$type": "color", "$value": "{palette.red.500}" }
     },
     "splitter": {
       "hit": { "$type": "dimension", "$value": "8px" }

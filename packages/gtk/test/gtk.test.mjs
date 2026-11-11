@@ -57,7 +57,7 @@ test('metric sheets carry no colours and use only units GTK understands', () => 
 });
 
 test('dark accent is brand cyan and light and dark differ', () => {
-  assert.match(gtkCss('dark'), /@define-color accent_bg_color #8adbe0;/);
+  assert.match(gtkCss('dark'), /@define-color accent_bg_color #2cc5d3;/);
   assert.notEqual(gtkCss('light'), gtkCss('dark'));
 });
 

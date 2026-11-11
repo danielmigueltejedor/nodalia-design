@@ -58,7 +58,24 @@ Diferencias con libadwaita que conviene conocer:
 - Los diálogos se presentan dentro de la ventana, sobre un velo, cuando la ventana es de este crate; en otra ventana abren una propia.
 - `PreferencesDialog`, `AboutDialog`, `ShortcutsDialog`, `AlertDialog` y `Toast` son tipos de Rust, no GObject: no se meten en un `view!` de relm4, se crean en código.
 - `ToastOverlay` no implementa los rasgos de contenedor de relm4; en un `view!` se usa `set_child`.
-- Los iconos son los del tema del sistema. Ver [iconografía](../iconography.md).
+- Los iconos son los de NDL: `init` instala el tema de iconos **Nodalia** y lo hace el de la app; los nombres estándar responden con dibujos de NDL. Ver [iconografía](../iconography.md).
+- `init` sustituye también el tema base de GTK (el Adwaita que GTK lleva dentro) por el tema vacío que GTK incluye, así que todo lo que se ve es de NDL: no queda ningún widget a medio camino entre dos lenguajes.
+
+### La forma: islas
+
+La identidad visual de NDL en GTK son **islas**: superficies planas y redondeadas (16 px) sobre el marco de la ventana, separadas por 8 px. `OverlaySplitView` dibuja la barra lateral y el contenido como islas, y la barra inferior de `BottomSheet` es otra. La ventana tiene 20 px de radio; botones, búsqueda y *chips* son píldoras. Sin degradados ni brillos: la única sombra es la de lo que flota (menús, diálogos).
+
+Clases para la app:
+
+| Clase | Para qué |
+| --- | --- |
+| `.ndl-island` | Una superficie isla propia |
+| `.ndl-view-title` | El título grande con el que abre una vista (Sora 700, interletrado −0,04 em) |
+| `.ndl-micro` | Etiquetas de sección en versalitas pequeñas (BIBLIOTECA) |
+| `.ndl-count` | Un número junto a una etiqueta, discreto |
+| `.ndl-chip` | Conmutadores en píldora para los modos de una vista |
+
+En la barra lateral, la fila activa se **invierte** (fondo del color del texto, texto del color del marco) en lugar de teñirse: el acento se reserva para el progreso, el foco y la acción principal. Los controles de ventana son una cápsula con tres píldoras y glifos propios; cerrar se vuelve coral bajo el puntero.
 
 ## Comprobación en un GTK real
 

@@ -24,6 +24,8 @@ fn reparent(slot: &RefCell<Option<gtk::Widget>>, holder: &gtk::Box, child: Optio
 fn holder(class: &str) -> gtk::Box {
     let b = gtk::Box::new(gtk::Orientation::Vertical, 0);
     b.add_css_class(class);
+    // Panes are rounded islands: what they hold is clipped to the corners.
+    b.set_overflow(gtk::Overflow::Hidden);
     b
 }
 

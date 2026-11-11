@@ -15,6 +15,7 @@ mod about;
 mod animation;
 mod breakpoint;
 mod dialog;
+mod icons;
 mod layout;
 mod misc;
 mod navigation;
@@ -25,6 +26,8 @@ mod toolbar;
 mod window;
 
 pub use gtk;
+
+pub use icons::THEME as ICON_THEME;
 
 pub use about::{
     AboutDialog, AboutDialogBuilder, ShortcutsDialog, ShortcutsItem, ShortcutsSection,

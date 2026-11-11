@@ -581,6 +581,20 @@ export const ICONS = {
     '<path d="M8 10.5h5"/>',
   ] },
   // --- media ---
+  "play": { group: "media", body: [
+    '<path d="M8 5.5v13l10.5-6.5z"/>',
+  ] },
+  "repeat-one": { group: "media", body: [
+    '<path d="M17 3.5l3 3-3 3"/>',
+    '<path d="M4 11V9.5a3 3 0 0 1 3-3h13"/>',
+    '<path d="M7 20.5l-3-3 3-3"/>',
+    '<path d="M20 13v1.5a3 3 0 0 1-3 3H4"/>',
+    '<path d="M11 11l1.5-1v4.5"/>',
+  ] },
+  "volume-low": { group: "media", body: [
+    '<path d="M4 9.5h3.5l4.5-4v13l-4.5-4H4z"/>',
+    '<path d="M15.5 9a4.25 4.25 0 0 1 0 6"/>',
+  ] },
   "pause": { group: "media", body: [
     '<rect x="6.5" y="5" width="3.5" height="14" rx="1"/>',
     '<rect x="14" y="5" width="3.5" height="14" rx="1"/>',
@@ -1122,5 +1136,27 @@ export const ICONS = {
   "book": { group: "document", body: [
     '<path d="M12 6.5C10 5 7.5 4.5 4 4.5V18c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2V4.5c-3.5 0-6 .5-8 2z"/>',
     '<path d="M12 6.5V20"/>',
+  ] },
+  // --- window ---
+  "window-minimize": { group: "general", body: [
+    '<path d="M7 12h10"/>',
+  ] },
+  "window-maximize": { group: "general", body: [
+    '<rect x="7" y="7" width="10" height="10" rx="2"/>',
+  ] },
+  "window-restore": { group: "general", body: [
+    '<rect x="6" y="9" width="9" height="9" rx="1.75"/>',
+    '<path d="M9 6h7.25A1.75 1.75 0 0 1 18 7.75V15"/>',
+  ] },
+  "window-close": { group: "general", body: [
+    '<path d="M7.5 7.5l9 9M16.5 7.5l-9 9"/>',
+  ] },
+  "offline": { group: "general", body: [
+    '<path d="M3.5 9.5a12.5 12.5 0 0 1 4.25-2.75"/>',
+    '<path d="M12.5 5.5a12.5 12.5 0 0 1 8 4"/>',
+    '<path d="M6.5 13a8 8 0 0 1 3-1.75"/>',
+    '<path d="M15.25 11.75a8 8 0 0 1 2.25 1.25"/>',
+    '<path d="M9.5 16.5a3.5 3.5 0 0 1 5 0"/>',
+    '<path d="M4 4l16 16"/>',
   ] },
 };

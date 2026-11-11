@@ -20,7 +20,7 @@ window {
 }
 
 window.csd {
-  border-radius: var(--ndl-radius-lg);
+  border-radius: var(--ndl-component-window-radius);
   box-shadow: var(--ndl-elevation-overlay), 0 0 0 1px var(--ndl-color-border-subtle);
 }
 
@@ -66,13 +66,39 @@ label link {
 .title-1 {
   font-family: var(--ndl-font-family-display);
   font-size: var(--ndl-font-size-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* The one big word a view opens with: Sora, heavy and tight. */
+.ndl-view-title {
+  font-family: var(--ndl-font-family-display);
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+/* Section labels: small capitals that order a column without competing with it. */
+.ndl-micro {
+  font-size: 10.5px;
   font-weight: var(--ndl-font-weight-semibold);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ndl-color-text-tertiary);
+}
+
+/* A number beside a label (how many songs, how many albums): present, never loud. */
+.ndl-count {
+  font-size: var(--ndl-font-size-small);
+  font-feature-settings: "tnum";
+  color: var(--ndl-color-text-tertiary);
 }
 
 .title-2 {
   font-family: var(--ndl-font-family-display);
   font-size: var(--ndl-font-size-headline);
-  font-weight: var(--ndl-font-weight-semibold);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .title-3 {
@@ -201,6 +227,7 @@ button.flat:disabled {
 
 button.image-button {
   padding: 0;
+  min-width: var(--ndl-density-control-height);
 }
 
 button.circular {
@@ -263,6 +290,42 @@ dropdown > button > box > arrow {
   min-height: var(--ndl-size-icon-medium);
 }
 
+/* GTK's own icons. NDL replaces GTK's built-in theme, so every one it drew is named here. */
+dropdown arrow,
+combobox arrow,
+menubutton arrow.down {
+  -gtk-icon-source: -gtk-icontheme("pan-down-symbolic");
+}
+
+menubutton arrow.none {
+  -gtk-icon-source: -gtk-icontheme("open-menu-symbolic");
+}
+
+menubutton arrow.up {
+  -gtk-icon-source: -gtk-icontheme("pan-up-symbolic");
+}
+
+menubutton arrow.left,
+modelbutton arrow.left {
+  -gtk-icon-source: -gtk-icontheme("pan-start-symbolic");
+}
+
+menubutton arrow.right,
+modelbutton arrow.right,
+expander {
+  -gtk-icon-source: -gtk-icontheme("pan-end-symbolic");
+}
+
+expander:checked {
+  -gtk-icon-source: -gtk-icontheme("pan-down-symbolic");
+}
+
+arrow,
+expander {
+  min-width: var(--ndl-size-icon-medium);
+  min-height: var(--ndl-size-icon-medium);
+}
+
 /* ---------------------------------------------------------------- fields */
 
 entry,
@@ -271,9 +334,11 @@ searchbar entry,
 passwordentry {
   min-height: var(--ndl-density-control-height);
   padding: 0 var(--ndl-space-sm);
+  padding: 0 var(--ndl-space-md);
   border-radius: var(--ndl-component-field-radius);
-  border: var(--ndl-component-field-border-width) solid var(--ndl-color-border-default);
-  background-color: var(--ndl-color-control-field-bg);
+  border: var(--ndl-component-field-border-width) solid transparent;
+  background-color: var(--ndl-color-control-bg);
+  border-spacing: var(--ndl-space-xs);
   color: var(--ndl-color-text-primary);
   box-shadow: none;
   outline: 0 solid transparent;
@@ -286,6 +351,7 @@ passwordentry:focus-within {
   border-color: var(--ndl-color-border-focus);
   outline: 1px solid var(--ndl-color-border-focus);
   outline-offset: -2px;
+  background-color: var(--ndl-color-control-field-bg);
 }
 
 entry:disabled,
@@ -386,7 +452,19 @@ checkbutton > radio {
 }
 
 checkbutton > check {
-  border-radius: var(--ndl-radius-sm);
+  border-radius: var(--ndl-radius-md);
+}
+
+checkbutton > check:checked {
+  -gtk-icon-source: -gtk-icontheme("ndl-check-symbolic");
+}
+
+checkbutton > check:indeterminate {
+  -gtk-icon-source: -gtk-icontheme("ndl-minus-symbolic");
+}
+
+checkbutton > radio:checked {
+  box-shadow: inset 0 0 0 4px var(--ndl-color-control-field-bg);
 }
 
 checkbutton > radio {
@@ -531,7 +609,8 @@ list.navigation-sidebar {
   min-height: var(--ndl-density-row-height);
   margin: 1px 0;
   padding: 0 var(--ndl-space-sm);
-  border-radius: var(--ndl-radius-md);
+  border-radius: var(--ndl-component-control-radius);
+  color: var(--ndl-color-text-secondary);
 }
 
 .navigation-sidebar > row:hover,
@@ -539,17 +618,57 @@ list.navigation-sidebar {
   background-color: var(--ndl-color-control-bg-hover);
 }
 
+/* The row you are on is inverted, not tinted: the strongest mark the palette has, kept for the one
+ * thing that is current. */
 .navigation-sidebar > row:selected,
 .navigation-sidebar > listview > row:selected {
-  background-color: var(--ndl-color-accent-subtle);
-  color: var(--ndl-color-accent-text);
+  background-color: var(--ndl-color-text-primary);
+  color: var(--ndl-color-surface-window);
+}
+
+.navigation-sidebar > row:selected .ndl-count,
+.navigation-sidebar > listview > row:selected .ndl-count {
+  color: var(--ndl-color-surface-window);
+  opacity: 0.6;
+}
+
+.navigation-sidebar .ndl-micro {
+  margin: var(--ndl-space-lg) var(--ndl-space-md) var(--ndl-space-xs);
 }
 
 .card {
   background-color: var(--ndl-color-surface-raised);
   border-radius: var(--ndl-component-panel-radius);
   border: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
-  box-shadow: var(--ndl-elevation-raised);
+  box-shadow: none;
+}
+
+/* An island: a flat surface set on the window's frame. The identity's one structural idea. */
+.ndl-island {
+  background-color: var(--ndl-color-surface-panel);
+  border-radius: var(--ndl-component-panel-radius);
+}
+
+/* Chips: pill toggles for a view's modes (grid, list, sort). */
+.ndl-chip {
+  min-height: 28px;
+  padding: 0 var(--ndl-space-md);
+  border-radius: var(--ndl-radius-full);
+  background-color: transparent;
+  border: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
+  color: var(--ndl-color-text-secondary);
+  font-weight: var(--ndl-font-weight-medium);
+}
+
+.ndl-chip:hover {
+  background-color: var(--ndl-color-control-bg-hover);
+  color: var(--ndl-color-text-primary);
+}
+
+.ndl-chip:checked {
+  background-color: var(--ndl-color-text-primary);
+  border-color: var(--ndl-color-text-primary);
+  color: var(--ndl-color-surface-window);
 }
 
 .badge,
@@ -587,17 +706,62 @@ headerbar .subtitle {
   color: var(--ndl-color-text-secondary);
 }
 
-windowcontrols > button {
-  min-width: 24px;
-  min-height: 24px;
-  padding: 0;
-  margin: 0 var(--ndl-space-xxs);
+/* One capsule holding three pills, with NDL's own glyphs. Close is the only one that takes a
+ * colour, and only under the pointer. */
+windowcontrols {
+  padding: 3px;
+  border-spacing: 2px;
   border-radius: var(--ndl-radius-full);
   background-color: var(--ndl-color-control-bg);
 }
 
+windowcontrols:not(.empty) {
+  margin: 0 var(--ndl-space-xxs);
+}
+
+windowcontrols.empty {
+  padding: 0;
+  background-color: transparent;
+}
+
+windowcontrols > button {
+  min-width: 30px;
+  min-height: 22px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: var(--ndl-radius-full);
+  background-color: transparent;
+  color: var(--ndl-color-text-secondary);
+  -gtk-icon-size: 14px;
+}
+
 windowcontrols > button:hover {
   background-color: var(--ndl-color-control-bg-hover);
+  color: var(--ndl-color-text-primary);
+}
+
+windowcontrols > button.close:hover,
+windowcontrols > button.close:active {
+  background-color: var(--ndl-component-window-close);
+  color: var(--ndl-palette-neutral-0);
+}
+
+windowcontrols > button.minimize > image {
+  -gtk-icon-source: -gtk-icontheme("ndl-window-minimize-symbolic");
+}
+
+windowcontrols > button.maximize > image {
+  -gtk-icon-source: -gtk-icontheme("ndl-window-maximize-symbolic");
+}
+
+window.maximized windowcontrols > button.maximize > image,
+window.tiled windowcontrols > button.maximize > image {
+  -gtk-icon-source: -gtk-icontheme("ndl-window-restore-symbolic");
+}
+
+windowcontrols > button.close > image {
+  -gtk-icon-source: -gtk-icontheme("ndl-window-close-symbolic");
 }
 
 searchbar > revealer > box {
@@ -635,11 +799,40 @@ popover > arrow {
   border: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
 }
 
+popover > contents {
+  min-width: 200px;
+}
+
 popover.menu modelbutton,
 popover.menu > contents modelbutton {
   min-height: var(--ndl-density-row-height);
   padding: 0 var(--ndl-space-sm);
-  border-radius: var(--ndl-radius-sm);
+  border-radius: var(--ndl-component-control-radius);
+  border-spacing: var(--ndl-space-sm);
+}
+
+popover.menu modelbutton image {
+  color: var(--ndl-color-text-secondary);
+}
+
+popover.menu modelbutton check,
+popover.menu modelbutton radio {
+  min-width: 14px;
+  min-height: 14px;
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+popover.menu modelbutton check:checked {
+  -gtk-icon-source: -gtk-icontheme("ndl-check-symbolic");
+  color: var(--ndl-color-text-primary);
+}
+
+popover.menu modelbutton radio:checked {
+  background-color: var(--ndl-color-text-primary);
+  box-shadow: inset 0 0 0 4px var(--ndl-color-surface-overlay);
+  border-radius: var(--ndl-radius-full);
 }
 
 popover.menu modelbutton:hover,
@@ -659,7 +852,7 @@ tooltip,
 tooltip.background {
   border: none;
   padding: var(--ndl-space-xs) var(--ndl-space-sm);
-  border-radius: var(--ndl-radius-md);
+  border-radius: var(--ndl-component-control-radius);
   background-color: var(--ndl-color-surface-inverse);
   color: var(--ndl-color-text-inverse);
   box-shadow: none;
@@ -704,7 +897,7 @@ scrollbar.overlay-indicator:not(.hovering) > range > trough > slider {
 
 ndl-toolbar-view > .top-bar,
 ndl-toolbar-view > .bottom-bar {
-  background-color: var(--ndl-color-surface-window);
+  background-color: transparent;
 }
 
 ndl-toolbar-view > .top-bar.raised,
@@ -712,29 +905,37 @@ ndl-toolbar-view.raised > .top-bar {
   box-shadow: 0 1px var(--ndl-color-border-subtle);
 }
 
-ndl-overlay-split-view > .ndl-sidebar-pane {
-  background-color: var(--ndl-color-surface-sunken);
-  border-right: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
+/* Sidebar and content are islands on the window's frame, a gap apart. */
+ndl-overlay-split-view > .ndl-sidebar-pane,
+ndl-overlay-split-view > .ndl-content-pane {
+  background-color: var(--ndl-color-surface-panel);
+  border-radius: var(--ndl-component-panel-radius);
+  margin: var(--ndl-component-window-gap);
+}
+
+ndl-overlay-split-view:not(.collapsed) > .ndl-sidebar-pane {
+  margin-right: 0;
 }
 
 ndl-overlay-split-view.collapsed > .ndl-sidebar-pane {
   box-shadow: var(--ndl-elevation-overlay);
-  border-right: none;
 }
 
 .ndl-scrim {
   background-color: var(--ndl-color-scrim-default);
 }
 
+/* The bar under the content is an island of its own. */
 ndl-bottom-sheet > .ndl-bottom-bar {
   background-color: var(--ndl-color-surface-panel);
-  border-top: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
+  border-radius: var(--ndl-component-panel-radius);
+  margin: 0 var(--ndl-component-window-gap) var(--ndl-component-window-gap);
 }
 
 ndl-bottom-sheet > .ndl-sheet {
-  background-color: var(--ndl-color-surface-window);
-  border-top-left-radius: var(--ndl-radius-lg);
-  border-top-right-radius: var(--ndl-radius-lg);
+  background-color: var(--ndl-color-surface-panel);
+  border-top-left-radius: var(--ndl-component-window-radius);
+  border-top-right-radius: var(--ndl-component-window-radius);
   box-shadow: var(--ndl-elevation-overlay);
 }
 
@@ -747,9 +948,9 @@ ndl-bottom-sheet > .ndl-sheet {
 }
 
 ndl-dialog {
-  background-color: var(--ndl-color-surface-window);
+  background-color: var(--ndl-color-surface-panel);
   color: var(--ndl-color-text-primary);
-  border-radius: var(--ndl-radius-lg);
+  border-radius: var(--ndl-component-panel-radius);
   border: var(--ndl-border-width-thin) solid var(--ndl-color-border-subtle);
   box-shadow: var(--ndl-elevation-overlay);
   margin: var(--ndl-space-xl);
@@ -851,6 +1052,10 @@ ndl-spinner {
 
 .ndl-about .icon {
   margin-bottom: var(--ndl-space-sm);
+}
+
+.ndl-about .title-1 {
+  font-size: 32px;
 }
 
 .ndl-release-notes {

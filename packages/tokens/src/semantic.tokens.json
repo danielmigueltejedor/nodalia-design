@@ -3,7 +3,7 @@
   "color": {
     "$type": "color",
     "surface": {
-      "window": { "$value": "{palette.neutral.50}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.1000}", "light-hc": "{palette.neutral.0}", "dark-hc": "{palette.neutral.1000}" } } },
+      "window": { "$value": "{palette.neutral.150}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.1000}", "light-hc": "{palette.neutral.0}", "dark-hc": "{palette.neutral.1000}" } } },
       "panel": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.900}", "dark-hc": "{palette.neutral.950}" } } },
       "raised": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.850}", "dark-hc": "{palette.neutral.900}" } } },
       "sunken": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.950}", "light-hc": "{palette.neutral.50}", "dark-hc": "{palette.neutral.1000}" } } },
@@ -20,7 +20,7 @@
       "inverse": { "$value": "{palette.neutral.50}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.900}", "light-hc": "{palette.neutral.0}" } } }
     },
     "border": {
-      "subtle": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.800}", "light-hc": "{palette.neutral.500}", "dark-hc": "{palette.neutral.400}" } } },
+      "subtle": { "$value": "{palette.neutral.150}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.750}", "light-hc": "{palette.neutral.500}", "dark-hc": "{palette.neutral.400}" } } },
       "default": { "$value": "{palette.neutral.300}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.600}", "light-hc": "{palette.neutral.700}", "dark-hc": "{palette.neutral.300}" } } },
       "strong": { "$value": "{palette.neutral.500}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.400}", "light-hc": "{palette.neutral.900}", "dark-hc": "{palette.neutral.100}" } } },
       "focus": { "$value": "{palette.accent.600}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.300}", "light-hc": "{palette.accent.800}", "dark-hc": "{palette.accent.200}" } } }
@@ -33,16 +33,16 @@
       "text": { "$value": "{palette.accent.700}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.300}", "light-hc": "{palette.accent.800}", "dark-hc": "{palette.accent.200}" } } }
     },
     "control": {
-      "bg": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.800}", "light-hc": "{palette.neutral.50}", "dark-hc": "{palette.neutral.900}" } } },
-      "bg-hover": { "$value": "{palette.neutral.200}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.700}", "light-hc": "{palette.neutral.100}", "dark-hc": "{palette.neutral.800}" } } },
-      "bg-pressed": { "$value": "{palette.neutral.300}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.600}", "light-hc": "{palette.neutral.200}", "dark-hc": "{palette.neutral.700}" } } },
+      "bg": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.850}", "light-hc": "{palette.neutral.50}", "dark-hc": "{palette.neutral.900}" } } },
+      "bg-hover": { "$value": "{palette.neutral.150}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.800}", "light-hc": "{palette.neutral.100}", "dark-hc": "{palette.neutral.800}" } } },
+      "bg-pressed": { "$value": "{palette.neutral.200}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.700}", "light-hc": "{palette.neutral.200}", "dark-hc": "{palette.neutral.700}" } } },
       "bg-disabled": { "$value": "{palette.neutral.50}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.900}", "light-hc": "{palette.neutral.50}", "dark-hc": "{palette.neutral.950}" } } },
       "field-bg": { "$value": "{palette.neutral.0}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.950}", "dark-hc": "{palette.neutral.1000}" } } },
       "track": { "$value": "{palette.neutral.400}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.500}", "light-hc": "{palette.neutral.600}", "dark-hc": "{palette.neutral.400}" } } }
     },
     "selection": {
       "bg": { "$value": "{palette.accent.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.accent.900}", "dark-hc": "{palette.accent.800}" } } },
-      "bg-inactive": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.800}" } } }
+      "bg-inactive": { "$value": "{palette.neutral.100}", "$extensions": { "com.nodalia.modes": { "dark": "{palette.neutral.850}" } } }
     },
     "status": {
       "success": {
