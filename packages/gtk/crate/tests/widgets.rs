@@ -28,7 +28,9 @@ fn widgets() {
 fn window_title_stacks_its_subtitle() {
     let title = ndl::WindowTitle::new("Cola", "1 canción");
     let one = ndl::WindowTitle::new("Cola", "");
-    assert!(natural(&title, gtk::Orientation::Vertical) > natural(&one, gtk::Orientation::Vertical));
+    assert!(
+        natural(&title, gtk::Orientation::Vertical) > natural(&one, gtk::Orientation::Vertical)
+    );
 }
 
 /// Each row type registers its own `activated` signal; a shared one panicked on the second.
