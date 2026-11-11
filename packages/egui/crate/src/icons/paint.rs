@@ -2,9 +2,10 @@
 //! M L H V C A Z in either case, rects with rx, circles; fills, `fill-opacity` and
 //! `stroke-dasharray`), flattened to egui shapes with round caps and joins.
 //!
-//! A filled element is drawn as a convex polygon, which is what NDL's solid parts are.
+//! A filled element is filled even-odd (an outline inside another is a hole in it): as a convex
+//! polygon when it is one, else triangulated, since egui only fills convex polygons.
 
-use egui::{pos2, Color32, Painter, Pos2, Rect, Shape, Stroke};
+use egui::{epaint::Mesh, pos2, Color32, Painter, Pos2, Rect, Shape, Stroke};
 
 use super::{Icon, BOLD_STROKE, STROKE};
 
@@ -63,15 +64,19 @@ pub fn paint(p: &Painter, rect: Rect, icon: &Icon, style: Style) -> bool {
             Some(accent) if icon.accent.contains(&i) => accent,
             _ => style.ink,
         };
+        if el.fill {
+            // Without a stroke over it, a triangulated fill's edge needs a hairline to be smooth.
+            let edge = (!el.stroke && el.fill_opacity >= 1.0).then(|| Stroke::new(0.5 * s, color));
+            fill(
+                p,
+                &el.outlines,
+                &at,
+                color.gamma_multiply(el.fill_opacity),
+                edge,
+            );
+        }
         for o in &el.outlines {
             let pts: Vec<Pos2> = o.pts.iter().copied().map(at).collect();
-            if el.fill && pts.len() >= 3 {
-                p.add(Shape::convex_polygon(
-                    pts.clone(),
-                    color.gamma_multiply(el.fill_opacity),
-                    Stroke::NONE,
-                ));
-            }
             if !el.stroke {
                 continue;
             }
@@ -118,6 +123,172 @@ struct Element {
     stroke: bool,
     dash: Option<(f32, f32)>,
 }
+type Pt = (f32, f32);
+
+/// Fill an element's outlines even-odd: an outline inside another is a hole in that one.
+fn fill(
+    p: &Painter,
+    outlines: &[Outline],
+    at: &impl Fn(Pt) -> Pos2,
+    color: Color32,
+    edge: Option<Stroke>,
+) {
+    let usable: Vec<&[Pt]> = outlines
+        .iter()
+        .map(|o| o.pts.as_slice())
+        .filter(|pts| pts.len() >= 3)
+        .collect();
+    let hole = |k: usize, of: Option<usize>| {
+        let first = usable.get(k).and_then(|pts| pts.first().copied());
+        usable.iter().enumerate().any(|(j, other)| {
+            j != k && of.is_none_or(|o| o == j) && first.is_some_and(|f| inside(f, other))
+        })
+    };
+    for (k, outer) in usable.iter().enumerate() {
+        if hole(k, None) {
+            continue;
+        }
+        let mut poly = oriented(outer, true);
+        let mut holes = 0;
+        for (h, pts) in usable.iter().enumerate() {
+            if h != k && hole(h, Some(k)) {
+                bridge(&mut poly, &oriented(pts, false));
+                holes += 1;
+            }
+        }
+        let screen: Vec<Pos2> = poly.iter().copied().map(at).collect();
+        if holes == 0 && convex(&poly) {
+            p.add(Shape::convex_polygon(screen, color, Stroke::NONE));
+            continue;
+        }
+        let mut mesh = Mesh::default();
+        for &v in &screen {
+            mesh.colored_vertex(v, color);
+        }
+        for [a, b, c] in triangulate(&poly) {
+            mesh.add_triangle(a, b, c);
+        }
+        p.add(Shape::mesh(mesh));
+        if let Some(edge) = edge {
+            p.add(Shape::closed_line(
+                outer.iter().copied().map(at).collect(),
+                edge,
+            ));
+        }
+    }
+}
+
+/// Twice the signed area; positive when the outline turns the way `cross` calls convex.
+fn area(pts: &[Pt]) -> f32 {
+    let next = pts.iter().cycle().skip(1);
+    pts.iter()
+        .zip(next)
+        .map(|(a, b)| a.0 * b.1 - b.0 * a.1)
+        .sum()
+}
+
+fn oriented(pts: &[Pt], positive: bool) -> Vec<Pt> {
+    let mut v = pts.to_vec();
+    if (area(&v) > 0.0) != positive {
+        v.reverse();
+    }
+    v
+}
+
+fn cross(a: Pt, b: Pt, c: Pt) -> f32 {
+    (b.0 - a.0) * (c.1 - b.1) - (b.1 - a.1) * (c.0 - b.0)
+}
+
+/// Whether a positively oriented outline never turns the other way.
+fn convex(pts: &[Pt]) -> bool {
+    let n = pts.len();
+    (0..n).all(|i| {
+        let at = |k: usize| pts.get((i + k) % n).copied().unwrap_or_default();
+        cross(at(0), at(1), at(2)) >= -1e-4
+    })
+}
+
+/// Even-odd point in polygon.
+fn inside(q: Pt, pts: &[Pt]) -> bool {
+    let next = pts.iter().cycle().skip(1);
+    pts.iter()
+        .zip(next)
+        .filter(|(a, b)| {
+            (a.1 > q.1) != (b.1 > q.1) && q.0 < a.0 + (q.1 - a.1) * (b.0 - a.0) / (b.1 - a.1)
+        })
+        .count()
+        % 2
+        == 1
+}
+
+/// Join a hole (oriented against `poly`) into `poly` through its nearest vertex pair, so the
+/// two become one outline that ear clipping can fill.
+fn bridge(poly: &mut Vec<Pt>, hole: &[Pt]) {
+    let d = |a: Pt, b: Pt| (a.0 - b.0).powi(2) + (a.1 - b.1).powi(2);
+    let best = poly
+        .iter()
+        .enumerate()
+        .flat_map(|(i, &a)| hole.iter().enumerate().map(move |(j, &b)| (d(a, b), i, j)))
+        .min_by(|x, y| x.0.total_cmp(&y.0));
+    let Some((_, i, j)) = best else {
+        return;
+    };
+    let ring = hole.iter().cycle().skip(j).take(hole.len() + 1).copied();
+    let tail = poly.split_off(i);
+    poly.extend(tail.first().copied());
+    poly.extend(ring);
+    poly.extend(tail);
+}
+
+/// Ear clipping of a positively oriented simple outline (bridged holes included).
+fn triangulate(pts: &[Pt]) -> Vec<[u32; 3]> {
+    let mut idx: Vec<usize> = (0..pts.len()).collect();
+    let mut out = Vec::new();
+    let pt = |i: usize| pts.get(i).copied().unwrap_or_default();
+    let mut guard = pts.len() * pts.len() + 8;
+    while idx.len() >= 3 && guard > 0 {
+        guard -= 1;
+        let n = idx.len();
+        let corner = |k: usize| {
+            let get = |o: usize| idx.get((k + o) % n).copied().unwrap_or_default();
+            (get(n - 1), get(0), get(1))
+        };
+        let ear = (0..n).find(|&k| {
+            let (a, b, c) = corner(k);
+            let (pa, pb, pc) = (pt(a), pt(b), pt(c));
+            cross(pa, pb, pc) > 1e-6
+                && idx.iter().all(|&o| {
+                    let q = pt(o);
+                    q == pa || q == pb || q == pc || !in_triangle(q, pa, pb, pc)
+                })
+        });
+        // No ear means only slivers are left: drop the flattest corner and carry on.
+        let k = ear.unwrap_or_else(|| {
+            (0..n)
+                .min_by(|&x, &y| {
+                    let f = |k| {
+                        let (a, b, c) = corner(k);
+                        cross(pt(a), pt(b), pt(c)).abs()
+                    };
+                    f(x).total_cmp(&f(y))
+                })
+                .unwrap_or(0)
+        });
+        let (a, b, c) = corner(k);
+        if ear.is_some() {
+            if let (Ok(a), Ok(b), Ok(c)) = (u32::try_from(a), u32::try_from(b), u32::try_from(c)) {
+                out.push([a, b, c]);
+            }
+        }
+        idx.remove(k);
+    }
+    out
+}
+
+fn in_triangle(q: Pt, a: Pt, b: Pt, c: Pt) -> bool {
+    cross(a, b, q) >= 0.0 && cross(b, c, q) >= 0.0 && cross(c, a, q) >= 0.0
+}
+
 /// The value of `name="…"` in an element's tag.
 fn attr<'a>(el: &'a str, name: &str) -> Option<&'a str> {
     let key = format!(" {name}=\"");
@@ -484,6 +655,60 @@ mod tests {
         )
         .unwrap();
         assert!(e.fill && (e.fill_opacity - 0.18).abs() < 1e-6);
+    }
+
+    fn covered(poly: &[Pt]) -> f32 {
+        triangulate(poly)
+            .iter()
+            .map(|t| {
+                let [a, b, c] = t.map(|i| poly[i as usize]);
+                cross(a, b, c).abs() / 2.0
+            })
+            .sum()
+    }
+
+    #[test]
+    fn concave_fills_keep_their_shape() {
+        let mut concave = 0;
+        for icon in super::super::all() {
+            for e in icon.body.iter().chain(icon.bold_body()) {
+                let el = parse_element(e).unwrap();
+                if !el.fill || el.outlines.len() != 1 {
+                    continue;
+                }
+                let poly = oriented(&el.outlines[0].pts, true);
+                concave += usize::from(!convex(&poly));
+                let want = area(&poly) / 2.0;
+                assert!(
+                    (covered(&poly) - want).abs() < 0.02 * want.max(1.0),
+                    "{}",
+                    icon.name
+                );
+            }
+        }
+        // The bold star, heart, folder, bell... are not convex.
+        assert!(concave >= 8, "{concave}");
+    }
+
+    #[test]
+    fn a_hole_stays_open() {
+        let disc = super::super::get("disc").unwrap();
+        let el = disc
+            .bold_body()
+            .iter()
+            .filter_map(|e| parse_element(e))
+            .find(|el| el.fill && el.outlines.len() == 2)
+            .unwrap();
+        let (outer, hole) = (&el.outlines[0].pts, &el.outlines[1].pts);
+        assert!(inside(hole[0], outer) && !inside(outer[0], hole));
+        let mut poly = oriented(outer, true);
+        bridge(&mut poly, &oriented(hole, false));
+        let want = (area(outer).abs() - area(hole).abs()) / 2.0;
+        assert!(
+            (covered(&poly) - want).abs() < 0.02 * want,
+            "{} vs {want}",
+            covered(&poly)
+        );
     }
 
     #[test]

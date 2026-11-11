@@ -97,6 +97,6 @@ mod tests {
         for name in ["line", "trim", "dim-continue", "layer-freeze", "coincident"] {
             assert!(get(name).is_some(), "{name}");
         }
-        assert!(all().iter().filter(|i| i.group == "cad").count() >= 90);
+        assert!(all().iter().filter(|i| i.group == "cad").count() >= 93);
     }
 }

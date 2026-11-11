@@ -43,6 +43,38 @@ test('paths start inside the view box and stay on a quarter-pixel grid', () => {
   }
 });
 
+// Every absolute point a path passes through (end points and Bézier controls; arcs by their ends).
+function points(d) {
+  const tokens = d.match(/[a-zA-Z]|-?(?:\d+\.?\d*|\.\d+)/g);
+  const out = [];
+  let [i, x, y, sx, sy, cmd] = [0, 0, 0, 0, 0, ''];
+  const next = () => Number(tokens[i++]);
+  while (i < tokens.length) {
+    if (/[a-zA-Z]/.test(tokens[i])) cmd = tokens[i++];
+    const [ox, oy] = cmd === cmd.toLowerCase() ? [x, y] : [0, 0];
+    const kind = cmd.toUpperCase();
+    if (kind === 'Z') [x, y] = [sx, sy];
+    else if (kind === 'H') x = ox + next();
+    else if (kind === 'V') y = oy + next();
+    else {
+      if (kind === 'A') for (let k = 0; k < 5; k++) next();
+      for (let k = 0; k < ({ C: 2, S: 1 }[kind] ?? 0); k++) out.push([ox + next(), oy + next()]);
+      [x, y] = [ox + next(), oy + next()];
+      if (kind === 'M') [sx, sy, cmd] = [x, y, cmd === 'm' ? 'l' : 'L'];
+    }
+    out.push([x, y]);
+  }
+  return out;
+}
+
+test('paths keep two pixels clear of every edge, so no stroke is clipped', () => {
+  for (const name of names()) for (const part of ICONS[name].body.filter((p) => p.startsWith('<path'))) {
+    for (const [x, y] of points(/ d="([^"]+)"/.exec(part)[1])) {
+      assert.ok(Math.min(x, y) >= 2 - 1e-9 && Math.max(x, y) <= SIZE - 2 + 1e-9, `${name}: ${x}, ${y}`);
+    }
+  }
+});
+
 test('standalone files are complete documents in the requested ink', () => {
   const current = svg('search');
   assert.match(current, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1\.75"/);
@@ -83,6 +115,6 @@ test('the bold style fills only elements that exist, and its own bodies follow t
 test('accents name elements that exist, and the CAD set is complete', () => {
   for (const name of names()) for (const i of ICONS[name].accent ?? []) assert.ok(Number.isInteger(i) && i >= 0 && i < ICONS[name].body.length, `${name}: accent ${i}`);
   const cad = names().filter((n) => ICONS[n].group === 'cad');
-  assert.ok(cad.length >= 90, `${cad.length} CAD icons`);
+  assert.ok(cad.length >= 93, `${cad.length} CAD icons`);
   for (const shared of ['line', 'circle', 'rectangle', 'fillet', 'chamfer', 'dimension']) assert.ok(ICONS[shared].accent, shared);
 });

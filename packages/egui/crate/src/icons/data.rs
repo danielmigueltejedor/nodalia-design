@@ -138,7 +138,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "att-def",
         group: "cad",
-        body: &[r#"<path d="M9 4L17 8L9 12L1 8ZM1 8L1 15L9 19L17 15L17 8"/>"#, r#"<path d="M16 22.5l3-7 3 7M17.1 20h3.8"/>"#],
+        body: &[r#"<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>"#, r#"<path d="M15.55 21.31l2.66 -6.2 2.66 6.2M16.52 19.09h3.37"/>"#],
         bold: &[],
         accent: &[1],
     },
@@ -180,14 +180,14 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "block-create",
         group: "cad",
-        body: &[r#"<path d="M9 4L17 8L9 12L1 8ZM1 8L1 15L9 19L17 15L17 8"/>"#, r#"<path d="M19 2v6M16.4 3.5l5.2 3M16.4 6.5l5.2-3"/>"#],
+        body: &[r#"<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>"#, r#"<path d="M18.2 3.14v5.32M15.9 4.47l4.61 2.66M15.9 7.12l4.61 -2.66"/>"#],
         bold: &[],
         accent: &[1],
     },
     Icon {
         name: "block-edit",
         group: "cad",
-        body: &[r#"<path d="M9 4L17 8L9 12L1 8ZM1 8L1 15L9 19L17 15L17 8"/>"#, r#"<path d="M14 22L22 14"/>"#],
+        body: &[r#"<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>"#, r#"<path d="M13.77 20.86L20.86 13.77"/>"#],
         bold: &[],
         accent: &[1],
     },
@@ -250,7 +250,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "bulb-off",
         group: "cad",
-        body: &[r#"<circle cx="12" cy="10" r="6" fill="currentColor" stroke="none"/>"#, r#"<rect x="9.5" y="15" width="5" height="4" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<circle cx="12" cy="10" r="6"/>"#, r#"<rect x="9.5" y="16" width="5" height="3"/>"#, r#"<path d="M4 4l16 16"/>"#],
         bold: &[],
         accent: &[0, 1],
     },
@@ -516,7 +516,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "dim-arc",
         group: "cad",
-        body: &[r#"<path d="M19.52 15.26A8 8 0 0 0 4.48 15.26"/>"#, r#"<path d="M22.88 12.93A12 12 0 0 0 1.12 12.93"/>"#],
+        body: &[r#"<path d="M18.74 14.92A7.17 7.17 0 0 0 5.26 14.92"/>"#, r#"<path d="M21.75 12.83A10.75 10.75 0 0 0 2.25 12.83"/>"#],
         bold: &[],
         accent: &[1],
     },
@@ -551,7 +551,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "dim-style",
         group: "cad",
-        body: &[r#"<path d="M2 4L2 12M15 4L15 12M2 8L15 8"/>"#, r#"<path d="M2 8L5 6.6L5 9.4Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M15 8L12 9.4L12 6.6Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M20.88 16.27L22.39 16.46L22.39 18.54L20.88 18.73L20.26 19.81L20.85 21.22L19.05 22.25L18.13 21.05L16.87 21.05L15.95 22.25L14.15 21.22L14.74 19.81L14.12 18.73L12.61 18.54L12.61 16.46L14.12 16.27L14.74 15.19L14.15 13.78L15.95 12.75L16.87 13.95L18.13 13.95L19.05 12.75L20.85 13.78L20.26 15.19Z"/>"#, r#"<circle cx="17.5" cy="17.5" r="1.5"/>"#],
+        body: &[r#"<path d="M2.62 4.49L2.62 12M14.82 4.49L14.82 12M2.62 8.25L14.82 8.25"/>"#, r#"<path d="M2.62 8.25L5.43 6.93L5.43 9.56Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M14.82 8.25L12 9.56L12 6.93Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M20.33 16.01L21.75 16.19L21.75 18.14L20.33 18.32L19.75 19.33L20.3 20.65L18.62 21.62L17.75 20.49L16.57 20.49L15.71 21.62L14.02 20.65L14.57 19.33L13.99 18.32L12.57 18.14L12.57 16.19L13.99 16.01L14.57 14.99L14.02 13.67L15.71 12.7L16.57 13.83L17.75 13.83L18.62 12.7L20.3 13.67L19.75 14.99Z"/>"#, r#"<circle cx="17.16" cy="17.16" r="1.41"/>"#],
         bold: &[],
         accent: &[3, 4],
     },
@@ -649,7 +649,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "export",
         group: "files",
-        body: &[r#"<path d="M5 3L14 3L18 7L18 21L5 21Z"/>"#, r#"<path d="M9 13L17 13"/>"#, r#"<path d="M23 13L17 18L17 8Z" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M5.8 4.02L13.77 4.02L17.32 7.57L17.32 19.98L5.8 19.98Z"/>"#, r#"<path d="M9.34 12.89L16.43 12.89"/>"#, r#"<path d="M21.75 12.89L16.43 17.32L16.43 8.45Z" fill="currentColor" stroke="none"/>"#],
         bold: &[],
         accent: &[1, 2],
     },
@@ -1013,7 +1013,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "insert",
         group: "cad",
-        body: &[r#"<path d="M9 4L17 8L9 12L1 8ZM1 8L1 15L9 19L17 15L17 8"/>"#, r#"<path d="M14 20L22 20"/>"#, r#"<path d="M13 20L16 18.6L16 21.4Z" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>"#, r#"<path d="M13.77 19.09L20.86 19.09"/>"#, r#"<path d="M12.89 19.09L15.55 17.85L15.55 20.33Z" fill="currentColor" stroke="none"/>"#],
         bold: &[],
         accent: &[1, 2],
     },
@@ -1097,7 +1097,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "layer-off",
         group: "cad",
-        body: &[r#"<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>"#, r#"<circle cx="18" cy="17" r="3.5" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>"#, r#"<circle cx="18" cy="17" r="3.5"/>"#, r#"<path d="M15.5 19.5l5-5"/>"#],
         bold: &[],
         accent: &[1],
     },
@@ -1342,7 +1342,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "move",
         group: "cad",
-        body: &[r#"<path d="M12 6L12 18M6 12L18 12"/>"#, r#"<path d="M12 1.5L15.3 7L8.7 7Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M12 22.5L8.7 17L15.3 17Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M1.5 12L7 8.7L7 15.3Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M22.5 12L17 15.3L17 8.7Z" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M12 6.43L12 17.57M6.43 12L17.57 12"/>"#, r#"<path d="M12 2.25L15.06 7.36L8.94 7.36Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M12 21.75L8.94 16.64L15.06 16.64Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M2.25 12L7.36 8.94L7.36 15.06Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M21.75 12L16.64 15.06L16.64 8.94Z" fill="currentColor" stroke="none"/>"#],
         bold: &[],
         accent: &[0, 1, 2, 3, 4],
     },
@@ -1664,7 +1664,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "preview",
         group: "files",
-        body: &[r#"<path d="M1.5 8L13.5 8L13.5 14.5L1.5 14.5ZM3.8 4L11.2 4L11.2 8L3.8 8ZM3.8 12L11.2 12L11.2 18L3.8 18Z"/>"#, r#"<circle cx="17.5" cy="13" r="4"/>"#, r#"<path d="M20.4 15.9L23 18.5"/>"#],
+        body: &[r#"<path d="M2.69 8.45L13.33 8.45L13.33 14.22L2.69 14.22ZM4.73 4.91L11.29 4.91L11.29 8.45L4.73 8.45ZM4.73 12L11.29 12L11.29 17.32L4.73 17.32Z"/>"#, r#"<circle cx="16.88" cy="12.89" r="3.55"/>"#, r#"<path d="M19.45 15.46L21.75 17.76"/>"#],
         bold: &[],
         accent: &[1, 2],
     },
@@ -1713,7 +1713,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "quick-props",
         group: "cad",
-        body: &[r#"<path d="M3 4L18 4L18 17L3 17ZM3 7L18 7M5 10L9 10"/>"#, r#"<path d="M11 10L16 10"/>"#, r#"<path d="M5 13L9 13"/>"#, r#"<path d="M11 13L16 13"/>"#, r#"<path d="M15 14L15 22L17 20L19.5 22.5L20.5 21.5L18 19L21 18.5Z"/>"#],
+        body: &[r#"<path d="M3.64 4.57L17.57 4.57L17.57 16.64L3.64 16.64ZM3.64 7.36L17.57 7.36M5.5 10.14L9.21 10.14"/>"#, r#"<path d="M11.07 10.14L15.71 10.14"/>"#, r#"<path d="M5.5 12.93L9.21 12.93"/>"#, r#"<path d="M11.07 12.93L15.71 12.93"/>"#, r#"<path d="M14.79 13.86L14.79 21.29L16.64 19.43L18.96 21.75L19.89 20.82L17.57 18.5L20.36 18.04Z"/>"#],
         bold: &[],
         accent: &[1, 3],
     },
@@ -1748,7 +1748,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "ray",
         group: "cad",
-        body: &[r#"<path d="M5 19L23 3"/>"#, r#"<circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M5.8 18.2L21.75 4.02"/>"#, r#"<circle cx="5.8" cy="18.2" r="1.42" fill="currentColor" stroke="none"/>"#],
         bold: &[],
         accent: &[0, 1],
     },
@@ -1881,7 +1881,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "save-as",
         group: "files",
-        body: &[r#"<path d="M4 4L17 4L20 7L20 20L4 20ZM8 4L16 4L16 9L8 9ZM7 13L17 13L17 20L7 20Z"/>"#, r#"<path d="M12.6 19.4L20.6 11.4L23.6 14.4L15.6 22.4ZM19 13L22 16"/>"#, r#"<path d="M12.6 19.4L15.6 22.4L10.8 24Z" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M5.5 5.5L16.06 5.5L18.5 7.94L18.5 18.5L5.5 18.5ZM8.75 5.5L15.25 5.5L15.25 9.56L8.75 9.56ZM7.94 12.81L16.06 12.81L16.06 18.5L7.94 18.5Z"/>"#, r#"<path d="M12.49 18.01L18.99 11.51L21.43 13.95L14.93 20.45ZM17.69 12.81L20.12 15.25"/>"#, r#"<path d="M12.49 18.01L14.93 20.45L11.03 21.75Z" fill="currentColor" stroke="none"/>"#],
         bold: &[],
         accent: &[1, 2],
     },
@@ -2126,7 +2126,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "stretch",
         group: "cad",
-        body: &[r#"<path d="M3 18L3 8L10 8"/>"#, r#"<path d="M10 8L20 8L20 18L3 18"/>"#, r#"<path d="M12 5L13.5 5M15 5L16.5 5M18 5L19.5 5M21 5L22.5 5"/>"#],
+        body: &[r#"<path d="M3.64 17.57L3.64 8.29L10.14 8.29"/>"#, r#"<path d="M10.14 8.29L19.43 8.29L19.43 17.57L3.64 17.57"/>"#, r#"<path d="M12 5.5L13.39 5.5M14.79 5.5L16.18 5.5M17.57 5.5L18.96 5.5M20.36 5.5L21.75 5.5"/>"#],
         bold: &[],
         accent: &[1],
     },
@@ -2252,7 +2252,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "text-style",
         group: "cad",
-        body: &[r#"<path d="M20.88 16.27L22.39 16.46L22.39 18.54L20.88 18.73L20.26 19.81L20.85 21.22L19.05 22.25L18.13 21.05L16.87 21.05L15.95 22.25L14.15 21.22L14.74 19.81L14.12 18.73L12.61 18.54L12.61 16.46L14.12 16.27L14.74 15.19L14.15 13.78L15.95 12.75L16.87 13.95L18.13 13.95L19.05 12.75L20.85 13.78L20.26 15.19Z"/>"#, r#"<circle cx="17.5" cy="17.5" r="1.5"/>"#, r#"<path d="M5 16.5 9.5 4.5l4.5 12M6.7 12h5.6"/>"#],
+        body: &[r#"<path d="M20.33 16.01L21.75 16.19L21.75 18.14L20.33 18.32L19.75 19.33L20.3 20.65L18.62 21.62L17.75 20.49L16.57 20.49L15.71 21.62L14.02 20.65L14.57 19.33L13.99 18.32L12.57 18.14L12.57 16.19L13.99 16.01L14.57 14.99L14.02 13.67L15.71 12.7L16.57 13.83L17.75 13.83L18.62 12.7L20.3 13.67L19.75 14.99Z"/>"#, r#"<circle cx="17.16" cy="17.16" r="1.41"/>"#, r#"<path d="M5.43 16.22 9.65 4.96l4.22 11.26M7.03 12h5.26"/>"#],
         bold: &[],
         accent: &[0, 1],
     },
@@ -2294,7 +2294,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "trim",
         group: "cad",
-        body: &[r#"<path d="M1.5 20L9 20M15 20L22.5 20"/>"#, r#"<circle cx="7.5" cy="4.5" r="3"/>"#, r#"<circle cx="16.5" cy="4.5" r="3"/>"#, r#"<path d="M9.3 6.9L14.6 18.5M14.7 6.9L9.4 18.5"/>"#, r#"<path d="M14.6 18.5L13 13.5L11.8 14.6Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M9.4 18.5L11 13.5L12.2 14.6Z" fill="currentColor" stroke="none"/>"#, r#"<circle cx="12" cy="12.6" r="1.3" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M2.25 19.43L9.21 19.43M14.79 19.43L21.75 19.43"/>"#, r#"<circle cx="7.82" cy="5.04" r="2.79"/>"#, r#"<circle cx="16.18" cy="5.04" r="2.79"/>"#, r#"<path d="M9.49 7.26L14.41 18.04M14.51 7.26L9.59 18.04"/>"#, r#"<path d="M14.41 18.04L12.93 13.39L11.81 14.41Z" fill="currentColor" stroke="none"/>"#, r#"<path d="M9.59 18.04L11.07 13.39L12.19 14.41Z" fill="currentColor" stroke="none"/>"#, r#"<circle cx="12" cy="12.56" r="1.21" fill="currentColor" stroke="none"/>"#],
         bold: &[],
         accent: &[1, 2, 3, 4, 5, 6],
     },
@@ -2490,7 +2490,7 @@ pub(super) static ICONS: [Icon; 359] = [
     Icon {
         name: "x-line",
         group: "cad",
-        body: &[r#"<path d="M1 22L23 2"/>"#, r#"<circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>"#],
+        body: &[r#"<path d="M2.25 20.86L21.75 3.14"/>"#, r#"<circle cx="12" cy="12" r="1.42" fill="currentColor" stroke="none"/>"#],
         bold: &[],
         accent: &[0, 1],
     },
