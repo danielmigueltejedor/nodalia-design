@@ -52,7 +52,10 @@ pub use rows::{
     EntryRowBuilder, PasswordEntryRow, PasswordEntryRowBuilder, SpinRow, SwitchRow,
     SwitchRowBuilder,
 };
-pub use theme::{ColorScheme, Density, StyleManager, WIDGETS_CSS};
+pub use theme::{
+    set_window_controls, window_controls, ColorScheme, Density, StyleManager, WindowControls,
+    WIDGETS_CSS,
+};
 pub use toolbar::{HeaderBar, HeaderBarBuilder, ToolbarView, ToolbarViewBuilder, WindowTitle};
 pub use window::{ApplicationWindow, BreakpointBin, Window, WindowBuilder};
 

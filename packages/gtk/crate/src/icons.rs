@@ -59,8 +59,9 @@ fn apply(display: &gtk::gdk::Display, settings: &gtk::Settings) {
 /// Writes the theme under the user's cache and returns the directory to search.
 fn write(inherits: Option<&str>) -> std::io::Result<PathBuf> {
     let index = index_theme(inherits);
+    let system = crate::theme::window_controls() == crate::theme::WindowControls::System;
     let mut hasher = DefaultHasher::new();
-    (ICONS, &index).hash(&mut hasher);
+    (ICONS, &index, system).hash(&mut hasher);
     let root = glib::user_cache_dir()
         .join("nodalia-gtk")
         .join(format!("icons-{:016x}", hasher.finish()));
@@ -77,10 +78,26 @@ fn write_files(theme: &Path, index: &str) -> std::io::Result<()> {
     let actions = theme.join("scalable").join("actions");
     std::fs::create_dir_all(&actions)?;
     std::fs::write(theme.join("index.theme"), index)?;
+    let system = crate::theme::window_controls() == crate::theme::WindowControls::System;
     for (name, svg) in ICONS {
+        // With the desktop's window controls its own glyphs answer for them.
+        if system && is_window_glyph(name) {
+            continue;
+        }
         std::fs::write(actions.join(format!("{name}.svg")), svg)?;
     }
     Ok(())
+}
+
+/// The names GTK's window controls ask for.
+fn is_window_glyph(name: &str) -> bool {
+    matches!(
+        name,
+        "window-minimize-symbolic"
+            | "window-maximize-symbolic"
+            | "window-restore-symbolic"
+            | "window-close-symbolic"
+    )
 }
 
 fn index_theme(inherits: Option<&str>) -> String {

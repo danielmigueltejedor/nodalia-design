@@ -120,6 +120,54 @@ mod imp {
     }
 }
 
+/// Who draws a window's minimise, maximise and close buttons on Linux.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum WindowControls {
+    /// Nodalia's: 28 px circles tinted cyan, amber and coral, with NDL's glyphs.
+    #[default]
+    Nodalia,
+    /// The desktop's: its button layout and its icon theme's glyphs (Adwaita on GNOME, Breeze on
+    /// KDE…), flat, without Nodalia's circles or tints.
+    System,
+}
+
+static SYSTEM_CONTROLS: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// Chooses the window controls. Call it before [`init`](crate::init) or the first
+/// [`StyleManager::default`]: the icon theme is written once, so a later change applies on the
+/// next start. Apps keep the choice in their preferences.
+pub fn set_window_controls(controls: WindowControls) {
+    SYSTEM_CONTROLS.store(
+        controls == WindowControls::System,
+        std::sync::atomic::Ordering::Relaxed,
+    );
+}
+
+/// The window controls chosen with [`set_window_controls`].
+pub fn window_controls() -> WindowControls {
+    if SYSTEM_CONTROLS.load(std::sync::atomic::Ordering::Relaxed) {
+        WindowControls::System
+    } else {
+        WindowControls::Nodalia
+    }
+}
+
+/// The desktop's controls: plain buttons over the system glyphs, a soft disc under the pointer.
+const SYSTEM_CONTROLS_CSS: &str = "
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action),
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).close:hover,
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).maximize:hover {
+  background-color: transparent;
+  color: var(--ndl-color-text-primary);
+  -gtk-icon-size: 16px;
+}
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action):hover,
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).close:hover,
+headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).maximize:hover {
+  background-color: var(--ndl-color-control-bg-hover);
+}
+";
+
 glib::wrapper! {
     /// Which NDL mode is on screen, and the app's say in it.
     pub struct StyleManager(ObjectSubclass<imp::StyleManager>);
@@ -164,6 +212,11 @@ impl StyleManager {
             );
         }
         imp.widgets.borrow().load_from_string(WIDGETS_CSS);
+        if window_controls() == WindowControls::System {
+            let system = gtk::CssProvider::new();
+            system.load_from_string(SYSTEM_CONTROLS_CSS);
+            gtk::style_context_add_provider_for_display(&display, &system, priority + 1);
+        }
         replace_base_theme(&gtk::Settings::for_display(&display));
         crate::icons::install(&display);
         crate::fonts::install();

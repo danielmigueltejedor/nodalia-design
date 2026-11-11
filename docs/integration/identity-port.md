@@ -51,6 +51,13 @@ Vinilo 2.0 (GTK) es la primera app con la identidad completa. Esta nota lista lo
 | Título de vista | Cada vista de lista abre con su nombre grande |
 | Barra lateral | Etiquetas de sección en versalitas, icono y nombre en cada fila, número discreto a la derecha |
 
+## Controles de ventana del sistema
+
+En Linux, los controles de Nodalia son los de serie, pero cada app deja elegir los del escritorio (GNOME, KDE…) en Preferencias; el cambio se aplica al reiniciar.
+
+- GTK: `nodalia_gtk::set_window_controls(WindowControls::System)` antes de `nodalia_gtk::init()`. Los botones siguen la disposición del escritorio y los glifos de su tema de iconos, planos, sin los círculos ni los tintes de Nodalia. GTK 4 no admite decoraciones del servidor, así que la ventana sigue dibujando su cabecera.
+- Qt: la ventana devuelve el marco al escritorio (decoración del servidor en KDE, la del tema de Qt en GNOME). Los menús siguen yendo a la barra superior si la hay; si no, a la barra de menús de la ventana. En Vortia es `ui/window-controls=system` y la variable `VORTIA_NATIVE_TITLEBAR=1` lo fuerza para una ejecución.
+
 ## Menú global
 
 En Linux, cada app exporta su menú a la barra superior del shell (`org.gtk.Menus` / `org.gtk.Actions`): un menú con el nombre de la app (Acerca de, Preferencias, Atajos, Cerrar sesión, Salir) y luego los de su trabajo (Reproducción, Ver, Ventana, Ayuda). El menú principal dentro de la ventana se mantiene. En GTK lo hace `nodalia_gtk::global_menu` y la barra lo lee por Mutter (`gtk_menubar_object_path`), también en Wayland.
