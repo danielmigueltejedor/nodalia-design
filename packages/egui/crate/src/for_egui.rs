@@ -22,14 +22,16 @@ use ::egui::{
 };
 
 use crate::{
-    border_width, component, font_size, line_height, motion, radius, size, space, Density, Mode,
-    Palette, Rgba, Shadow,
+    border_width, component, font_size, line_height, motion, radius, size, space, Accent, Density,
+    Mode, Palette, Rgba, Shadow,
 };
 
 /// What the user (or the system) chose. `mode` is ignored by [`apply_system`] except for contrast.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Appearance {
     pub mode: Mode,
+    /// The accent of the app. `Accent::Nodalia` unless the app has its own.
+    pub accent: Accent,
     pub density: Density,
     /// Collapses animations to zero. Bind it to the system "reduce motion" preference.
     pub reduced_motion: bool,
@@ -39,6 +41,7 @@ impl Default for Appearance {
     fn default() -> Self {
         Self {
             mode: Mode::Light,
+            accent: Accent::Nodalia,
             density: Density::REGULAR,
             reduced_motion: false,
         }
@@ -80,9 +83,14 @@ fn widget(fill: Rgba, border: Rgba, border_width: f32, text: Rgba) -> WidgetVisu
     }
 }
 
-/// egui visuals for one mode.
+/// egui visuals for one mode with the default accent.
 pub fn visuals(mode: Mode) -> Visuals {
-    let p: &Palette = mode.palette();
+    visuals_with(mode, Accent::Nodalia)
+}
+
+/// egui visuals for one mode and the accent of an app.
+pub fn visuals_with(mode: Mode, accent: Accent) -> Visuals {
+    let p: &Palette = &mode.palette_with(accent);
     let mut v = if mode.is_dark() {
         Visuals::dark()
     } else {
@@ -153,7 +161,7 @@ pub fn visuals(mode: Mode) -> Visuals {
 pub fn style(appearance: &Appearance) -> Style {
     let d = appearance.density;
     let mut s = Style {
-        visuals: visuals(appearance.mode),
+        visuals: visuals_with(appearance.mode, appearance.accent),
         ..Style::default()
     };
 

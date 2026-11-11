@@ -9,6 +9,7 @@
     ".": "./dist/tokens.json",
     "./css": "./dist/tokens.css",
     "./resolved": "./dist/resolved.json",
+    "./accents": "./dist/accents.json",
     "./src/*": "./src/*",
     "./lib": "./lib/index.mjs"
   },

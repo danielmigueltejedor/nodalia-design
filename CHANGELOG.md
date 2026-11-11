@@ -5,6 +5,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 ## [Sin publicar]
 
 ### Añadido
+- **Acento por app.** Cada app aporta un color clave en `accents.json` y NDL deriva una rampa con la misma luminancia, paso a paso, que la de por defecto, así que el contraste es idéntico y se valida en la compilación. 17 apps incluidas. Disponible en CSS (`data-accent`), en el crate Rust (`Accent`, `Mode::palette_with`) y en `nodalia-qt.json` (grupo `accent`). `dist/accents.json` lista rampas y colores resultantes.
 - `@nodalia/icons`: 192 iconos nuevos (247 en total) en diez grupos más: general, medios, texto, datos, diapositivas, diseño, foto, correo, modelado y documento. Mismas normas de dibujo. `dist/preview.html` muestra el conjunto completo.
 - `@nodalia/gtk`: hojas de métricas `nodalia-metrics-{compact,regular,comfortable}.css` con espaciado, radios, tipografía, movimiento y tamaños de componente como variables `--ndl-*` (requiere GTK 4.16+), y `--ndl-elevation-raised` / `--ndl-elevation-overlay` en las hojas de cada modo. Siguen sin selectores de widgets: la app decide qué widget usa cada valor.
 - `@nodalia/gtk`: `nodalia-gtk.css`, hoja de widgets para GTK 4 que solo lee variables `--ndl-*`.

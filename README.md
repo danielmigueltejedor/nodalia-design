@@ -8,7 +8,7 @@ Lenguaje de diseño de las aplicaciones de Nodalia: una especificación única, 
 
 | Paquete | Qué es | Estado |
 | --- | --- | --- |
-| [`@nodalia/tokens`](packages/tokens) | 190 tokens DTCG (primitivos, semánticos, de componente), cuatro modos de apariencia, validación de contraste WCAG y generador de CSS | Operativo |
+| [`@nodalia/tokens`](packages/tokens) | 190 tokens DTCG (primitivos, semánticos, de componente), un acento por app derivado de un solo color, cuatro modos de apariencia, validación de contraste WCAG y generador de CSS | Operativo |
 | [`@nodalia/web`](packages/web) | Componentes CSS sin framework + comportamientos ARIA (pestañas, árbol, barra de herramientas, separador, menú contextual, tooltip) | Operativo |
 | [`@nodalia/icons`](packages/icons) | 255 iconos originales de trazo para cualquier app: SVG sueltos, *sprite*, índice y página de vista previa | Operativo; 55 de ellos en uso en Vortia 0.5.0, y el tema de iconos completo de nodalia-gtk (Vinilo 2.0) |
 | [`@nodalia/gtk`](packages/gtk) | Hojas de estilo GTK4 / libadwaita (colores con nombre públicos) generadas desde los tokens | Generado y probado estructuralmente; **sin verificar en un runtime GTK real** |

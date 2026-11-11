@@ -2,7 +2,7 @@
 // The file is committed so Rust apps can depend on the crate straight from git, without Node.
 // A test fails when the committed file no longer matches the tokens.
 import { writeFileSync } from 'node:fs';
-import { MODES, SOURCE_DIR, loadTokens, resolve, parseHex, px, ms } from '@nodalia/tokens/lib';
+import { MODES, SOURCE_DIR, DEFAULT_ACCENT, accentSets, loadTokens, resolve, parseHex, px, ms } from '@nodalia/tokens/lib';
 
 const tokens = loadTokens(SOURCE_DIR);
 const all = [...tokens.values()];
@@ -23,6 +23,7 @@ const densityNames = [...new Set(all.filter((t) => t.path.startsWith('density.')
 const densityKeys = [...new Set(all.filter((t) => t.path.startsWith('density.')).map((t) => t.path.split('.')[2]))];
 const group = (prefix) => all.filter((t) => t.path.startsWith(`${prefix}.`));
 const light = (t) => resolve(tokens, t.path, 'light');
+const accents = accentSets(tokens, SOURCE_DIR);
 
 function dimensionModule(name, prefix, doc) {
   const items = group(prefix).filter((t) => t.type === 'dimension');
@@ -107,6 +108,43 @@ export function rustSource() {
       '',
     );
   }
+  // App accents: only the colours that differ from the default palette are written.
+  const names = [...accents.keys()];
+  lines.push(
+    '/// The accent of an app. `Nodalia` is the default; the others take the colour of the app icon.',
+    '/// Every accent has the luminance of the default one step by step, so contrast is the same.',
+    '#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]',
+    'pub enum Accent {',
+    '    #[default]',
+    ...names.map((n) => `    ${pascal(n)},`),
+    '}',
+    '',
+    'impl Accent {',
+    `    pub const ALL: [Accent; ${names.length}] = [${names.map((n) => `Accent::${pascal(n)}`).join(', ')}];`,
+    '',
+    '    /// The name used by the other NDL adapters (`data-accent` on the web).',
+    '    pub const fn name(self) -> &\'static str {',
+    '        match self {',
+    ...names.map((n) => `            Accent::${pascal(n)} => "${n}",`),
+    '        }',
+    '    }',
+    '}',
+    '',
+    'impl Mode {',
+    '    /// The palette of this mode with the accent of an app.',
+    '    pub const fn palette_with(self, accent: Accent) -> Palette {',
+    '        let mut p = *self.palette();',
+    '        match (accent, self) {',
+    `            (Accent::${pascal(DEFAULT_ACCENT)}, _) => {}`,
+  );
+  for (const [name, set] of accents) {
+    if (name === DEFAULT_ACCENT) continue;
+    for (const mode of MODES) {
+      const changed = colors.filter((t) => resolve(set.tokens, t.path, mode) !== resolve(tokens, t.path, mode));
+      lines.push(`            (Accent::${pascal(name)}, Mode::${pascal(mode)}) => {`, ...changed.map((t) => `                p.${colorField(t)} = ${rgba(resolve(set.tokens, t.path, mode))};`), '            }');
+    }
+  }
+  lines.push('        }', '        p', '    }', '}', '');
   lines.push(
     '/// Control metrics of one density, in logical pixels.',
     '#[derive(Clone, Copy, Debug, PartialEq)]',

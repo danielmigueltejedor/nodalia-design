@@ -38,6 +38,8 @@ Y una `QPalette` con los mismos tokens, porque el dibujo propio de la app (gráf
 
 Si la app quiere cambiar de modo o densidad en caliente, carga `nodalia-qt.json` y `nodalia.qss` y sustituye cada `{{grupo.nombre}}`: `color.*` se busca bajo el modo activo, `density.*` bajo la densidad activa y el resto directamente. La app añade después su propia hoja, con la misma sintaxis, para sus nombres de objeto.
 
+**Acento de la app.** `nodalia-qt.json` trae un grupo `accent.<app>.<modo>` con los colores que sustituyen a los de `color.<modo>`. Al rellenar la plantilla, la app busca primero ahí y después en `color`. Las hojas ya rellenas usan el acento por defecto.
+
 Variantes de botón: `button->setProperty("ndlVariant", "primary" | "subtle" | "danger")`. El botón por defecto de un diálogo ya toma el acento.
 
 ## Lo que la app tiene que poner
