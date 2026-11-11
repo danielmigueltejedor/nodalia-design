@@ -43,6 +43,49 @@ test('paths start inside the view box and stay on a quarter-pixel grid', () => {
   }
 });
 
+// Every absolute point a path passes through (end points and Bézier controls; arcs by their ends).
+function points(d) {
+  const tokens = d.match(/[a-zA-Z]|-?(?:\d+\.?\d*|\.\d+)/g);
+  const out = [];
+  let [i, x, y, sx, sy, cmd, c2] = [0, 0, 0, 0, 0, '', null];
+  const next = () => Number(tokens[i++]);
+  while (i < tokens.length) {
+    if (/[a-zA-Z]/.test(tokens[i])) cmd = tokens[i++];
+    else if (cmd === '' || cmd.toUpperCase() === 'Z') throw new Error(`a number without a command: ${d}`);
+    const [ox, oy] = cmd === cmd.toLowerCase() ? [x, y] : [0, 0];
+    const kind = cmd.toUpperCase();
+    // An S reflects the previous C or S's second control point about the current point.
+    const reflected = c2 ? [2 * x - c2[0], 2 * y - c2[1]] : [x, y];
+    c2 = null;
+    if (kind === 'Z') [x, y] = [sx, sy];
+    else if (kind === 'H') x = ox + next();
+    else if (kind === 'V') y = oy + next();
+    else {
+      if (kind === 'A') for (let k = 0; k < 5; k++) next();
+      if (kind === 'S') out.push(reflected);
+      if (kind === 'C') out.push([ox + next(), oy + next()]);
+      if (kind === 'C' || kind === 'S') out.push((c2 = [ox + next(), oy + next()]));
+      [x, y] = [ox + next(), oy + next()];
+      if (kind === 'M') [sx, sy, cmd] = [x, y, cmd === 'm' ? 'l' : 'L'];
+    }
+    out.push([x, y]);
+  }
+  return out;
+}
+
+test('paths keep two pixels clear of every edge, so no stroke is clipped', () => {
+  for (const name of names()) for (const part of ICONS[name].body.filter((p) => p.startsWith('<path'))) {
+    for (const [x, y] of points(/ d="([^"]+)"/.exec(part)[1])) {
+      assert.ok(Math.min(x, y) >= 2 - 1e-9 && Math.max(x, y) <= SIZE - 2 + 1e-9, `${name}: ${x}, ${y}`);
+    }
+  }
+});
+
+test('the path reader rejects stray numbers and follows reflected controls', () => {
+  assert.throws(() => points('M2 2Z5'));
+  assert.ok(points('M3 12C3 12 3 12 21 12S21 12 21 18').some(([x]) => x === 39));
+});
+
 test('standalone files are complete documents in the requested ink', () => {
   const current = svg('search');
   assert.match(current, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1\.75"/);
@@ -78,4 +121,11 @@ test('the bold style fills only elements that exist, and its own bodies follow t
   }
   // The style's character: the media controls and the library's own icons are solid.
   assert.ok(solid >= 25, `${solid} solid icons`);
+});
+
+test('accents name elements that exist, and the CAD set is complete', () => {
+  for (const name of names()) for (const i of ICONS[name].accent ?? []) assert.ok(Number.isInteger(i) && i >= 0 && i < ICONS[name].body.length, `${name}: accent ${i}`);
+  const cad = names().filter((n) => ICONS[n].group === 'cad');
+  assert.ok(cad.length >= 93, `${cad.length} CAD icons`);
+  for (const shared of ['line', 'circle', 'rectangle', 'fillet', 'chamfer', 'dimension']) assert.ok(ICONS[shared].accent, shared);
 });

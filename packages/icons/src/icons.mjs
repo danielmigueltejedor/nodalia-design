@@ -3,6 +3,8 @@
 // filled circles for nodes, dashes only for what is not real geometry, a soft fill only for a face.
 // Colours are always currentColor. Edit here and rebuild; never retouch a generated file.
 // `fill` lists the elements the bold style draws solid (see bold.mjs); the regular style ignores it.
+// `accent` lists the elements a CAD app draws in its accent colour: the geometry a tool creates,
+// against the existing geometry in the ink. Every other consumer draws the icon in one colour.
 
 export const ICONS = {
   // --- edit ---
@@ -144,21 +146,21 @@ export const ICONS = {
     '<path d="M4 20l1-4.5L16.5 4a2.1 2.1 0 0 1 3 3L8 18.5z"/>',
     '<path d="M14.5 6l3.5 3.5"/>',
   ] },
-  "line": { group: "sketch", body: [
+  "line": { group: "sketch", accent: [0,1,2], body: [
     '<path d="M6.5 17.5l11-11"/>',
     '<circle cx="5" cy="19" r="2"/>',
     '<circle cx="19" cy="5" r="2"/>',
   ] },
-  "rectangle": { group: "sketch", body: [
+  "rectangle": { group: "sketch", accent: [0,1,2], body: [
     '<rect x="4.5" y="6.5" width="15" height="11" rx="0.5"/>',
     '<circle cx="4.5" cy="6.5" r="1.9" fill="currentColor" stroke="none"/>',
     '<circle cx="19.5" cy="17.5" r="1.9" fill="currentColor" stroke="none"/>',
   ] },
-  "circle": { group: "sketch", body: [
+  "circle": { group: "sketch", accent: [0,1], body: [
     '<circle cx="12" cy="12" r="8"/>',
     '<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>',
   ] },
-  "radius": { group: "sketch", body: [
+  "radius": { group: "sketch", accent: [1,2], body: [
     '<circle cx="12" cy="12" r="8"/>',
     '<path d="M12 12l5.6-5.6"/>',
     '<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>',
@@ -189,12 +191,12 @@ export const ICONS = {
     '<circle cx="9" cy="19.5" r="1.6" fill="currentColor" stroke="none"/>',
     '<circle cx="15" cy="19.5" r="1.6" fill="currentColor" stroke="none"/>',
   ] },
-  "dimension": { group: "sketch", body: [
+  "dimension": { group: "sketch", accent: [1,2], body: [
     '<path d="M4 5v14M20 5v14"/>',
     '<path d="M4 12h16"/>',
     '<path d="M7.5 9 4.5 12l3 3M16.5 9l3 3-3 3"/>',
   ] },
-  "fillet": { group: "sketch", body: [
+  "fillet": { group: "sketch", accent: [0], body: [
     '<path d="M5 20v-8a7 7 0 0 1 7-7h8"/>',
     '<path d="M5 10V5h5" stroke-dasharray="2 3"/>',
   ] },
@@ -927,7 +929,7 @@ export const ICONS = {
     '<path d="M19.5 12A7.5 7.5 0 1 1 12 4.5h4"/>',
     '<path d="M13.5 2 16 4.5 13.5 7"/>',
   ] },
-  "flip": { group: "design", body: [
+  "flip": { group: "design", accent: [2], body: [
     '<path d="M12 3.5v17" stroke-dasharray="2 3"/>',
     '<path d="M9 7 3.5 17H9z"/>',
     '<path d="M15 7l5.5 10H15z" fill="currentColor" fill-opacity="0.18"/>',
@@ -960,7 +962,7 @@ export const ICONS = {
     '<circle cx="10" cy="7.5" r="1.15" fill="currentColor" stroke="none"/>',
     '<circle cx="14.5" cy="7.5" r="1.15" fill="currentColor" stroke="none"/>',
   ] },
-  "polygon": { group: "design", body: [
+  "polygon": { group: "design", accent: [0], body: [
     '<path d="M12 3.5l8 5.8-3 9.7H7l-3-9.7z"/>',
   ] },
   "ruler": { group: "design", body: [
@@ -1080,19 +1082,19 @@ export const ICONS = {
     '<path d="M12 12V3.5M12 12l7.5 4.5M12 12l-7.5 4.5"/>',
     '<circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
   ] },
-  "angle": { group: "model", body: [
+  "angle": { group: "model", accent: [2], body: [
     '<path d="M4.5 19.5h15"/>',
     '<path d="M4.5 19.5 15 5"/>',
     '<path d="M11.5 19.5a7 7 0 0 0-2.9-5.7"/>',
   ] },
-  "chamfer": { group: "model", body: [
+  "chamfer": { group: "model", accent: [0], body: [
     '<path d="M5 20v-9l6-6h9"/>',
   ] },
   "hole": { group: "model", body: [
     '<circle cx="12" cy="12" r="8.5"/>',
     '<circle cx="12" cy="12" r="3.5"/>',
   ] },
-  "pattern": { group: "model", body: [
+  "pattern": { group: "model", accent: [1,2,3,4,5,6,7,8], body: [
     '<circle cx="6" cy="6" r="1.5" fill="currentColor" stroke="none"/>',
     '<circle cx="12" cy="6" r="1.5" fill="currentColor" stroke="none"/>',
     '<circle cx="18" cy="6" r="1.5" fill="currentColor" stroke="none"/>',
@@ -1171,5 +1173,511 @@ export const ICONS = {
     '<path d="M15.25 11.75a8 8 0 0 1 2.25 1.25"/>',
     '<path d="M9.5 16.5a3.5 3.5 0 0 1 5 0"/>',
     '<path d="M4 4l16 16"/>',
+  ] },
+  // --- cad: drafting, dimensions, layers and blocks; `accent` lists the parts a CAD app tints ---
+  "add-leader": { group: "cad", accent: [0,1,3], body: [
+    '<path d="M3 20L10 9M10 9L14 9"/>',
+    '<path d="M3 20L3.22 16.7L5.67 18.05Z" fill="currentColor" stroke="none"/>',
+    '<path d="M15 6L22 6M15 10L21 10"/>',
+    '<path d="M19 15.5v5M16.5 18h5"/>',
+  ] },
+  "align-leaders": { group: "cad", accent: [0,1], body: [
+    '<path d="M3 20L10 9M10 9L14 9"/>',
+    '<path d="M3 20L3.22 16.7L5.67 18.05Z" fill="currentColor" stroke="none"/>',
+    '<path d="M15 6L22 6M15 10L21 10"/>',
+  ] },
+  "annotation": { group: "cad", body: [
+    '<path d="M12 3L21 20L3 20ZM12 9L12 15"/>',
+    '<circle cx="12" cy="17.5" r="1" fill="currentColor" stroke="none"/>',
+  ] },
+  "arc": { group: "cad", accent: [0,1,2,3], body: [
+    '<path d="M20.86 14.44A9 9 0 0 0 3.14 14.44"/>',
+    '<circle cx="3.2" cy="14.5" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="12" cy="7" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="20.8" cy="14.5" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "area": { group: "cad", accent: [0], body: [
+    '<path d="M4 18L6 5L19 7L20 19Z"/>',
+    '<path d="M9.5 15.5 12 9.5l2.5 6M10.4 13.5h3.2"/>',
+  ] },
+  "array-polar": { group: "cad", accent: [0,2,3,4,5,6], body: [
+    '<circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="19.5" cy="12" r="2"/>',
+    '<circle cx="15.75" cy="18.5" r="2"/>',
+    '<circle cx="8.25" cy="18.5" r="2"/>',
+    '<circle cx="4.5" cy="12" r="2"/>',
+    '<circle cx="8.25" cy="5.5" r="2"/>',
+    '<circle cx="15.75" cy="5.5" r="2"/>',
+  ] },
+  "att-def": { group: "cad", accent: [1], body: [
+    '<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>',
+    '<path d="M15.55 21.31l2.66 -6.2 2.66 6.2M16.52 19.09h3.37"/>',
+  ] },
+  "block-create": { group: "cad", accent: [1], body: [
+    '<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>',
+    '<path d="M18.2 3.14v5.32M15.9 4.47l4.61 2.66M15.9 7.12l4.61 -2.66"/>',
+  ] },
+  "block-edit": { group: "cad", accent: [1], body: [
+    '<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>',
+    '<path d="M13.77 20.86L20.86 13.77"/>',
+  ] },
+  "blocks": { group: "cad", body: [
+    '<path d="M12 3L20 7L12 11L4 7ZM4 7L4 16L12 20L20 16L20 7M12 11L12 20"/>',
+  ] },
+  "break": { group: "cad", accent: [1,2], body: [
+    '<path d="M3 12L9 12M15 12L21 12"/>',
+    '<circle cx="9" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="15" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "bulb": { group: "cad", accent: [0,1], body: [
+    '<circle cx="12" cy="10" r="6" fill="currentColor" stroke="none"/>',
+    '<rect x="9.5" y="15" width="5" height="4" fill="currentColor" stroke="none"/>',
+  ] },
+  "bulb-off": { group: "cad", accent: [0,1], body: [
+    '<circle cx="12" cy="10" r="6"/>',
+    '<rect x="9.5" y="16" width="5" height="3"/>',
+    '<path d="M4 4l16 16"/>',
+  ] },
+  "closed-boundary": { group: "cad", accent: [2,3], body: [
+    '<path d="M4 4L20 4L20 20L4 20Z"/>',
+    '<circle cx="12" cy="12" r="6"/>',
+    '<path d="M4 4L20 4L20 20L4 20Z"/>',
+    '<circle cx="6" cy="6" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "coincident": { group: "cad", accent: [1], body: [
+    '<path d="M3 20L12 12M12 12L21 18"/>',
+    '<circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/>',
+  ] },
+  "collinear": { group: "cad", accent: [1], body: [
+    '<path d="M3 19L9 15"/>',
+    '<path d="M12 13L21 7"/>',
+  ] },
+  "concentric": { group: "cad", accent: [1], body: [
+    '<circle cx="12" cy="12" r="8"/>',
+    '<circle cx="12" cy="12" r="4"/>',
+  ] },
+  "constraint": { group: "cad", accent: [0,1], body: [
+    '<rect x="7" y="11" width="10" height="9" fill="currentColor" stroke="none"/>',
+    '<path d="M16 11A4 4 0 0 0 8 11"/>',
+  ] },
+  "del-constraint": { group: "cad", accent: [0,1], body: [
+    '<rect x="3" y="12" width="9" height="8" fill="currentColor" stroke="none"/>',
+    '<path d="M11 12A3.5 3.5 0 1 0 4 12"/>',
+    '<path d="M15 13L21 19M21 13L15 19"/>',
+  ] },
+  "dim-aligned": { group: "cad", accent: [1,2,3], body: [
+    '<path d="M5.78 20.62L2.86 7.95M21.37 17.02L18.45 4.35"/>',
+    '<path d="M3.53 10.88L19.12 7.28"/>',
+    '<path d="M3.53 10.88L6.14 8.84L6.77 11.57Z" fill="currentColor" stroke="none"/>',
+    '<path d="M19.12 7.28L16.51 9.32L15.88 6.59Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "dim-arc": { group: "cad", accent: [1], body: [
+    '<path d="M18.74 14.92A7.17 7.17 0 0 0 5.26 14.92"/>',
+    '<path d="M21.75 12.83A10.75 10.75 0 0 0 2.25 12.83"/>',
+  ] },
+  "dim-baseline": { group: "cad", accent: [1,2,3,4], body: [
+    '<path d="M4 18L4 5M20 18L20 5"/>',
+    '<path d="M4 8L20 8"/>',
+    '<path d="M4 8L7 6.6L7 9.4Z" fill="currentColor" stroke="none"/>',
+    '<path d="M20 8L17 9.4L17 6.6Z" fill="currentColor" stroke="none"/>',
+    '<path d="M4 4L13 4"/>',
+  ] },
+  "dim-continue": { group: "cad", accent: [1,2,3], body: [
+    '<path d="M4 18L4 5M20 18L20 5"/>',
+    '<path d="M4 8L20 8"/>',
+    '<path d="M4 8L7 6.6L7 9.4Z" fill="currentColor" stroke="none"/>',
+    '<path d="M20 8L17 9.4L17 6.6Z" fill="currentColor" stroke="none"/>',
+    '<path d="M12 18L12 5"/>',
+  ] },
+  "dim-diameter": { group: "cad", accent: [1,2,3], body: [
+    '<circle cx="12" cy="12" r="8"/>',
+    '<path d="M6.4 17.6L17.6 6.4"/>',
+    '<path d="M6.4 17.6L7.53 14.49L9.51 16.47Z" fill="currentColor" stroke="none"/>',
+    '<path d="M17.6 6.4L16.47 9.51L14.49 7.53Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "dim-ordinate": { group: "cad", accent: [1], body: [
+    '<path d="M4 20L4 4M4 20L20 20"/>',
+    '<path d="M10 20L10 8M16 20L16 11"/>',
+  ] },
+  "dim-style": { group: "cad", accent: [3,4], body: [
+    '<path d="M2.62 4.49L2.62 12M14.82 4.49L14.82 12M2.62 8.25L14.82 8.25"/>',
+    '<path d="M2.62 8.25L5.43 6.93L5.43 9.56Z" fill="currentColor" stroke="none"/>',
+    '<path d="M14.82 8.25L12 9.56L12 6.93Z" fill="currentColor" stroke="none"/>',
+    '<path d="M20.33 16.01L21.75 16.19L21.75 18.14L20.33 18.32L19.75 19.33L20.3 20.65L18.62 21.62L17.75 20.49L16.57 20.49L15.71 21.62L14.02 20.65L14.57 19.33L13.99 18.32L12.57 18.14L12.57 16.19L13.99 16.01L14.57 14.99L14.02 13.67L15.71 12.7L16.57 13.83L17.75 13.83L18.62 12.7L20.3 13.67L19.75 14.99Z"/>',
+    '<circle cx="17.16" cy="17.16" r="1.41"/>',
+  ] },
+  "distance": { group: "cad", accent: [1,2,3], body: [
+    '<path d="M3 15L21 15L21 20L3 20ZM6 15L6 17.5M9 15L9 17.5M12 15L12 17.5M15 15L15 17.5M18 15L18 17.5"/>',
+    '<path d="M3 8L21 8"/>',
+    '<path d="M3 8L6 6.6L6 9.4Z" fill="currentColor" stroke="none"/>',
+    '<path d="M21 8L18 9.4L18 6.6Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "donut": { group: "cad", accent: [0,1], body: [
+    '<circle cx="12" cy="12" r="8"/>',
+    '<circle cx="12" cy="12" r="4.5"/>',
+    '<circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',
+  ] },
+  "dyn-input": { group: "cad", body: [
+    '<path d="M3 6L15 6L15 13L3 13ZM6 9.5L12 9.5M17 13L21 21M17 13L17 21"/>',
+  ] },
+  "ellipse": { group: "cad", accent: [0,1,2], body: [
+    '<path d="M21 12L20.86 12.87L20.46 13.71L19.79 14.5L18.89 15.21L17.79 15.83L16.5 16.33L15.08 16.7L13.56 16.92L12 17L10.44 16.92L8.92 16.7L7.5 16.33L6.21 15.83L5.11 15.21L4.21 14.5L3.54 13.71L3.14 12.87L3 12L3.14 11.13L3.54 10.29L4.21 9.5L5.11 8.79L6.21 8.17L7.5 7.67L8.92 7.3L10.44 7.08L12 7L13.56 7.08L15.08 7.3L16.5 7.67L17.79 8.17L18.89 8.79L19.79 9.5L20.46 10.29L20.86 11.13Z"/>',
+    '<circle cx="3" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="21" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "equal": { group: "cad", accent: [1], body: [
+    '<path d="M5 9L19 9"/>',
+    '<path d="M5 15L19 15"/>',
+  ] },
+  "explode": { group: "cad", accent: [0,1], body: [
+    '<path d="M4 9L9 4M15 4L20 9M20 15L15 20M9 20L4 15"/>',
+    '<circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/>',
+  ] },
+  "extend": { group: "cad", accent: [1,2], body: [
+    '<path d="M21 2L21 22M2 12L9 12"/>',
+    '<path d="M9 12L14 12"/>',
+    '<path d="M20.5 12L13.5 16L13.5 8Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "fix": { group: "cad", accent: [0,1], body: [
+    '<rect x="7" y="11" width="10" height="9" fill="currentColor" stroke="none"/>',
+    '<path d="M16 11A4 4 0 0 0 8 11"/>',
+  ] },
+  "grid": { group: "cad", body: [
+    '<path d="M4 3L4 21M3 4L21 4M9.33 3L9.33 21M3 9.33L21 9.33M14.66 3L14.66 21M3 14.66L21 14.66M19.99 3L19.99 21M3 19.99L21 19.99"/>',
+  ] },
+  "hatch": { group: "cad", accent: [1], body: [
+    '<path d="M3 3L21 3L21 21L3 21Z"/>',
+    '<path d="M3 21L21 3M3 21L3 21M7.5 21L21 7.5M3 16.5L7.5 16.5M12 21L21 12M3 12L12 12M16.5 21L21 16.5M3 7.5L16.5 7.5M21 21L21 21M3 3L21 3"/>',
+  ] },
+  "horizontal": { group: "cad", accent: [0,1,2], body: [
+    '<path d="M3 12L21 12"/>',
+    '<circle cx="3" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="21" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "insert": { group: "cad", accent: [1,2], body: [
+    '<path d="M9.34 4.91L16.43 8.45L9.34 12L2.25 8.45ZM2.25 8.45L2.25 14.66L9.34 18.2L16.43 14.66L16.43 8.45"/>',
+    '<path d="M13.77 19.09L20.86 19.09"/>',
+    '<path d="M12.89 19.09L15.55 17.85L15.55 20.33Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "isodraft": { group: "cad", body: [
+    '<path d="M12 3L20 8L20 17L12 21L4 17L4 8ZM4 8L12 12L20 8M12 12L12 21"/>',
+  ] },
+  "join": { group: "cad", accent: [1,2], body: [
+    '<path d="M3 16L11 8"/>',
+    '<path d="M11 8L21 16"/>',
+    '<circle cx="11" cy="8" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "layer-freeze": { group: "cad", accent: [1], body: [
+    '<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>',
+    '<path d="M18 13.5v7M15 15.25l6 3.5M15 18.75l6-3.5"/>',
+  ] },
+  "layer-iso": { group: "cad", accent: [1], body: [
+    '<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>',
+    '<circle cx="18" cy="17" r="3.5" fill="currentColor" stroke="none"/>',
+  ] },
+  "layer-lock": { group: "cad", accent: [1], body: [
+    '<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>',
+    '<path d="M15 16L21 16L21 21L15 21Z"/>',
+  ] },
+  "layer-match": { group: "cad", accent: [1], body: [
+    '<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>',
+    '<path d="M14 17L22 17"/>',
+  ] },
+  "layer-off": { group: "cad", accent: [1], body: [
+    '<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>',
+    '<circle cx="18" cy="17" r="3.5"/>',
+    '<path d="M15.5 19.5l5-5"/>',
+  ] },
+  "layer-prev": { group: "cad", accent: [1], body: [
+    '<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>',
+    '<path d="M18 13.5A3.5 3.5 0 1 0 21.5 17"/>',
+  ] },
+  "layer-props": { group: "cad", accent: [0], body: [
+    '<path d="M3 7L12 3L21 7L12 11Z"/>',
+    '<path d="M3 12L12 8L21 12L12 16ZM3 17L12 13L21 17L12 21Z"/>',
+  ] },
+  "layers": { group: "cad", accent: [0], body: [
+    '<path d="M3 7L12 3L21 7L12 11Z"/>',
+    '<path d="M3 12L12 8L21 12L12 16ZM3 17L12 13L21 17L12 21Z"/>',
+  ] },
+  "lengthen": { group: "cad", accent: [1,2], body: [
+    '<path d="M3 12L13 12"/>',
+    '<path d="M13 12L20 12"/>',
+    '<path d="M21 12L18 13.4L18 10.6Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "lineweight": { group: "cad", body: [
+    '<rect x="3" y="5.5" width="18" height="1" fill="currentColor" stroke="none"/>',
+    '<rect x="3" y="10.5" width="18" height="2" fill="currentColor" stroke="none"/>',
+    '<rect x="3" y="16" width="18" height="3.5" rx="0.5" fill="currentColor" stroke="none"/>',
+  ] },
+  "m-leader": { group: "cad", accent: [0,1], body: [
+    '<path d="M3 20L10 9M10 9L14 9"/>',
+    '<path d="M3 20L3.22 16.7L5.67 18.05Z" fill="currentColor" stroke="none"/>',
+    '<path d="M15 6L22 6M15 10L21 10"/>',
+  ] },
+  "m-text": { group: "cad", accent: [0], body: [
+    '<path d="M14 15L21 15M14 18L21 18M14 21L19 21"/>',
+    '<path d="M3.5 16 8 4l4.5 12M5.2 11.5h5.6"/>',
+  ] },
+  "make-current": { group: "cad", accent: [1], body: [
+    '<path d="M2 9L10 5L18 9L10 13ZM2 13L10 17L18 13"/>',
+    '<path d="M15 17L17 19L21 14.5"/>',
+  ] },
+  "match-prop": { group: "cad", accent: [1], body: [
+    '<path d="M4 3L18 3L18 9L4 9ZM18 6L20 6M20 6L20 11L11 11L11 14"/>',
+    '<rect x="9.5" y="14" width="3" height="8" fill="currentColor" stroke="none"/>',
+  ] },
+  "measure": { group: "cad", accent: [1,2,3], body: [
+    '<path d="M3 15L21 15L21 20L3 20ZM6 15L6 17.5M9 15L9 17.5M12 15L12 17.5M15 15L15 17.5M18 15L18 17.5"/>',
+    '<path d="M3 8L21 8"/>',
+    '<path d="M3 8L6 6.6L6 9.4Z" fill="currentColor" stroke="none"/>',
+    '<path d="M21 8L18 9.4L18 6.6Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "move": { group: "cad", accent: [0,1,2,3,4], body: [
+    '<path d="M12 6.43L12 17.57M6.43 12L17.57 12"/>',
+    '<path d="M12 2.25L15.06 7.36L8.94 7.36Z" fill="currentColor" stroke="none"/>',
+    '<path d="M12 21.75L8.94 16.64L15.06 16.64Z" fill="currentColor" stroke="none"/>',
+    '<path d="M2.25 12L7.36 8.94L7.36 15.06Z" fill="currentColor" stroke="none"/>',
+    '<path d="M21.75 12L16.64 15.06L16.64 8.94Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "move-bottom": { group: "cad", accent: [0], body: [
+    '<path d="M5 20L19 20"/>',
+    '<path d="M12 3L12 12"/>',
+    '<path d="M12 17L7.5 11L16.5 11Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "move-down": { group: "cad", body: [
+    '<path d="M12 4L12 14"/>',
+    '<path d="M12 20L7 13L17 13Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "move-top": { group: "cad", accent: [0], body: [
+    '<path d="M5 4L19 4"/>',
+    '<path d="M12 21L12 12"/>',
+    '<path d="M12 7L16.5 13L7.5 13Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "move-up": { group: "cad", body: [
+    '<path d="M12 20L12 10"/>',
+    '<path d="M12 4L17 11L7 11Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "o-track": { group: "cad", body: [
+    '<path d="M9 9L15 9L15 15L9 15ZM2 12L3.5 12M5 12L6.5 12M17 12L18.5 12M20 12L21.5 12M12 2L12 3.5M12 5L12 6.5M12 17L12 18.5M12 20L12 21.5"/>',
+  ] },
+  "offset": { group: "cad", accent: [1], body: [
+    '<path d="M14 12A6 6 0 0 0 8 18M14 12L21 12M8 18L8 22"/>',
+    '<path d="M14 8A10 10 0 0 0 4 18M14 8L21 8M4 18L4 22"/>',
+  ] },
+  "ortho": { group: "cad", body: [
+    '<path d="M4 3L4 20L21 20"/>',
+  ] },
+  "osnap": { group: "cad", body: [
+    '<path d="M7 7L17 7L17 17L7 17ZM12 2L12 7M12 17L12 22M2 12L7 12M17 12L22 12"/>',
+  ] },
+  "parallel": { group: "cad", accent: [1], body: [
+    '<path d="M4 18L16 4"/>',
+    '<path d="M9 20L21 6"/>',
+  ] },
+  "parameters": { group: "cad", accent: [1,2], body: [
+    '<path d="M3 4L21 4L21 20L3 20Z"/>',
+    '<path d="M11 8a1.5 1.5 0 0 0-3 0v8.5M6.5 11.5h3.5"/>',
+    '<path d="M12.5 11.5l3.5 5M16 11.5l-3.5 5"/>',
+  ] },
+  "perpendicular": { group: "cad", accent: [1], body: [
+    '<path d="M4 20L20 20"/>',
+    '<path d="M12 20L12 4"/>',
+    '<path d="M12 16L16 16L16 20L12 20Z"/>',
+  ] },
+  "pick-add": { group: "cad", accent: [1], body: [
+    '<path d="M3 3L14 3L14 14L3 14Z"/>',
+    '<path d="M17 11L17 21M12 16L22 16"/>',
+  ] },
+  "point": { group: "cad", accent: [0], body: [
+    '<circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<path d="M12 5L12 9M12 15L12 19M5 12L9 12M15 12L19 12"/>',
+  ] },
+  "polar": { group: "cad", body: [
+    '<path d="M4 20L21 20M4 20L18 6M13 20A9 9 0 0 0 10.36 13.64"/>',
+    '<circle cx="4" cy="20" r="1.2"/>',
+  ] },
+  "polyline": { group: "cad", accent: [0,1,2,3], body: [
+    '<path d="M3 19L8 8L14 15M13.17 14.21A5 5 0 0 0 21.7 9.29"/>',
+    '<circle cx="3" cy="19" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="14" cy="15" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "q-dim": { group: "cad", accent: [1,2,3], body: [
+    '<path d="M4 18L4 5M20 18L20 5"/>',
+    '<path d="M4 8L20 8"/>',
+    '<path d="M4 8L7 6.6L7 9.4Z" fill="currentColor" stroke="none"/>',
+    '<path d="M20 8L17 9.4L17 6.6Z" fill="currentColor" stroke="none"/>',
+    '<circle cx="12" cy="14.75" r="2.25"/>',
+    '<path d="M13.5 16.25 15 17.75"/>',
+  ] },
+  "quick-props": { group: "cad", accent: [1,3], body: [
+    '<path d="M3.64 4.57L17.57 4.57L17.57 16.64L3.64 16.64ZM3.64 7.36L17.57 7.36M5.5 10.14L9.21 10.14"/>',
+    '<path d="M11.07 10.14L15.71 10.14"/>',
+    '<path d="M5.5 12.93L9.21 12.93"/>',
+    '<path d="M11.07 12.93L15.71 12.93"/>',
+    '<path d="M14.79 13.86L14.79 21.29L16.64 19.43L18.96 21.75L19.89 20.82L17.57 18.5L20.36 18.04Z"/>',
+  ] },
+  "quick-select": { group: "cad", accent: [1], body: [
+    '<path d="M3 4L19 4L13 11L13 19L9 17L9 11Z"/>',
+    '<path d="M20 10L16.5 15.5L20 15.5L17 21"/>',
+  ] },
+  "ray": { group: "cad", accent: [0,1], body: [
+    '<path d="M5.8 18.2L21.75 4.02"/>',
+    '<circle cx="5.8" cy="18.2" r="1.42" fill="currentColor" stroke="none"/>',
+  ] },
+  "region": { group: "cad", accent: [0,1], body: [
+    '<path d="M4 18L6 6L16 4L20 14L12 20Z"/>',
+    '<circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>',
+  ] },
+  "remove-leader": { group: "cad", accent: [0,1,3], body: [
+    '<path d="M3 20L10 9M10 9L14 9"/>',
+    '<path d="M3 20L3.22 16.7L5.67 18.05Z" fill="currentColor" stroke="none"/>',
+    '<path d="M15 6L22 6M15 10L21 10"/>',
+    '<path d="M16.5 18h5"/>',
+  ] },
+  "rev-cloud": { group: "cad", accent: [0], body: [
+    '<path d="M19.09 15A3.2 3.2 0 1 0 16.91 9M12.94 19.65A3.2 3.2 0 1 0 17.06 14.75M5.85 16.64A3.2 3.2 0 1 0 12.15 17.75M4.91 9A3.2 3.2 0 1 0 7.09 15M11.06 4.35A3.2 3.2 0 0 0 6.94 9.25M18.15 7.36A3.2 3.2 0 1 0 11.85 6.25"/>',
+  ] },
+  "scale": { group: "cad", accent: [1,2], body: [
+    '<path d="M3 11L13 11L13 21L3 21Z"/>',
+    '<path d="M3 3L21 3L21 21L3 21ZM9 15L18 6"/>',
+    '<path d="M19 5L17.87 8.11L15.89 6.13Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "select-objects": { group: "cad", accent: [0], body: [
+    '<path d="M12 3L21 3L21 12L12 12Z"/>',
+    '<path d="M4 6L4 20L7.5 16.5L10.5 21.5L12.5 20.5L9.5 15.5L14 15Z"/>',
+  ] },
+  "smooth": { group: "cad", accent: [1,2], body: [
+    '<path d="M3 18L11 18"/>',
+    '<path d="M11 18A8 8 0 0 0 19 10"/>',
+    '<circle cx="11" cy="18" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "snap": { group: "cad", body: [
+    '<circle cx="4" cy="4" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="4" cy="9.33" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="4" cy="14.66" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="4" cy="19.99" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="9.33" cy="4" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="9.33" cy="9.33" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="9.33" cy="14.66" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="9.33" cy="19.99" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="14.66" cy="4" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="14.66" cy="9.33" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="14.66" cy="14.66" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="14.66" cy="19.99" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="19.99" cy="4" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="19.99" cy="9.33" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="19.99" cy="14.66" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="19.99" cy="19.99" r="1" fill="currentColor" stroke="none"/>',
+  ] },
+  "snowflake": { group: "cad", accent: [0], body: [
+    '<path d="M4 12L20 12M8 5.07L16 18.93M16 5.07L8 18.93"/>',
+  ] },
+  "spline": { group: "cad", accent: [0,1,2,3,4], body: [
+    '<path d="M3 12L3.9 10.15L4.8 8.47L5.7 7.15L6.6 6.29L7.5 6L8.4 6.29L9.3 7.15L10.2 8.47L11.1 10.15L12 12L12.9 13.85L13.8 15.53L14.7 16.85L15.6 17.71L16.5 18L17.4 17.71L18.3 16.85L19.2 15.53L20.1 13.85L21 12"/>',
+    '<circle cx="3" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="7.5" cy="6" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="16.5" cy="18" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="21" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "stretch": { group: "cad", accent: [1], body: [
+    '<path d="M3.64 17.57L3.64 8.29L10.14 8.29"/>',
+    '<path d="M10.14 8.29L19.43 8.29L19.43 17.57L3.64 17.57"/>',
+    '<path d="M12 5.5L13.39 5.5M14.79 5.5L16.18 5.5M17.57 5.5L18.96 5.5M20.36 5.5L21.75 5.5"/>',
+  ] },
+  "symmetric": { group: "cad", accent: [1], body: [
+    '<path d="M9 5L4 12L9 19M15 5L20 12L15 19"/>',
+    '<path d="M12 3L12 7M12 9L12 13M12 15L12 19"/>',
+  ] },
+  "tangent": { group: "cad", accent: [1], body: [
+    '<circle cx="10" cy="13" r="6"/>',
+    '<path d="M3 7L21 7"/>',
+  ] },
+  "text-style": { group: "cad", accent: [0,1], body: [
+    '<path d="M20.33 16.01L21.75 16.19L21.75 18.14L20.33 18.32L19.75 19.33L20.3 20.65L18.62 21.62L17.75 20.49L16.57 20.49L15.71 21.62L14.02 20.65L14.57 19.33L13.99 18.32L12.57 18.14L12.57 16.19L13.99 16.01L14.57 14.99L14.02 13.67L15.71 12.7L16.57 13.83L17.75 13.83L18.62 12.7L20.3 13.67L19.75 14.99Z"/>',
+    '<circle cx="17.16" cy="17.16" r="1.41"/>',
+    '<path d="M5.43 16.22 9.65 4.96l4.22 11.26M7.03 12h5.26"/>',
+  ] },
+  "transparency": { group: "cad", accent: [0,1], body: [
+    '<rect x="3" y="3" width="12" height="12" fill="currentColor" stroke="none"/>',
+    '<rect x="9" y="9" width="12" height="12" fill="currentColor" stroke="none"/>',
+  ] },
+  "trim": { group: "cad", accent: [1,2,3,4,5,6], body: [
+    '<path d="M2.25 19.43L9.21 19.43M14.79 19.43L21.75 19.43"/>',
+    '<circle cx="7.82" cy="5.04" r="2.79"/>',
+    '<circle cx="16.18" cy="5.04" r="2.79"/>',
+    '<path d="M9.49 7.26L14.41 18.04M14.51 7.26L9.59 18.04"/>',
+    '<path d="M14.41 18.04L12.93 13.39L11.81 14.41Z" fill="currentColor" stroke="none"/>',
+    '<path d="M9.59 18.04L11.07 13.39L12.19 14.41Z" fill="currentColor" stroke="none"/>',
+    '<circle cx="12" cy="12.56" r="1.21" fill="currentColor" stroke="none"/>',
+  ] },
+  "vertical": { group: "cad", accent: [0,1,2], body: [
+    '<path d="M12 3L12 21"/>',
+    '<circle cx="12" cy="3" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="12" cy="21" r="1.6" fill="currentColor" stroke="none"/>',
+  ] },
+  "wipeout": { group: "cad", accent: [1,2], body: [
+    '<path d="M3 3L16 3L16 16L3 16Z"/>',
+    '<rect x="8" y="8" width="13" height="13" fill="currentColor" stroke="none"/>',
+    '<path d="M8 8L21 8L21 21L8 21Z"/>',
+  ] },
+  "x-line": { group: "cad", accent: [0,1], body: [
+    '<path d="M2.25 20.86L21.75 3.14"/>',
+    '<circle cx="12" cy="12" r="1.42" fill="currentColor" stroke="none"/>',
+  ] },
+  "export": { group: "files", accent: [1,2], body: [
+    '<path d="M5.8 4.02L13.77 4.02L17.32 7.57L17.32 19.98L5.8 19.98Z"/>',
+    '<path d="M9.34 12.89L16.43 12.89"/>',
+    '<path d="M21.75 12.89L16.43 17.32L16.43 8.45Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "list": { group: "general", body: [
+    '<circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none"/>',
+    '<path d="M8 6L20 6"/>',
+    '<circle cx="5" cy="11" r="1.2" fill="currentColor" stroke="none"/>',
+    '<path d="M8 11L20 11"/>',
+    '<circle cx="5" cy="16" r="1.2" fill="currentColor" stroke="none"/>',
+    '<path d="M8 16L20 16"/>',
+  ] },
+  "page-setup": { group: "files", accent: [1,2], body: [
+    '<path d="M5 3L17 3L17 20L5 20Z"/>',
+    '<circle cx="17" cy="17" r="3"/>',
+    '<circle cx="17" cy="17" r="1" fill="currentColor" stroke="none"/>',
+  ] },
+  "preview": { group: "files", accent: [1,2], body: [
+    '<path d="M2.69 8.45L13.33 8.45L13.33 14.22L2.69 14.22ZM4.73 4.91L11.29 4.91L11.29 8.45L4.73 8.45ZM4.73 12L11.29 12L11.29 17.32L4.73 17.32Z"/>',
+    '<circle cx="16.88" cy="12.89" r="3.55"/>',
+    '<path d="M19.45 15.46L21.75 17.76"/>',
+  ] },
+  "properties": { group: "general", accent: [1,3,5], body: [
+    '<path d="M4 3L20 3L20 21L4 21ZM7 8L10 8"/>',
+    '<path d="M12 8L17 8"/>',
+    '<path d="M7 12L10 12"/>',
+    '<path d="M12 12L17 12"/>',
+    '<path d="M7 16L10 16"/>',
+    '<path d="M12 16L17 16"/>',
+  ] },
+  "publish": { group: "files", accent: [1], body: [
+    '<path d="M3 10L16 10L16 17L3 17ZM6 6L13 6L13 10L6 10Z"/>',
+    '<path d="M9 3L21 3L21 12L9 12Z"/>',
+  ] },
+  "save-as": { group: "files", accent: [1,2], body: [
+    '<path d="M5.5 5.5L16.06 5.5L18.5 7.94L18.5 18.5L5.5 18.5ZM8.75 5.5L15.25 5.5L15.25 9.56L8.75 9.56ZM7.94 12.81L16.06 12.81L16.06 18.5L7.94 18.5Z"/>',
+    '<path d="M12.49 18.01L18.99 11.51L21.43 13.95L14.93 20.45ZM17.69 12.81L20.12 15.25"/>',
+    '<path d="M12.49 18.01L14.93 20.45L11.03 21.75Z" fill="currentColor" stroke="none"/>',
+  ] },
+  "switcher": { group: "view", accent: [0], body: [
+    '<rect x="3" y="3" width="8" height="8" fill="currentColor" stroke="none"/>',
+    '<rect x="13" y="3" width="8" height="8" fill="currentColor" stroke="none"/>',
+    '<rect x="3" y="13" width="8" height="8" fill="currentColor" stroke="none"/>',
+    '<rect x="13" y="13" width="8" height="8" fill="currentColor" stroke="none"/>',
+  ] },
+  "workspace": { group: "view", body: [
+    '<path d="M3 4L21 4L21 20L3 20ZM9 4L9 20M9 9L21 9"/>',
+  ] },
+  "zoom-window": { group: "view", accent: [1,2], body: [
+    '<path d="M3 3L15 3L15 15L3 15Z"/>',
+    '<circle cx="14" cy="14" r="4.5"/>',
+    '<path d="M17.5 17.5L21 21"/>',
   ] },
 };
