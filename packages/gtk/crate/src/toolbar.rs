@@ -496,6 +496,10 @@ mod title_imp {
             self.parent_constructed();
             let obj = self.obj();
             obj.set_valign(gtk::Align::Center);
+            // Title over subtitle: a BoxLayout is horizontal until told otherwise.
+            if let Some(layout) = obj.layout_manager().and_downcast::<gtk::BoxLayout>() {
+                layout.set_orientation(gtk::Orientation::Vertical);
+            }
             let title = gtk::Label::new(None);
             title.add_css_class("title");
             title.set_ellipsize(gtk::pango::EllipsizeMode::End);

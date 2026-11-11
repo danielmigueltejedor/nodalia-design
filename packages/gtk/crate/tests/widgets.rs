@@ -21,6 +21,14 @@ fn widgets() {
     sidebar_fills_the_pane();
     toolbar_reports_its_bars();
     navigation_pops_back_to_the_root();
+    window_title_stacks_its_subtitle();
+}
+
+/// A title and subtitle read top to bottom, never "Cola1 canción" on one line.
+fn window_title_stacks_its_subtitle() {
+    let title = ndl::WindowTitle::new("Cola", "1 canción");
+    let one = ndl::WindowTitle::new("Cola", "");
+    assert!(natural(&title, gtk::Orientation::Vertical) > natural(&one, gtk::Orientation::Vertical));
 }
 
 /// Each row type registers its own `activated` signal; a shared one panicked on the second.
