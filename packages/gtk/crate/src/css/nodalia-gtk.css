@@ -689,9 +689,12 @@ list.navigation-sidebar {
 
 /* ---------------------------------------------------------------- bars */
 
+/* The header's children stretch to its height. The padding keeps them at the window controls'
+ * height (a control less 4 px), centred with the same gap above, below and at the sides,
+ * instead of filling the bar to its top edge. */
 headerbar {
-  min-height: calc(var(--ndl-density-control-height) + var(--ndl-space-lg));
-  padding: 0 var(--ndl-space-xs);
+  min-height: calc(var(--ndl-density-control-height) - 4px);
+  padding: calc(var(--ndl-space-lg) / 2 + 2px) calc(var(--ndl-space-lg) / 2);
   background-color: transparent;
   background-image: none;
   border: none;
@@ -701,6 +704,17 @@ headerbar {
 
 headerbar > windowhandle > box {
   border-spacing: var(--ndl-space-xs);
+}
+
+/* Buttons and fields in a header share the window controls' 28 px, so the row reads as one.
+ * Their 1 px border sits outside the minimum, hence 6 px less than a control. */
+headerbar button,
+headerbar entry {
+  min-height: calc(var(--ndl-density-control-height) - 6px);
+}
+
+headerbar button.image-button {
+  min-width: calc(var(--ndl-density-control-height) - 6px);
 }
 
 headerbar .title {
@@ -717,9 +731,8 @@ headerbar .subtitle {
  * (window-minimize, window-maximize, window-restore, window-close). */
 windowcontrols {
   border-spacing: var(--ndl-space-xs);
-  /* The header stretches its window controls to its own height; the padding brings them back to
-   * 28 px, centred on the header's 32 px buttons. */
-  padding: calc(var(--ndl-space-lg) / 2 + 2px) 0;
+  /* The header already holds them at 28 px, like its other buttons. */
+  padding: 0;
   background-color: transparent;
 }
 
