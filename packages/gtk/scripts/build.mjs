@@ -110,7 +110,7 @@ export function gtkSymbolic(name) {
 export function iconTheme() {
   const aliases = Object.entries(JSON.parse(readFileSync(new URL('../icon-aliases.json', import.meta.url), 'utf8')))
     .filter(([k]) => !k.startsWith('$'));
-  const files = Object.keys(ICONS).sort().map((n) => [`ndl-${n}-symbolic`, n]);
+  const files = Object.keys(ICONS).sort((a, b) => a.localeCompare(b, 'en')).map((n) => [`ndl-${n}-symbolic`, n]);
   return [...files, ...aliases.map(([alias, n]) => [alias.replace(/-symbolic$/, '') + '-symbolic', n])]
     .map(([file, n]) => [file, gtkSymbolic(n)]);
 }
