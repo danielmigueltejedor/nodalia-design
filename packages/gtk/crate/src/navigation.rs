@@ -388,16 +388,16 @@ impl NavigationView {
 
     /// Pops the visible page. False when only the root is left, or the page cannot be popped.
     pub fn pop(&self) -> bool {
-        let popped = {
+        // The length is read in its own statement: a borrow taken inside the call's argument
+        // lives until the call returns, and pop_to_index borrows the pages mutably.
+        let len = {
             let pages = self.imp().pages.borrow();
             if pages.len() < 2 || pages.last().is_some_and(|p| !p.can_pop()) {
                 return false;
             }
-            pages.last().cloned()
+            pages.len()
         };
-        let Some(popped) = popped else { return false };
-        self.pop_to_index(self.imp().pages.borrow().len() - 2);
-        let _ = popped;
+        self.pop_to_index(len - 2);
         true
     }
 

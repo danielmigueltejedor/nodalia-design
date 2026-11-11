@@ -83,7 +83,8 @@ mod imp {
         type ParentType = gtk::Widget;
 
         fn class_init(klass: &mut Self::Class) {
-            klass.set_layout_manager_type::<gtk::BinLayout>();
+            // No layout manager: GTK would then skip `measure` below, and with it the
+            // content size, leaving every dialog at its child's minimum.
             klass.set_css_name("ndl-dialog");
             klass.set_accessible_role(gtk::AccessibleRole::Dialog);
         }
@@ -140,6 +141,12 @@ mod imp {
                 self.content_height.get()
             };
             (min, if wanted > 0 { wanted.max(min) } else { nat }, -1, -1)
+        }
+
+        fn size_allocate(&self, width: i32, height: i32, baseline: i32) {
+            if let Some(child) = self.child.borrow().as_ref() {
+                child.allocate(width, height, baseline, None);
+            }
         }
     }
 }

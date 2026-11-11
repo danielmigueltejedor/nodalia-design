@@ -67,6 +67,6 @@ jobs:
         run: |
           cargo fmt --check
           cargo clippy --all-targets -- -D warnings
-          cargo test
+          xvfb-run -a cargo test
       - name: GTK parses every stylesheet and resolves every variable
         run: xvfb-run -a python3 packages/gtk/tools/check-gtk.py

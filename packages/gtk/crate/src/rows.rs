@@ -126,9 +126,13 @@ pub(crate) fn on_row_activated(row: &gtk::ListBoxRow, f: impl Fn() + 'static) {
     });
 }
 
-fn activated_signal() -> &'static [Signal] {
-    static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
-    SIGNALS.get_or_init(|| vec![Signal::builder("activated").build()])
+/// The `activated` signal, as a static of the calling class. A `Signal` registers once, so a
+/// single static shared by every row type made the second type to load panic.
+macro_rules! activated_signal {
+    () => {{
+        static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
+        SIGNALS.get_or_init(|| vec![Signal::builder("activated").build()])
+    }};
 }
 
 /// The methods every row has, written once.
@@ -265,7 +269,7 @@ mod action_imp {
 
     impl ObjectImpl for ActionRow {
         fn signals() -> &'static [Signal] {
-            activated_signal()
+            activated_signal!()
         }
 
         fn constructed(&self) {
@@ -364,7 +368,7 @@ mod switch_imp {
     #[glib::derived_properties]
     impl ObjectImpl for SwitchRow {
         fn signals() -> &'static [Signal] {
-            activated_signal()
+            activated_signal!()
         }
 
         fn constructed(&self) {
@@ -454,7 +458,7 @@ mod combo_imp {
     #[glib::derived_properties]
     impl ObjectImpl for ComboRow {
         fn signals() -> &'static [Signal] {
-            activated_signal()
+            activated_signal!()
         }
 
         fn constructed(&self) {
@@ -564,7 +568,7 @@ mod spin_imp {
     #[glib::derived_properties]
     impl ObjectImpl for SpinRow {
         fn signals() -> &'static [Signal] {
-            activated_signal()
+            activated_signal!()
         }
 
         fn constructed(&self) {
@@ -646,7 +650,7 @@ mod button_imp {
 
     impl ObjectImpl for ButtonRow {
         fn signals() -> &'static [Signal] {
-            activated_signal()
+            activated_signal!()
         }
 
         fn constructed(&self) {

@@ -374,7 +374,7 @@ mod avatar_imp {
         type ParentType = gtk::Widget;
 
         fn class_init(klass: &mut Self::Class) {
-            klass.set_layout_manager_type::<gtk::BinLayout>();
+            // No layout manager, or GTK would skip `measure` and ignore the size.
             klass.set_css_name("ndl-avatar");
             klass.set_accessible_role(gtk::AccessibleRole::Img);
         }
@@ -411,6 +411,16 @@ mod avatar_imp {
         fn measure(&self, _orientation: gtk::Orientation, _for_size: i32) -> (i32, i32, i32, i32) {
             let s = self.size.get().max(0);
             (s, s, -1, -1)
+        }
+
+        fn size_allocate(&self, width: i32, height: i32, baseline: i32) {
+            let mut child = self.obj().first_child();
+            while let Some(c) = child {
+                if c.should_layout() {
+                    c.allocate(width, height, baseline, None);
+                }
+                child = c.next_sibling();
+            }
         }
     }
 }

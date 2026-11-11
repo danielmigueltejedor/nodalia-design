@@ -47,7 +47,8 @@ mod toolbar_imp {
         type ParentType = gtk::Widget;
 
         fn class_init(klass: &mut Self::Class) {
-            klass.set_layout_manager_type::<gtk::BoxLayout>();
+            // Laid out by hand: with a layout manager GTK never calls `size_allocate` below,
+            // and the bar heights would never be reported.
             klass.set_css_name("ndl-toolbar-view");
         }
     }
@@ -57,9 +58,6 @@ mod toolbar_imp {
         fn constructed(&self) {
             self.parent_constructed();
             let obj = self.obj();
-            if let Some(layout) = obj.layout_manager().and_downcast::<gtk::BoxLayout>() {
-                layout.set_orientation(gtk::Orientation::Vertical);
-            }
             let top = gtk::Box::new(gtk::Orientation::Vertical, 0);
             top.add_css_class("top-bar");
             let holder = gtk::Box::new(gtk::Orientation::Vertical, 0);
@@ -88,11 +86,59 @@ mod toolbar_imp {
         }
     }
 
+    impl ToolbarView {
+        fn parts(&self) -> [Option<gtk::Box>; 3] {
+            [
+                self.top.borrow().clone(),
+                self.holder.borrow().clone(),
+                self.bottom.borrow().clone(),
+            ]
+        }
+    }
+
+    /// A bar's height at `width`: its natural height, or nothing when hidden.
+    fn bar_height(bar: Option<&gtk::Box>, width: i32) -> i32 {
+        bar.filter(|b| b.should_layout())
+            .map_or(0, |b| b.measure(gtk::Orientation::Vertical, width).1)
+    }
+
     impl WidgetImpl for ToolbarView {
-        fn size_allocate(&self, width: i32, height: i32, baseline: i32) {
-            self.parent_size_allocate(width, height, baseline);
-            let top = self.top.borrow().as_ref().map_or(0, |b| b.height());
-            let bottom = self.bottom.borrow().as_ref().map_or(0, |b| b.height());
+        fn measure(&self, orientation: gtk::Orientation, for_size: i32) -> (i32, i32, i32, i32) {
+            let (mut min, mut nat) = (0, 0);
+            for part in self
+                .parts()
+                .into_iter()
+                .flatten()
+                .filter(|p| p.should_layout())
+            {
+                if orientation == gtk::Orientation::Vertical {
+                    let (m, n, _, _) = part.measure(orientation, for_size);
+                    min += m;
+                    nat += n;
+                } else {
+                    let (m, n, _, _) = part.measure(orientation, -1);
+                    min = min.max(m);
+                    nat = nat.max(n);
+                }
+            }
+            (min, nat, -1, -1)
+        }
+
+        fn size_allocate(&self, width: i32, height: i32, _baseline: i32) {
+            let [top_bar, holder, bottom_bar] = self.parts();
+            let top = bar_height(top_bar.as_ref(), width);
+            let bottom = bar_height(bottom_bar.as_ref(), width);
+            let middle = (height - top - bottom).max(0);
+            let place = |w: Option<&gtk::Box>, y: i32, h: i32| {
+                if let Some(w) = w.filter(|w| w.should_layout()) {
+                    let t = gtk::gsk::Transform::new()
+                        .translate(&gtk::graphene::Point::new(0.0, y as f32));
+                    w.allocate(width, h, -1, Some(t));
+                }
+            };
+            place(top_bar.as_ref(), 0, top);
+            place(holder.as_ref(), top, middle);
+            place(bottom_bar.as_ref(), top + middle, bottom);
             if top != self.top_bar_height.get() || bottom != self.bottom_bar_height.get() {
                 // Notified after allocation: a handler that moves widgets must not do it mid-layout.
                 let weak = self.obj().downgrade();
@@ -449,9 +495,6 @@ mod title_imp {
         fn constructed(&self) {
             self.parent_constructed();
             let obj = self.obj();
-            if let Some(layout) = obj.layout_manager().and_downcast::<gtk::BoxLayout>() {
-                layout.set_orientation(gtk::Orientation::Vertical);
-            }
             obj.set_valign(gtk::Align::Center);
             let title = gtk::Label::new(None);
             title.add_css_class("title");
