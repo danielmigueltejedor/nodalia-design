@@ -69,10 +69,10 @@
   --popover-bg-color: #ffffff;
   --popover-fg-color: #0b0c10;
   --ndl-component-window-close: #ff5c4d;
-  --ndl-component-window-minimize: #06535b;
-  --ndl-component-window-minimize-tint: #d8f6f7;
-  --ndl-component-window-maximize: #33240a;
-  --ndl-component-window-maximize-tint: #fbefd0;
+  --ndl-component-window-minimize: #33240a;
+  --ndl-component-window-minimize-tint: #fbefd0;
+  --ndl-component-window-maximize: #06535b;
+  --ndl-component-window-maximize-tint: #d8f6f7;
   --ndl-palette-neutral-0: #ffffff;
   --ndl-palette-neutral-50: #eef0f4;
   --ndl-palette-neutral-100: #eceef2;

@@ -727,7 +727,7 @@ headerbar .subtitle {
 }
 
 /* Three round buttons, each standing on its own: a flat raised disc at rest. Under the pointer
- * minimise takes a cyan tint, maximise an amber one, close turns coral. The glyphs are NDL's
+ * minimise takes an amber tint, maximise a cyan one, close turns coral. The glyphs are NDL's
  * (window-minimize, window-maximize, window-restore, window-close). */
 windowcontrols {
   border-spacing: var(--ndl-space-xs);
