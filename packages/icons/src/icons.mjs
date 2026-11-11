@@ -1141,17 +1141,19 @@ export const ICONS = {
     '<path d="M12 6.5V20"/>',
   ] },
   // --- window ---
+  // Window glyphs are drawn for 1:1 at 24 px: 2 px strokes centred on whole pixels, so every
+  // straight edge lands on the pixel grid.
   "window-minimize": { group: "general", body: [
-    '<path d="M7.5 12h9" stroke-width="2.75"/>',
+    '<path d="M8 12h8" stroke-width="2"/>',
   ] },
   "window-maximize": { group: "general", body: [
-    '<rect x="7" y="7" width="10" height="10" rx="3" stroke-width="2.25"/>',
+    '<rect x="8" y="8" width="8" height="8" rx="2" stroke-width="2"/>',
   ] },
   "window-restore": { group: "general", fill: [0], body: [
-    '<rect x="7" y="7" width="10" height="10" rx="3" stroke-width="2.25"/>',
+    '<rect x="8" y="8" width="8" height="8" rx="2" stroke-width="2"/>',
   ] },
   "window-close": { group: "general", body: [
-    '<path d="M7.75 7.75l8.5 8.5M16.25 7.75l-8.5 8.5" stroke-width="2.75"/>',
+    '<path d="M8 8l8 8M16 8l-8 8" stroke-width="2"/>',
   ] },
   "offline": { group: "general", body: [
     '<path d="M3.5 9.5a12.5 12.5 0 0 1 4.25-2.75"/>',

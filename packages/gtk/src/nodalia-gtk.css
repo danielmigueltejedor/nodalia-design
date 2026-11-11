@@ -736,18 +736,21 @@ headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action
   border-radius: var(--ndl-radius-full);
   background-color: var(--ndl-color-control-bg);
   color: var(--ndl-color-text-secondary);
-  -gtk-icon-size: var(--ndl-size-icon-medium);
+  /* 24 px, the glyphs' own grid: drawn 1:1 their edges stay on whole pixels. */
+  -gtk-icon-size: 24px;
+  box-shadow: none;
+  outline: none;
   transition: background-color 120ms var(--ndl-easing-standard),
     color 120ms var(--ndl-easing-standard);
 }
 
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action):hover {
-  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 18%, var(--ndl-color-control-bg));
+  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 28%, var(--ndl-color-control-bg));
   color: var(--ndl-color-accent-text);
 }
 
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action):active {
-  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 30%, var(--ndl-color-control-bg));
+  background-color: color-mix(in srgb, var(--ndl-color-accent-default) 40%, var(--ndl-color-control-bg));
 }
 
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action).close:hover {
