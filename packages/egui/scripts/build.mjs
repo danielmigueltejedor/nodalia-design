@@ -215,6 +215,8 @@ export function iconsSource() {
   const raw = (text) => `r#"${text}"#`;
   const list = (items) => `&[${items.join(', ')}]`;
   const names = Object.keys(ICONS).sort();
+  // The bold body is stored only where it differs; Icon::bold_body falls back to the regular one.
+  const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
   const entry = (name) => {
     const icon = ICONS[name];
     return [
@@ -222,7 +224,7 @@ export function iconsSource() {
       `        name: ${JSON.stringify(name)},`,
       `        group: ${JSON.stringify(icon.group)},`,
       `        body: ${list(icon.body.map(raw))},`,
-      `        bold: ${list(boldBody(name).map(raw))},`,
+      `        bold: ${same(boldBody(name), icon.body) ? '&[]' : list(boldBody(name).map(raw))},`,
       `        accent: ${list((icon.accent ?? []).map(String))},`,
       '    },',
     ].join('\n');

@@ -33,10 +33,22 @@ pub struct Icon {
     pub group: &'static str,
     /// The regular style's SVG elements.
     pub body: &'static [&'static str],
-    /// The bold style's SVG elements.
+    /// The bold style's SVG elements when they differ from `body`, else empty: use
+    /// [`Icon::bold_body`].
     pub bold: &'static [&'static str],
     /// The indices of the elements a CAD app draws in its accent colour.
     pub accent: &'static [usize],
+}
+
+impl Icon {
+    /// The bold style's SVG elements.
+    pub fn bold_body(&self) -> &'static [&'static str] {
+        if self.bold.is_empty() {
+            self.body
+        } else {
+            self.bold
+        }
+    }
 }
 
 /// Every icon, sorted by name.
@@ -68,7 +80,7 @@ mod tests {
         for icon in all() {
             assert_eq!(get(icon.name), Some(icon));
             assert!(
-                !icon.body.is_empty() && !icon.bold.is_empty(),
+                !icon.body.is_empty() && !icon.bold_body().is_empty(),
                 "{}",
                 icon.name
             );

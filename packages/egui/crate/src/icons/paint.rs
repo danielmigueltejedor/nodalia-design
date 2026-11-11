@@ -43,7 +43,11 @@ impl Style {
 /// Paint `icon` into the square `rect`. False (nothing painted) when one of its elements is
 /// outside the subset this reader understands.
 pub fn paint(p: &Painter, rect: Rect, icon: &Icon, style: Style) -> bool {
-    let body = if style.bold { icon.bold } else { icon.body };
+    let body = if style.bold {
+        icon.bold_body()
+    } else {
+        icon.body
+    };
     let Some(elements) = body
         .iter()
         .map(|e| parse_element(e))
@@ -322,7 +326,8 @@ fn parse_path(d: &str) -> Option<Vec<Outline>> {
             }
             'A' => {
                 let (rx, ry, rot) = (take(&mut i)?, take(&mut i)?, take(&mut i)?);
-                let (large, sweep) = (take(&mut i)? != 0.0, take(&mut i)? != 0.0);
+                // The flags are 0 or 1.
+                let (large, sweep) = (take(&mut i)? > 0.5, take(&mut i)? > 0.5);
                 let (ex, ey) = (ox + take(&mut i)?, oy + take(&mut i)?);
                 arc(&mut cur.pts, (x, y), (ex, ey), rx, ry, rot, large, sweep);
                 (x, y) = (ex, ey);
@@ -440,7 +445,7 @@ mod tests {
     #[test]
     fn every_icon_in_the_set_parses() {
         for icon in super::super::all() {
-            for e in icon.body.iter().chain(icon.bold) {
+            for e in icon.body.iter().chain(icon.bold_body()) {
                 assert!(parse_element(e).is_some(), "{}: {e}", icon.name);
             }
         }
