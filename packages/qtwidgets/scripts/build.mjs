@@ -40,7 +40,12 @@ export function flatTokens() {
     accent: Object.fromEntries([...accentOverrides(accentSets(tokens, SOURCE_DIR), MODES, resolve)].map(([name, modes]) => [name,
       Object.fromEntries(Object.entries(modes).map(([m, values]) => [m, Object.fromEntries(Object.entries(values).map(([path, hex]) => [camel(path.slice('color.'.length)), qssColor(hex)]))]))])),
     // Looked up under the active density: density.<name>
-    density: Object.fromEntries(DENSITIES.map((d) => [d, dims(`density.${d}`)])),
+    // Qt draws no corner radius past half the side, so "full" (9999) squares a control off. Each
+    // density gets the pill radius its control height allows.
+    density: Object.fromEntries(DENSITIES.map((d) => {
+      const own = dims(`density.${d}`);
+      return [d, { ...own, pillRadius: Math.floor(own.controlHeight / 2) }];
+    })),
     space: dims('space'),
     radius: dims('radius'),
     border: dims('border-width'),
