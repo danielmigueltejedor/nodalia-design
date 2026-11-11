@@ -47,18 +47,24 @@ test('paths start inside the view box and stay on a quarter-pixel grid', () => {
 function points(d) {
   const tokens = d.match(/[a-zA-Z]|-?(?:\d+\.?\d*|\.\d+)/g);
   const out = [];
-  let [i, x, y, sx, sy, cmd] = [0, 0, 0, 0, 0, ''];
+  let [i, x, y, sx, sy, cmd, c2] = [0, 0, 0, 0, 0, '', null];
   const next = () => Number(tokens[i++]);
   while (i < tokens.length) {
     if (/[a-zA-Z]/.test(tokens[i])) cmd = tokens[i++];
+    else if (cmd === '' || cmd.toUpperCase() === 'Z') throw new Error(`a number without a command: ${d}`);
     const [ox, oy] = cmd === cmd.toLowerCase() ? [x, y] : [0, 0];
     const kind = cmd.toUpperCase();
+    // An S reflects the previous C or S's second control point about the current point.
+    const reflected = c2 ? [2 * x - c2[0], 2 * y - c2[1]] : [x, y];
+    c2 = null;
     if (kind === 'Z') [x, y] = [sx, sy];
     else if (kind === 'H') x = ox + next();
     else if (kind === 'V') y = oy + next();
     else {
       if (kind === 'A') for (let k = 0; k < 5; k++) next();
-      for (let k = 0; k < ({ C: 2, S: 1 }[kind] ?? 0); k++) out.push([ox + next(), oy + next()]);
+      if (kind === 'S') out.push(reflected);
+      if (kind === 'C') out.push([ox + next(), oy + next()]);
+      if (kind === 'C' || kind === 'S') out.push((c2 = [ox + next(), oy + next()]));
       [x, y] = [ox + next(), oy + next()];
       if (kind === 'M') [sx, sy, cmd] = [x, y, cmd === 'm' ? 'l' : 'L'];
     }
@@ -73,6 +79,11 @@ test('paths keep two pixels clear of every edge, so no stroke is clipped', () =>
       assert.ok(Math.min(x, y) >= 2 - 1e-9 && Math.max(x, y) <= SIZE - 2 + 1e-9, `${name}: ${x}, ${y}`);
     }
   }
+});
+
+test('the path reader rejects stray numbers and follows reflected controls', () => {
+  assert.throws(() => points('M2 2Z5'));
+  assert.ok(points('M3 12C3 12 3 12 21 12S21 12 21 18').some(([x]) => x === 39));
 });
 
 test('standalone files are complete documents in the requested ink', () => {
