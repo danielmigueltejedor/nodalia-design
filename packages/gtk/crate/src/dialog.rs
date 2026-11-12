@@ -189,6 +189,10 @@ impl Dialog {
             host.add_css_class("ndl-dialog-host");
             host.set_hexpand(true);
             host.set_vexpand(true);
+            // A vertical box hands a child that does not expand only its natural height, at the
+            // top: `valign: center` then centres it in that slot and the dialog sat over the
+            // header bar. Expanding gives it the whole height to centre in.
+            self.set_vexpand(true);
             host.append(self);
             let click = gtk::GestureClick::new();
             let weak = self.downgrade();
@@ -358,6 +362,10 @@ struct AlertInner {
     default_response: RefCell<Option<String>>,
     close_response: RefCell<String>,
     handlers: RefCell<Vec<(Option<String>, ResponseHandler)>>,
+    /// The alert itself while it is on screen. Apps build an alert, present it and drop their
+    /// handle; without this the buttons' weak references found nothing and clicks did nothing.
+    /// Cleared when the dialog closes, which ends the cycle.
+    showing: RefCell<Option<Rc<AlertInner>>>,
 }
 
 /// A short question with a row of answers.
@@ -403,7 +411,16 @@ impl AlertDialog {
             default_response: RefCell::default(),
             close_response: RefCell::new("close".into()),
             handlers: RefCell::default(),
+            showing: RefCell::default(),
         }));
+        let weak = Rc::downgrade(&this.0);
+        this.0.dialog.connect_closed(move |_| {
+            if let Some(inner) = weak.upgrade() {
+                // Dropped after the borrow ends: this may be the last strong reference.
+                let showing = inner.showing.take();
+                drop(showing);
+            }
+        });
         let weak = Rc::downgrade(&this.0);
         this.0.dialog.connect_close_attempt(move |_| {
             if let Some(inner) = weak.upgrade() {
@@ -509,6 +526,7 @@ impl AlertDialog {
     }
 
     pub fn present(&self, parent: Option<&impl IsA<gtk::Widget>>) {
+        self.0.showing.replace(Some(Rc::clone(&self.0)));
         self.0.dialog.present(parent);
         if let Some(id) = self.0.default_response.borrow().as_ref() {
             if let Some((_, b)) = self.0.responses.borrow().iter().find(|(r, _)| r == id) {
