@@ -12,7 +12,8 @@ export const SIZE = 24;
 export const STROKE = 1.75;
 const ATTRS = `fill="none" stroke-width="${STROKE}" stroke-linecap="round" stroke-linejoin="round"`;
 
-export const names = () => Object.keys(ICONS).sort();
+// Code-point order, stable across locales, so the generated files never reorder.
+export const names = () => Object.keys(ICONS).sort((a, b) => (a < b ? -1 : Number(a > b)));
 
 /** One icon as a standalone SVG document. `ink` replaces currentColor when given. */
 export function svg(name, ink = null) {

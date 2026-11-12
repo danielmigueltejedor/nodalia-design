@@ -4,12 +4,12 @@
 export function parseHex(hex) {
   const m = /^#([0-9a-f]{6})([0-9a-f]{2})?$/i.exec(hex);
   if (!m) throw new Error(`unsupported colour "${hex}" (expected #RRGGBB or #RRGGBBAA)`);
-  const n = parseInt(m[1], 16);
+  const n = Number.parseInt(m[1], 16);
   return {
     r: (n >> 16) & 255,
     g: (n >> 8) & 255,
     b: n & 255,
-    a: m[2] ? parseInt(m[2], 16) / 255 : 1,
+    a: m[2] ? Number.parseInt(m[2], 16) / 255 : 1,
   };
 }
 

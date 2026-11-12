@@ -13,7 +13,7 @@ export function lintCss(source, tokenNames) {
     const at = (msg) => problems.push(`line ${i + 1}: ${msg}: ${line.trim()}`);
     if (/#[0-9a-f]{3,8}\b/i.test(line)) at('colour literal, use a colour token');
     if (/\b(rgb|rgba|hsl|hsla|oklch|oklab|color-mix)\(/i.test(line)) at('colour function, use a colour token');
-    const unit = /(?<![\w.-])-?\d*\.?\d+(px|rem|em|ms|s|pt|cm|mm)\b/.exec(line);
+    const unit = /(?<![\w.-])-?(?:\d+(?:\.\d+)?|\.\d+)(px|rem|em|ms|s|pt|cm|mm)\b/.exec(line);
     if (unit) at(`fixed ${unit[1]} value, use a size, space or duration token`);
     for (const [, name] of line.matchAll(/var\((--ndl-[\w-]+)/g)) {
       if (!tokenNames.has(name) && !RUNTIME_VARS.has(name)) at(`unknown token ${name}`);
@@ -24,7 +24,7 @@ export function lintCss(source, tokenNames) {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const tokens = loadTokens(SOURCE_DIR);
-  const names = new Set([...tokens.keys()].map(cssName));
+  const names = new Set([...tokens.keys()].map((name) => cssName(name)));
   for (const t of tokens.keys()) {
     const m = /^density\.\w+\.(.+)$/.exec(t);
     if (m) names.add(`--ndl-density-${m[1]}`);

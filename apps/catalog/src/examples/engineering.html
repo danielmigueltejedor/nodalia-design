@@ -37,9 +37,9 @@
         </div>
         <div role="tabpanel" id="p-hist" aria-labelledby="t-hist" hidden><ul class="ndl-list" role="listbox" aria-label="History" id="hist"></ul></div>
       </div>
-      <div class="ndl-splitter" role="separator" tabindex="0" aria-label="Resize browser" id="spl"></div>
+      <div class="ndl-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-label="Resize browser" id="spl"></div>
       <div class="ndl-viewport demo-grid" style="overflow:hidden">
-        <canvas class="demo-canvas" id="cv" role="img" aria-label="Isometric preview of the part"></canvas>
+        <div role="img" aria-label="Isometric preview of the part" class="demo-canvas-frame"><canvas class="demo-canvas" id="cv" aria-hidden="true"></canvas></div>
         <div class="ndl-viewport__overlay" data-corner="top-start"><span class="ndl-type-small ndl-text-secondary">Isometric</span></div>
         <div class="ndl-viewport__overlay" data-corner="bottom-end"><span class="ndl-type-small ndl-numeric" id="dims"></span></div>
       </div>
