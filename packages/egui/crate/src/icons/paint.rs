@@ -19,6 +19,10 @@ pub struct Style {
     pub accent: Option<Color32>,
     /// The bold style (Nodalia apps' interface icons) instead of the regular one.
     pub bold: bool,
+    /// A stroke width in points that replaces the style's own ([`STROKE`] or [`BOLD_STROKE`] on
+    /// the 24 grid), for icons that must stay fine at large sizes: CAD tools in a tool palette,
+    /// where a stroke that grows with the icon clogs the geometry. `None` keeps the style's.
+    pub stroke: Option<f32>,
 }
 
 impl Style {
@@ -28,6 +32,7 @@ impl Style {
             ink,
             accent: None,
             bold: false,
+            stroke: None,
         }
     }
 
@@ -37,6 +42,7 @@ impl Style {
             ink,
             accent: None,
             bold: true,
+            stroke: None,
         }
     }
 }
@@ -58,7 +64,10 @@ pub fn paint(p: &Painter, rect: Rect, icon: &Icon, style: Style) -> bool {
     };
     let s = rect.width() / 24.0;
     let at = |(x, y): (f32, f32)| pos2(rect.min.x + x * s, rect.min.y + y * s);
-    let w = if style.bold { BOLD_STROKE } else { STROKE } * s;
+    let w = style
+        .stroke
+        .filter(|w| w.is_finite() && *w > 0.0)
+        .unwrap_or(if style.bold { BOLD_STROKE } else { STROKE } * s);
     for (i, el) in elements.iter().enumerate() {
         let color = match style.accent {
             Some(accent) if icon.accent.contains(&i) => accent,
@@ -760,6 +769,7 @@ mod tests {
             ink: Color32::WHITE,
             accent: Some(Color32::RED),
             bold: false,
+            stroke: None,
         };
         let mut out = ctx.run_ui(egui::RawInput::default(), |ui| {
             let p = ui.ctx().layer_painter(egui::LayerId::background());
@@ -790,5 +800,54 @@ mod tests {
             colours.contains(&Color32::WHITE) && colours.contains(&Color32::RED),
             "{colours:?}"
         );
+    }
+
+    /// The widths of the strokes `paint` draws for `name` at `size` with `style`.
+    fn stroke_widths(name: &str, size: f32, style: Style) -> Vec<f32> {
+        let ctx = egui::Context::default();
+        let icon = super::super::get(name).unwrap();
+        let mut out = ctx.run_ui(egui::RawInput::default(), |ui| {
+            let p = ui.ctx().layer_painter(egui::LayerId::background());
+            assert!(paint(
+                &p,
+                Rect::from_min_size(Pos2::ZERO, egui::vec2(size, size)),
+                icon,
+                style
+            ));
+        });
+        out.textures_delta.clear();
+        out.shapes
+            .iter()
+            .filter_map(|s| match &s.shape {
+                Shape::Path(path) => Some(path.stroke.width),
+                Shape::LineSegment { stroke, .. } => Some(stroke.width),
+                _ => None,
+            })
+            .filter(|w| *w > 0.6)
+            .collect()
+    }
+
+    #[test]
+    fn an_explicit_stroke_stays_fine_at_any_size() {
+        let regular = Style::regular(Color32::WHITE);
+        let fine = Style {
+            stroke: Some(1.25),
+            ..regular
+        };
+        // The style's own stroke grows with the icon: 1.75 on the grid is 2.33 pt at 32 pt.
+        assert!(stroke_widths("line", 32.0, regular)
+            .iter()
+            .all(|w| (*w - 1.75 * 32.0 / 24.0).abs() < 1e-3));
+        assert!(stroke_widths("line", 32.0, fine)
+            .iter()
+            .all(|w| (*w - 1.25).abs() < 1e-3));
+        // A nonsense width keeps the style's.
+        let bad = Style {
+            stroke: Some(f32::NAN),
+            ..regular
+        };
+        assert!(stroke_widths("line", 24.0, bad)
+            .iter()
+            .all(|w| (*w - 1.75).abs() < 1e-3));
     }
 }

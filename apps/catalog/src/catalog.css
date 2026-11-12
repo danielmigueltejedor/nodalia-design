@@ -39,5 +39,7 @@ body { margin: 0; }
 .demo-frame__bar label { color: inherit; }
 .demo-frame__bar a { color: inherit; }
 .demo-grid { background-image: linear-gradient(var(--ndl-color-border-subtle) var(--ndl-border-width-thin), transparent var(--ndl-border-width-thin)), linear-gradient(90deg, var(--ndl-color-border-subtle) var(--ndl-border-width-thin), transparent var(--ndl-border-width-thin)); background-size: var(--ndl-space-xl) var(--ndl-space-xl); }
+/* The frame carries the canvas's accessible name; it takes the space the canvas fills. */
+.demo-canvas-frame { display: block; inline-size: 100%; block-size: 100%; min-block-size: 0; }
 canvas.demo-canvas { display: block; inline-size: 100%; block-size: 100%; }
 @media (max-width: 800px) { .cat { grid-template-columns: 1fr; } .cat__nav { position: static; block-size: auto; } }

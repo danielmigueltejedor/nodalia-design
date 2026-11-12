@@ -7,7 +7,7 @@ const root = new URL('../dist/', import.meta.url).pathname;
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.mjs': 'text/javascript', '.js': 'text/javascript', '.json': 'application/json' };
 export function serve(port = 4318) {
   const server = createServer(async (req, res) => {
-    const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^(\.\.[/\\])+/, '');
+    const path = normalize(decodeURIComponent(new URL(req.url, 'https://localhost').pathname)).replace(/^(\.\.[/\\])+/, '');
     const file = join(root, path.endsWith('/') ? `${path}index.html` : path);
     if (!file.startsWith(root)) { res.writeHead(403).end(); return; }
     try {

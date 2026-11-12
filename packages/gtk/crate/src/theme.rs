@@ -123,7 +123,8 @@ mod imp {
 /// Who draws a window's minimise, maximise and close buttons.
 ///
 /// Nodalia's own controls exist only on Linux. On macOS and Windows the system's are always used,
-/// whatever an app asks for: an app that looks native there keeps the platform's own frame.
+/// whatever an app asks for: macOS gets its own traffic lights (GTK's native-controls mode, see
+/// `HeaderBar`), Windows gets flat, system-styled buttons, because GTK has no native frame there.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum WindowControls {
     /// Nodalia's: 28 px circles tinted cyan, amber and coral, with NDL's glyphs.

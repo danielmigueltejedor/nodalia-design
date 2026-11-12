@@ -6,14 +6,14 @@ const num = (n) => String(Number.parseFloat(n.toFixed(4)));
 
 /** "13px" -> 13 */
 export function px(value) {
-  const m = /^(-?\d*\.?\d+)px$/.exec(value);
+  const m = /^(-?(?:\d+(?:\.\d+)?|\.\d+))px$/.exec(value);
   if (!m) throw new Error(`expected a px dimension, got "${value}"`);
   return Number(m[1]);
 }
 
 /** "160ms" -> 160 */
 export function ms(value) {
-  const m = /^(\d*\.?\d+)ms$/.exec(value);
+  const m = /^((?:\d+(?:\.\d+)?|\.\d+))ms$/.exec(value);
   if (!m) throw new Error(`expected an ms duration, got "${value}"`);
   return Number(m[1]);
 }

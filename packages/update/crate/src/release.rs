@@ -4,8 +4,10 @@ use serde_json::Value;
 
 use crate::{Error, Release, ReleaseAsset};
 
-/// Names a package for this platform, best first. Matching is case-insensitive and on a
-/// substring, so `Vinilo-2.0.1-macos-arm64.dmg` answers `macos-arm64.dmg`.
+/// Names a package for this platform, best first. Matching is case-insensitive and on the end
+/// of the asset's name, so `Vinilo-2.0.1-macos-arm64.dmg` answers `macos-arm64.dmg` and a
+/// `.zsync` or `.sha256` beside the package never does. A package for another CPU is never
+/// listed: an AppImage built for x86-64 would replace an aarch64 one and not start.
 pub fn preferred_assets() -> &'static [&'static str] {
     #[cfg(target_os = "macos")]
     {
@@ -23,14 +25,29 @@ pub fn preferred_assets() -> &'static [&'static str] {
             ]
         }
     }
-    #[cfg(target_os = "linux")]
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
     {
         &[
             "linux-x86_64.appimage",
             "linux-amd64.appimage",
             "x86_64.appimage",
-            ".appimage",
         ]
+    }
+    #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+    {
+        &[
+            "linux-aarch64.appimage",
+            "linux-arm64.appimage",
+            "aarch64.appimage",
+            "arm64.appimage",
+        ]
+    }
+    #[cfg(all(
+        target_os = "linux",
+        not(any(target_arch = "x86_64", target_arch = "aarch64"))
+    ))]
+    {
+        &[]
     }
     #[cfg(not(any(target_os = "macos", target_os = "linux")))]
     {
@@ -49,16 +66,17 @@ pub(crate) fn is_sha256(text: &str) -> bool {
 }
 
 /// Like [`preferred_assets`], for an app whose release carries several builds per platform:
-/// on macOS every name is searched as `<edition>-<name>`, which is how the disk images are
-/// called (`Vinilo-2.0.1-native-macos-arm64.dmg`). Elsewhere, and without an edition, it is
-/// [`preferred_assets`].
+/// on macOS every name is searched as `{version}-<edition>-<name>`, which is how the disk images
+/// are called (`Vinilo-2.0.1-native-macos-arm64.dmg`). `{version}` is the release's own version,
+/// filled in by [`parse`]: it is what stops `native` from also matching `non-native`.
+/// Elsewhere, and without an edition, it is [`preferred_assets`].
 pub fn preferred_assets_for(edition: Option<&str>) -> Vec<String> {
     let base = preferred_assets();
     match edition {
         Some(edition) if cfg!(target_os = "macos") => {
             let edition = edition.to_ascii_lowercase();
             base.iter()
-                .map(|name| format!("{edition}-{name}"))
+                .map(|name| format!("{{version}}-{edition}-{name}"))
                 .collect()
         }
         _ => base.iter().map(|name| (*name).to_owned()).collect(),
@@ -77,6 +95,10 @@ pub fn parse<S: AsRef<str>>(json: &[u8], preferred: &[S]) -> Result<Release, Err
     if version.is_empty() {
         return Err(Error::NoVersion);
     }
+    let preferred: Vec<String> = preferred
+        .iter()
+        .map(|needle| needle.as_ref().replace("{version}", &version))
+        .collect();
     let text = |key: &str| {
         root.get(key)
             .and_then(Value::as_str)
@@ -93,7 +115,7 @@ pub fn parse<S: AsRef<str>>(json: &[u8], preferred: &[S]) -> Result<Release, Err
         version,
         notes: text("body"),
         page: text("html_url"),
-        asset: select_asset(assets, preferred),
+        asset: select_asset(assets, &preferred),
     })
 }
 
@@ -105,14 +127,12 @@ fn select_asset<S: AsRef<str>>(assets: &[Value], preferred: &[S]) -> Option<Rele
                 .get("name")
                 .and_then(Value::as_str)
                 .unwrap_or_default();
+            // The end of the name, not any part of it: `….AppImage.zsync` and `….AppImage.sha256`
+            // contain the package's name and are not the package.
             if !name
                 .to_ascii_lowercase()
-                .contains(&needle.to_ascii_lowercase())
+                .ends_with(&needle.to_ascii_lowercase())
             {
-                continue;
-            }
-            // Checksum sidecars (`….AppImage.sha256`) contain the package's name but are not it.
-            if name.ends_with(".sha256") || name.ends_with(".sig") {
                 continue;
             }
             let url = asset
@@ -160,13 +180,51 @@ mod tests {
             ("nodalia", "Vinilo-2.0.1-nodalia-macos-arm64.dmg"),
             ("native", "Vinilo-2.0.1-native-macos-arm64.dmg"),
         ] {
-            let needles: Vec<String> = ["macos-arm64.dmg"]
-                .iter()
-                .map(|n| format!("{edition}-{n}"))
-                .collect();
+            let needles = [format!("{{version}}-{edition}-macos-arm64.dmg")];
             let release = parse(json, &needles).unwrap();
             assert_eq!(release.asset.unwrap().name, expected);
         }
+    }
+
+    #[test]
+    fn an_edition_name_is_not_found_inside_a_longer_one() {
+        let json = br#"{"tag_name":"v2.0.1","body":"","html_url":"https://e/r","assets":[
+            {"name":"Vinilo-2.0.1-non-native-macos-arm64.dmg","browser_download_url":"https://e/x","size":1},
+            {"name":"Vinilo-2.0.1-native-macos-arm64.dmg","browser_download_url":"https://e/n","size":1}]}"#;
+        let release = parse(json, &["{version}-native-macos-arm64.dmg"]).unwrap();
+        assert_eq!(
+            release.asset.unwrap().name,
+            "Vinilo-2.0.1-native-macos-arm64.dmg"
+        );
+        let only_the_other = br#"{"tag_name":"v2.0.1","body":"","html_url":"https://e/r","assets":[
+            {"name":"Vinilo-2.0.1-non-native-macos-arm64.dmg","browser_download_url":"https://e/x","size":1}]}"#;
+        assert!(parse(only_the_other, &["{version}-native-macos-arm64.dmg"])
+            .unwrap()
+            .asset
+            .is_none());
+    }
+
+    #[test]
+    fn a_zsync_beside_the_appimage_is_not_the_appimage() {
+        let json = br#"{"tag_name":"v2.0.1","body":"","html_url":"https://e/r","assets":[
+            {"name":"Vinilo-2.0.1-x86_64.AppImage.zsync","browser_download_url":"https://e/z","size":1},
+            {"name":"Vinilo-2.0.1-x86_64.AppImage","browser_download_url":"https://e/a","size":9}]}"#;
+        let release = parse(json, &["x86_64.appimage"]).unwrap();
+        assert_eq!(release.asset.unwrap().name, "Vinilo-2.0.1-x86_64.AppImage");
+    }
+
+    #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+    #[test]
+    fn an_arm_machine_is_never_offered_the_x86_package() {
+        assert!(preferred_assets().iter().all(|n| !n.contains("x86")));
+    }
+
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+    #[test]
+    fn an_x86_machine_is_never_offered_the_arm_package() {
+        assert!(preferred_assets()
+            .iter()
+            .all(|n| !n.contains("arm") && !n.contains("aarch")));
     }
 
     #[cfg(target_os = "macos")]
@@ -174,7 +232,7 @@ mod tests {
     fn the_edition_prefixes_every_macos_name() {
         assert!(preferred_assets_for(Some("Native"))
             .iter()
-            .all(|n| n.starts_with("native-")));
+            .all(|n| n.starts_with("{version}-native-")));
         assert_eq!(preferred_assets_for(None).len(), preferred_assets().len());
     }
 
