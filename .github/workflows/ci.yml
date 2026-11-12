@@ -17,7 +17,7 @@ concurrency:
 jobs:
   verify:
     name: Validate, build and test
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
 
   gtk-crate:
     name: Rust crate nodalia-gtk (GTK 4.20)
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 20
     # Ubuntu's GTK is older than the 4.20 the crate needs; Fedora 43 ships it.
     container: fedora:43
