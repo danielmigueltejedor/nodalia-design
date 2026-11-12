@@ -13,6 +13,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 - `@nodalia/gtk`: `tools/check-gtk.py` carga todas las hojas en un GTK 4 real, estiliza widgets con ellas y falla con cualquier error; corre en CI.
 
 ### Cambiado
+- `nodalia-gtk`: en macOS los semáforos del sistema quedan separados del borde de la isla tanto como del borde superior, con el mismo aire antes del título.
 - NDL en GTK ya no se apoya en libadwaita (principio 9 y regla 4 de `AGENTS.md`). Las hojas siguen emitiendo sus colores con nombre.
 
 ## [0.1.0-alpha.1]

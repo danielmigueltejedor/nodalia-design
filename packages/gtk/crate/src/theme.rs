@@ -157,6 +157,21 @@ pub fn window_controls() -> WindowControls {
     }
 }
 
+/// macOS's traffic lights sit in the space `windowcontrols` reserves (GTK's native-controls mode).
+/// The header's own padding put them about 10 px from the island's edge and 18 px from its top,
+/// pressed against the side of a rounded corner. These margins give the left the same inset as
+/// the top, as a macOS sidebar holds them, and leave the same room again before the title.
+const MACOS_CONTROLS_CSS: &str = "
+headerbar windowcontrols.start {
+  margin-left: calc(var(--ndl-space-sm) + var(--ndl-space-xxs));
+  margin-right: var(--ndl-space-sm);
+}
+headerbar windowcontrols.end {
+  margin-right: calc(var(--ndl-space-sm) + var(--ndl-space-xxs));
+  margin-left: var(--ndl-space-sm);
+}
+";
+
 /// The desktop's controls: plain buttons over the system glyphs, a soft disc under the pointer.
 const SYSTEM_CONTROLS_CSS: &str = "
 headerbar windowcontrols > button:not(.suggested-action):not(.destructive-action),
@@ -221,6 +236,11 @@ impl StyleManager {
             let system = gtk::CssProvider::new();
             system.load_from_string(SYSTEM_CONTROLS_CSS);
             gtk::style_context_add_provider_for_display(&display, &system, priority + 1);
+        }
+        if cfg!(target_os = "macos") {
+            let mac = gtk::CssProvider::new();
+            mac.load_from_string(MACOS_CONTROLS_CSS);
+            gtk::style_context_add_provider_for_display(&display, &mac, priority + 1);
         }
         replace_base_theme(&gtk::Settings::for_display(&display));
         crate::icons::install(&display);
@@ -387,6 +407,27 @@ mod tests {
     fn off_linux_the_systems_controls_are_the_only_ones() {
         set_window_controls(WindowControls::Nodalia);
         assert_eq!(window_controls(), WindowControls::System);
+    }
+
+    /// The traffic lights' margins read spacing tokens; one every density defines, or GTK drops
+    /// the margin and the lights fall back against the island's edge.
+    #[test]
+    fn macos_controls_use_defined_spacing() {
+        let used: Vec<&str> = MACOS_CONTROLS_CSS
+            .split("var(")
+            .skip(1)
+            .filter_map(|rest| rest.split(')').next())
+            .collect();
+        assert!(!used.is_empty());
+        for density in [Density::Compact, Density::Regular, Density::Comfortable] {
+            let sheet = density_css(density);
+            for var in &used {
+                assert!(
+                    sheet.contains(&format!("{var}:")),
+                    "{var} missing for {density:?}"
+                );
+            }
+        }
     }
 
     #[test]
