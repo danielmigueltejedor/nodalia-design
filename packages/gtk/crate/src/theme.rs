@@ -120,7 +120,10 @@ mod imp {
     }
 }
 
-/// Who draws a window's minimise, maximise and close buttons on Linux.
+/// Who draws a window's minimise, maximise and close buttons.
+///
+/// Nodalia's own controls exist only on Linux. On macOS and Windows the system's are always used,
+/// whatever an app asks for: an app that looks native there keeps the platform's own frame.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum WindowControls {
     /// Nodalia's: 28 px circles tinted cyan, amber and coral, with NDL's glyphs.
@@ -135,7 +138,8 @@ static SYSTEM_CONTROLS: std::sync::atomic::AtomicBool = std::sync::atomic::Atomi
 
 /// Chooses the window controls. Call it before [`init`](crate::init) or the first
 /// [`StyleManager::default`]: the icon theme is written once, so a later change applies on the
-/// next start. Apps keep the choice in their preferences.
+/// next start. Apps keep the choice in their preferences. Off Linux the choice is ignored: the
+/// system's controls are the only ones.
 pub fn set_window_controls(controls: WindowControls) {
     SYSTEM_CONTROLS.store(
         controls == WindowControls::System,
@@ -145,7 +149,7 @@ pub fn set_window_controls(controls: WindowControls) {
 
 /// The window controls chosen with [`set_window_controls`].
 pub fn window_controls() -> WindowControls {
-    if SYSTEM_CONTROLS.load(std::sync::atomic::Ordering::Relaxed) {
+    if !cfg!(target_os = "linux") || SYSTEM_CONTROLS.load(std::sync::atomic::Ordering::Relaxed) {
         WindowControls::System
     } else {
         WindowControls::Nodalia
@@ -376,6 +380,13 @@ fn replace_base_theme(settings: &gtk::Settings) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[cfg(not(target_os = "linux"))]
+    fn off_linux_the_systems_controls_are_the_only_ones() {
+        set_window_controls(WindowControls::Nodalia);
+        assert_eq!(window_controls(), WindowControls::System);
+    }
 
     #[test]
     fn every_mode_has_a_sheet() {
