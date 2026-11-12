@@ -64,12 +64,16 @@ fn shoot(window: &gtk::ApplicationWindow, path: &str) {
     let snapshot = gtk::Snapshot::new();
     snapshot.scale(2.0, 2.0);
     paintable.snapshot(&snapshot, w as f64, h as f64);
-    let (Some(node), Some(renderer)) = (snapshot.to_node(), window.native().and_then(|n| n.renderer()))
-    else {
+    let (Some(node), Some(renderer)) = (
+        snapshot.to_node(),
+        window.native().and_then(|n| n.renderer()),
+    ) else {
         return;
     };
     let rect = gtk::graphene::Rect::new(0.0, 0.0, w * 2.0, h * 2.0);
-    let _ = renderer.render_texture(&node, Some(&rect)).save_to_png(path);
+    let _ = renderer
+        .render_texture(&node, Some(&rect))
+        .save_to_png(path);
 }
 
 fn island(sections: &[gtk::Widget]) -> gtk::Widget {
@@ -179,7 +183,10 @@ fn values() -> gtk::Widget {
     body.append(&scale);
     body.append(&progress);
     body.append(&level);
-    body.append(&row(&[spinner.upcast(), gtk::Label::new(Some("Cargando…")).upcast()]));
+    body.append(&row(&[
+        spinner.upcast(),
+        gtk::Label::new(Some("Cargando…")).upcast(),
+    ]));
     section("Valores y progreso", &body)
 }
 
@@ -193,7 +200,10 @@ fn tabs_and_chips() -> gtk::Widget {
     switcher.set_stack(Some(&stack));
     let notebook = gtk::Notebook::new();
     for title in ["Modelos", "Contornos"] {
-        notebook.append_page(&gtk::Label::new(Some(title)), Some(&gtk::Label::new(Some(title))));
+        notebook.append_page(
+            &gtk::Label::new(Some(title)),
+            Some(&gtk::Label::new(Some(title))),
+        );
     }
     let chip = |text: &str, class: &str| {
         let label = gtk::Label::new(Some(text));
@@ -209,7 +219,10 @@ fn tabs_and_chips() -> gtk::Widget {
 fn list() -> gtk::Widget {
     let list = gtk::ListBox::new();
     list.add_css_class("boxed-list");
-    for (title, subtitle) in [("Faro norte", "Lumen Costa"), ("Avenida 9", "Los Satélites")] {
+    for (title, subtitle) in [
+        ("Faro norte", "Lumen Costa"),
+        ("Avenida 9", "Los Satélites"),
+    ] {
         let row = ndl::ActionRow::new();
         row.set_title(title);
         row.set_subtitle(subtitle);
