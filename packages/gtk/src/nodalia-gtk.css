@@ -1037,6 +1037,14 @@ ndl-dialog {
   background-color: var(--ndl-color-scrim-default);
 }
 
+ndl-dialog .ndl-alert-text {
+  padding: var(--ndl-space-xl) var(--ndl-space-xl) var(--ndl-space-lg);
+}
+
+ndl-dialog .ndl-alert-buttons {
+  padding: 0 var(--ndl-space-xl) var(--ndl-space-xl);
+}
+
 ndl-dialog .ndl-alert-text .title-3 {
   font-size: var(--ndl-font-size-title);
 }

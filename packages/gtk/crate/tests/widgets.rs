@@ -23,6 +23,68 @@ fn widgets() {
     navigation_pops_back_to_the_root();
     window_title_stacks_its_subtitle();
     window_controls_are_not_stretched();
+    alert_answers_after_its_handle_is_dropped();
+    alert_is_centred_over_the_window();
+}
+
+fn find_buttons(widget: &gtk::Widget, found: &mut Vec<gtk::Button>) {
+    let mut child = widget.first_child();
+    while let Some(current) = child {
+        if let Ok(button) = current.clone().downcast::<gtk::Button>() {
+            found.push(button);
+        }
+        find_buttons(&current, found);
+        child = current.next_sibling();
+    }
+}
+
+/// Apps present an alert and drop it; its buttons still have to answer. They did nothing
+/// when the alert lived only in the caller's local.
+fn alert_answers_after_its_handle_is_dropped() {
+    let window = ndl::Window::new();
+    window.set_content(Some(&gtk::Label::new(Some("content"))));
+    let answered = std::rc::Rc::new(std::cell::RefCell::new(None::<String>));
+    let dialog = {
+        let alert = ndl::AlertDialog::new(Some("Update"), Some("Body"));
+        alert.add_response("later", "Later");
+        alert.add_response("install", "Install");
+        let seen = answered.clone();
+        alert.connect_response(None, move |_, id| {
+            seen.replace(Some(id.to_owned()));
+        });
+        alert.present(Some(&window));
+        alert.dialog().clone()
+    };
+    let mut buttons = Vec::new();
+    find_buttons(dialog.upcast_ref(), &mut buttons);
+    assert_eq!(buttons.len(), 2);
+    buttons[1].emit_clicked();
+    assert_eq!(answered.borrow().as_deref(), Some("install"));
+    assert!(dialog.parent().is_none(), "the alert closes once answered");
+}
+
+/// The alert floats in the middle of the window, not over its header bar.
+fn alert_is_centred_over_the_window() {
+    let window = ndl::Window::new();
+    window.set_content(Some(&gtk::Label::new(Some("content"))));
+    let alert = ndl::AlertDialog::new(Some("Update"), Some("Body"));
+    alert.add_response("later", "Later");
+    alert.present(Some(&window));
+    let dialog = alert.dialog().clone();
+    let Some(host) = dialog.parent() else {
+        panic!("presented on the window's dialog layer");
+    };
+    host.measure(gtk::Orientation::Vertical, 800);
+    host.allocate(800, 600, -1, None);
+    let height = dialog.height();
+    assert!(height > 0 && height < 600);
+    let Some(bounds) = dialog.compute_bounds(&host) else {
+        panic!("the dialog has bounds in its host");
+    };
+    let top = bounds.y() as i32;
+    let bottom = 600 - (top + height);
+    assert!((top - bottom).abs() <= 2, "top {top}, bottom {bottom}");
+    alert.dialog().force_close();
 }
 
 /// A header taller than the window controls centres them: stretched, the circles became pills.
