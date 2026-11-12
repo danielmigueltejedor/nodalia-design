@@ -280,6 +280,8 @@ mod header_imp {
             bar.set_show_title_buttons(false);
             let start = gtk::WindowControls::new(gtk::PackType::Start);
             let end = gtk::WindowControls::new(gtk::PackType::End);
+            // macOS draws its own traffic lights; the widget only reserves their place. Whether
+            // they are on follows the widget's visibility (`sync_controls`).
             // Centred at their own 28 px: a header taller than that (a field, a subtitle) would
             // otherwise stretch the round buttons into pills.
             start.set_valign(gtk::Align::Center);
@@ -406,6 +408,21 @@ impl HeaderBar {
         }
     }
 
+    /// Shows or hides a set of window controls. On macOS the traffic lights belong to the window,
+    /// not to the widget: GTK takes them down when the widget is unrealized, not when it is
+    /// hidden, so they are switched on and off here with the widget. Switching them off and on
+    /// again when the bar is shown also puts them back after another header that held them was
+    /// removed. This is not verified on a Mac yet.
+    fn show_controls(controls: &gtk::WindowControls, show: bool) {
+        if cfg!(target_os = "macos") {
+            if controls.uses_native_controls() {
+                controls.set_use_native_controls(false);
+            }
+            controls.set_use_native_controls(show);
+        }
+        controls.set_visible(show);
+    }
+
     /// Which buttons show depends on where the bar is: a dialog gets a close button instead of
     /// the window's controls, a pushed navigation page gets a back button.
     pub(crate) fn sync_controls(&self) {
@@ -413,10 +430,10 @@ impl HeaderBar {
         let in_dialog = crate::dialog::enclosing_dialog(self.upcast_ref());
         let can_go_back = crate::navigation::can_go_back(self.upcast_ref());
         if let Some(start) = imp.start_controls.borrow().as_ref() {
-            start.set_visible(in_dialog.is_none() && imp.show_start.get());
+            Self::show_controls(start, in_dialog.is_none() && imp.show_start.get());
         }
         if let Some(end) = imp.end_controls.borrow().as_ref() {
-            end.set_visible(in_dialog.is_none() && imp.show_end.get());
+            Self::show_controls(end, in_dialog.is_none() && imp.show_end.get());
         }
         if let Some(close) = imp.close.borrow().as_ref() {
             close.set_visible(

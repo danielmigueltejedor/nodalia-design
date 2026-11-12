@@ -53,7 +53,7 @@ Vinilo 2.0 (GTK) es la primera app con la identidad completa. Esta nota lista lo
 
 ## Controles de ventana del sistema
 
-En Linux, los controles de Nodalia son los de serie, pero cada app deja elegir los del escritorio (GNOME, KDE…) en Preferencias; el cambio se aplica al reiniciar.
+Los controles de Nodalia existen solo en Linux. En macOS y Windows las apps Nodalia usan siempre los controles nativos del sistema, sin opción de cambiarlos. En Linux son los de serie, salvo que se fuerce otro: cada app deja elegir los del escritorio (GNOME, KDE…) en Preferencias y el cambio se aplica al reiniciar.
 
 - GTK: `nodalia_gtk::set_window_controls(WindowControls::System)` antes de `nodalia_gtk::init()`. Los botones siguen la disposición del escritorio y los glifos de su tema de iconos, planos, sin los círculos ni los tintes de Nodalia. GTK 4 no admite decoraciones del servidor, así que la ventana sigue dibujando su cabecera.
 - Qt: la ventana devuelve el marco al escritorio (decoración del servidor en KDE, la del tema de Qt en GNOME). Los menús siguen yendo a la barra superior si la hay; si no, a la barra de menús de la ventana. En Vortia es `ui/window-controls=system` y la variable `VORTIA_NATIVE_TITLEBAR=1` lo fuerza para una ejecución.
