@@ -13,6 +13,7 @@
 
 use std::path::PathBuf;
 use std::sync::mpsc::{self, Receiver, Sender};
+use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::{App, Check, Failure, Language, Release};
@@ -74,6 +75,9 @@ enum Msg {
     Installed(Result<(), String>),
 }
 
+/// Where a check gets its answer: GitHub, unless an app's tests stand in for it.
+pub type Source = Arc<dyn Fn() -> Result<Check, String> + Send + Sync>;
+
 /// The update flow of one egui app.
 pub struct Updater {
     app: App,
@@ -84,6 +88,9 @@ pub struct Updater {
     accent: Option<egui::Color32>,
     /// Where the time of the last automatic check is kept; `None` keeps it nowhere (tests).
     stamp: Option<PathBuf>,
+    /// Stands in for GitHub (tests); `None` asks GitHub.
+    source: Option<Source>,
+    startup_delay: Duration,
 }
 
 impl Updater {
@@ -98,6 +105,8 @@ impl Updater {
             started: false,
             accent: None,
             stamp,
+            source: None,
+            startup_delay: STARTUP_DELAY,
         }
     }
 
@@ -110,6 +119,19 @@ impl Updater {
     /// Keeps the time of the last automatic check in this file instead of the update folder.
     pub fn with_stamp(mut self, path: Option<PathBuf>) -> Self {
         self.stamp = path;
+        self
+    }
+
+    /// Answers checks from `source` instead of GitHub, for an app's tests. The check at start then
+    /// runs whatever the install, since a test does not run from an AppImage.
+    pub fn with_source(mut self, source: Source) -> Self {
+        self.source = Some(source);
+        self
+    }
+
+    /// How long the check at start waits after the first frame (20 s unless changed).
+    pub fn with_startup_delay(mut self, delay: Duration) -> Self {
+        self.startup_delay = delay;
         self
     }
 
@@ -146,11 +168,13 @@ impl Updater {
         if let Some(failure) = crate::take_last_failure(&self.app) {
             self.status = Status::LastFailed(failure);
         }
-        if !crate::install_kind(&self.app).can_apply_in_place() || !due(self.last_check(), now()) {
+        let replaceable =
+            self.source.is_some() || crate::install_kind(&self.app).can_apply_in_place();
+        if !replaceable || !due(self.last_check(), now()) {
             return;
         }
         self.write_stamp();
-        self.spawn_check(ctx, false, STARTUP_DELAY);
+        self.spawn_check(ctx, false, self.startup_delay);
     }
 
     /// Looks for a release now and says what it found, whatever it is.
@@ -170,9 +194,13 @@ impl Updater {
             self.status = Status::Checking { user: false };
         }
         let (app, tx, ctx) = (self.app.clone(), self.tx.clone(), ctx.clone());
+        let source = self.source.clone();
         std::thread::spawn(move || {
             std::thread::sleep(delay);
-            let result = crate::check(&app).map_err(|e| e.to_string());
+            let result = match source {
+                Some(source) => source(),
+                None => crate::check(&app).map_err(|e| e.to_string()),
+            };
             let _ = tx.send(Msg::Checked { user, result });
             ctx.request_repaint();
         });
@@ -622,6 +650,29 @@ mod tests {
             repeat: false,
             modifiers: egui::Modifiers::NONE,
         }
+    }
+
+    #[test]
+    fn a_stand_in_source_answers_the_check_at_start() {
+        let source: Source = Arc::new(|| Ok(Check::Available(release())));
+        let mut updater = Updater::new(APP)
+            .with_stamp(None)
+            .with_source(source)
+            .with_startup_delay(Duration::ZERO);
+        let ctx = egui::Context::default();
+        updater.check_at_start(&ctx);
+        let deadline = std::time::Instant::now() + Duration::from_secs(10);
+        while updater.status() != &Status::Offer(release()) {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "{:?}",
+                updater.status()
+            );
+            updater.poll();
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        updater.check_at_start(&ctx);
+        assert_eq!(updater.status(), &Status::Offer(release()), "once per run");
     }
 
     #[test]
