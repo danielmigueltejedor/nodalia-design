@@ -76,8 +76,9 @@ fn apply_appimage_within(
     }
     #[cfg(unix)]
     {
+        // Owner-only: the file is the user's own copy of the app, and nobody else needs to run or write it.
         use std::os::unix::fs::PermissionsExt;
-        let _ = fs::set_permissions(current, fs::Permissions::from_mode(0o755));
+        let _ = fs::set_permissions(current, fs::Permissions::from_mode(0o700));
     }
     let restore = || {
         let _ = fs::remove_file(current);
