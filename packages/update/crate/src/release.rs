@@ -83,6 +83,68 @@ pub fn preferred_assets_for(edition: Option<&str>) -> Vec<String> {
     }
 }
 
+/// What marks a package for this operating system, whatever its CPU or format: a release
+/// without any of these is not for this machine (a macOS-only bug-fix release, say).
+pub fn platform_markers() -> &'static [&'static str] {
+    #[cfg(target_os = "macos")]
+    {
+        &[".dmg"]
+    }
+    #[cfg(target_os = "linux")]
+    {
+        &[".appimage", ".deb", ".rpm", ".flatpak", ".pkg.tar.zst"]
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    {
+        &[]
+    }
+}
+
+/// Reads the body of `releases` (newest first) and returns the newest published release that
+/// carries a package for this operating system, read as [`parse`] reads one. Releases of a
+/// single platform (a z version for macOS only) are then never offered elsewhere; a list where
+/// no release names a package for this system falls back to the newest one, as `latest` did.
+pub fn parse_list<S: AsRef<str>>(json: &[u8], preferred: &[S]) -> Result<Release, Error> {
+    let list: Value = serde_json::from_slice(json).map_err(|_| Error::BadResponse)?;
+    let releases: Vec<&Value> = list
+        .as_array()
+        .ok_or(Error::BadResponse)?
+        .iter()
+        .filter(|r| {
+            !r.get("draft").and_then(Value::as_bool).unwrap_or(false)
+                && !r
+                    .get("prerelease")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false)
+        })
+        .collect();
+    let for_this_system = |release: &Value| {
+        release
+            .get("assets")
+            .and_then(Value::as_array)
+            .is_some_and(|assets| {
+                assets.iter().any(|asset| {
+                    let name = asset
+                        .get("name")
+                        .and_then(Value::as_str)
+                        .unwrap_or_default()
+                        .to_ascii_lowercase();
+                    platform_markers()
+                        .iter()
+                        .any(|marker| name.ends_with(marker))
+                })
+            })
+    };
+    let chosen = releases
+        .iter()
+        .copied()
+        .find(|release| for_this_system(release))
+        .or_else(|| releases.first().copied())
+        .ok_or(Error::NoVersion)?;
+    let body = serde_json::to_vec(chosen).map_err(|_| Error::BadResponse)?;
+    parse(&body, preferred)
+}
+
 /// Reads the body of `releases/latest`.
 pub fn parse<S: AsRef<str>>(json: &[u8], preferred: &[S]) -> Result<Release, Error> {
     let root: Value = serde_json::from_slice(json).map_err(|_| Error::BadResponse)?;
@@ -274,5 +336,39 @@ mod tests {
         assert!(asset_digest(&short).is_none());
         let other: Value = serde_json::from_str(&format!(r#"{{"digest":"sha1:{HASH}"}}"#)).unwrap();
         assert!(asset_digest(&other).is_none());
+    }
+
+    #[test]
+    fn a_release_for_another_system_is_passed_over() {
+        let other = if cfg!(target_os = "macos") {
+            "Vinilo-0.1.3-x86_64.AppImage"
+        } else {
+            "Vinilo-0.1.3-nodalia-macos-arm64.dmg"
+        };
+        let mine = if cfg!(target_os = "macos") {
+            "Vinilo-0.1.1-nodalia-macos-arm64.dmg"
+        } else {
+            "Vinilo-0.1.1-x86_64.AppImage"
+        };
+        let list = format!(
+            r#"[
+              {{"tag_name": "v0.1.4", "draft": true, "assets": [{{"name": "{mine}"}}]}},
+              {{"tag_name": "v0.1.3", "assets": [{{"name": "{other}"}}]}},
+              {{"tag_name": "v0.1.2", "prerelease": true, "assets": [{{"name": "{mine}"}}]}},
+              {{"tag_name": "v0.1.1", "assets": [{{"name": "{mine}"}}]}}
+            ]"#
+        );
+        let release = super::parse_list(list.as_bytes(), &["nothing-matches"]).unwrap();
+        if cfg!(any(target_os = "macos", target_os = "linux")) {
+            assert_eq!(release.version, "0.1.1");
+        }
+    }
+
+    #[test]
+    fn without_any_package_for_this_system_the_newest_is_kept() {
+        let list =
+            br#"[{"tag_name": "v2.0.0", "assets": []}, {"tag_name": "v1.0.0", "assets": []}]"#;
+        let release = super::parse_list(list, &["x"]).unwrap();
+        assert_eq!(release.version, "2.0.0");
     }
 }

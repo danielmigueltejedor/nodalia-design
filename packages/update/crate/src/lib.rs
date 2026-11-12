@@ -28,7 +28,10 @@ pub use apply::{apply, take_last_failure, Failure};
 pub use download::download;
 pub use macos::{parse_codesign_display, same_publisher, CodeIdentity};
 pub use notes::{notes_in, Language};
-pub use release::{asset_digest, parse as parse_release, preferred_assets, preferred_assets_for};
+pub use release::{
+    asset_digest, parse as parse_release, parse_list as parse_release_list, platform_markers,
+    preferred_assets, preferred_assets_for,
+};
 pub use version::{compare as compare_versions, strip as strip_version};
 
 /// The app being updated.
@@ -168,11 +171,16 @@ fn runs_from(appdir: Option<std::ffi::OsString>, exe: Option<PathBuf>) -> bool {
     }
 }
 
-/// Asks GitHub for the latest release and compares it with `app.version`.
+/// Asks GitHub for the newest release with a package for this system and compares it with
+/// `app.version`. Not `releases/latest`: a z version published for one platform only must not
+/// be offered on the others.
 pub fn check(app: &App) -> Result<Check, Error> {
-    let url = format!("https://api.github.com/repos/{}/releases/latest", app.repo);
+    let url = format!(
+        "https://api.github.com/repos/{}/releases?per_page=20",
+        app.repo
+    );
     let body = download::get(&url, "application/vnd.github+json")?;
-    let release = release::parse(&body, &preferred_assets_for(app.edition))?;
+    let release = release::parse_list(&body, &preferred_assets_for(app.edition))?;
     if compare_versions(&release.version, app.version) != Ordering::Greater {
         return Ok(Check::UpToDate);
     }
