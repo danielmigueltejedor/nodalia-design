@@ -71,7 +71,8 @@ enum Msg {
         result: Result<Check, String>,
     },
     Progress(u64, Option<u64>),
-    Downloaded(Result<PathBuf, String>),
+    /// The version downloaded, so a result only completes the download that asked for it.
+    Downloaded(String, Result<PathBuf, String>),
     Installed(Result<(), String>),
 }
 
@@ -148,8 +149,14 @@ impl Updater {
         !matches!(self.status, Status::Idle | Status::Checking { user: false })
     }
 
-    /// Shows a release as if a check had found it.
+    /// Shows a release as if a check had found it. A download or install under way goes on.
     pub fn offer(&mut self, release: Release) {
+        if matches!(
+            self.status,
+            Status::Downloading { .. } | Status::Installing(_)
+        ) {
+            return;
+        }
         self.status = Status::Offer(release);
     }
 
@@ -166,14 +173,15 @@ impl Updater {
             return;
         }
         if let Some(failure) = crate::take_last_failure(&self.app) {
+            // The failure is what this run shows; the next start checks for a release.
             self.status = Status::LastFailed(failure);
+            return;
         }
         let replaceable =
             self.source.is_some() || crate::install_kind(&self.app).can_apply_in_place();
         if !replaceable || !due(self.last_check(), now()) {
             return;
         }
-        self.write_stamp();
         self.spawn_check(ctx, false, self.startup_delay);
     }
 
@@ -195,8 +203,13 @@ impl Updater {
         }
         let (app, tx, ctx) = (self.app.clone(), self.tx.clone(), ctx.clone());
         let source = self.source.clone();
+        // An automatic check counts once it starts: one the app closed before is not skipped.
+        let stamp = if user { None } else { self.stamp.clone() };
         std::thread::spawn(move || {
             std::thread::sleep(delay);
+            if let Some(stamp) = stamp {
+                write_stamp(&stamp);
+            }
             let result = match source {
                 Some(source) => source(),
                 None => crate::check(&app).map_err(|e| e.to_string()),
@@ -227,7 +240,10 @@ impl Updater {
                     ctx.request_repaint();
                 }
             });
-            let _ = tx.send(Msg::Downloaded(result.map_err(|e| e.to_string())));
+            let _ = tx.send(Msg::Downloaded(
+                release.version.clone(),
+                result.map_err(|e| e.to_string()),
+            ));
             ctx.request_repaint();
         });
     }
@@ -249,6 +265,11 @@ impl Updater {
         while let Ok(msg) = self.rx.try_recv() {
             match msg {
                 Msg::Checked { user, result } => {
+                    // Only the check still pending gets an answer: a late one must not replace a
+                    // download or a window the person has moved on to.
+                    if self.status != (Status::Checking { user }) {
+                        continue;
+                    }
                     self.status = match result {
                         Ok(Check::Available(release)) => Status::Offer(release),
                         Ok(Check::UpToDate) if user => Status::UpToDate,
@@ -271,9 +292,11 @@ impl Updater {
                         *t = total;
                     }
                 }
-                Msg::Downloaded(result) => {
+                Msg::Downloaded(version, result) => {
                     let release = match &self.status {
-                        Status::Downloading { release, .. } => release.clone(),
+                        Status::Downloading { release, .. } if release.version == version => {
+                            release.clone()
+                        }
                         _ => continue,
                     };
                     self.status = match result {
@@ -461,14 +484,13 @@ impl Updater {
             .and_then(|text| text.trim().parse().ok())
             .unwrap_or(0)
     }
+}
 
-    fn write_stamp(&self) {
-        let Some(path) = &self.stamp else { return };
-        if let Some(dir) = path.parent() {
-            let _ = std::fs::create_dir_all(dir);
-        }
-        let _ = std::fs::write(path, now().to_string());
+fn write_stamp(path: &std::path::Path) {
+    if let Some(dir) = path.parent() {
+        let _ = std::fs::create_dir_all(dir);
     }
+    let _ = std::fs::write(path, now().to_string());
 }
 
 fn now() -> u64 {
@@ -760,6 +782,70 @@ mod tests {
         });
         updater.poll();
         assert_eq!(updater.status(), &Status::Offer(release()));
+    }
+
+    #[test]
+    fn a_late_check_does_not_replace_a_download() {
+        let mut updater = Updater::new(APP).with_stamp(None);
+        let downloading = Status::Downloading {
+            release: release(),
+            received: 1,
+            total: Some(10),
+        };
+        updater.status = downloading.clone();
+        let _ = updater.tx.send(Msg::Checked {
+            user: false,
+            result: Ok(Check::Available(release())),
+        });
+        updater.poll();
+        assert_eq!(updater.status(), &downloading);
+        updater.offer(release());
+        assert_eq!(
+            updater.status(),
+            &downloading,
+            "an offer waits for the download"
+        );
+    }
+
+    #[test]
+    fn a_download_completes_only_the_release_that_asked_for_it() {
+        let mut updater = Updater::new(APP).with_stamp(None);
+        updater.status = Status::Downloading {
+            release: release(),
+            received: 1,
+            total: None,
+        };
+        let _ = updater
+            .tx
+            .send(Msg::Downloaded("0.0.1".into(), Ok(PathBuf::from("old"))));
+        updater.poll();
+        assert!(matches!(updater.status(), Status::Downloading { .. }));
+        let _ = updater
+            .tx
+            .send(Msg::Downloaded(release().version, Ok(PathBuf::from("new"))));
+        updater.poll();
+        assert_eq!(
+            updater.status(),
+            &Status::Ready {
+                release: release(),
+                package: PathBuf::from("new")
+            }
+        );
+    }
+
+    #[test]
+    fn the_day_counts_from_when_the_check_starts() {
+        let dir = std::env::temp_dir().join(format!("nodalia-update-stamp-{}", std::process::id()));
+        let stamp = dir.join("last-check");
+        let _ = std::fs::remove_dir_all(&dir);
+        let source: Source = Arc::new(|| Ok(Check::UpToDate));
+        let mut updater = Updater::new(APP)
+            .with_stamp(Some(stamp.clone()))
+            .with_source(source)
+            .with_startup_delay(Duration::from_secs(3600));
+        updater.check_at_start(&egui::Context::default());
+        assert!(!stamp.exists(), "nothing is recorded before the wait ends");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
