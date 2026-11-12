@@ -17,7 +17,9 @@ propio que dice qué hace la app:
 | Pluma | curva de Bézier con manejadores y plumilla | trazado |
 | Pulso | editor de curvas y fotogramas clave | fotogramas clave |
 | Toma | visor, pistas de vídeo y forma de onda | fotogramas y «play» |
+| Torno | pieza torneada con su eje, giro de revolución y cota | eje de revolución |
 | Vinilo | disco con su brazo | flecha en el color de la app |
+| Vortia | perfil alar con líneas de corriente | línea de corriente |
 
 Reglas: tintas planas, sin degradados ni brillos; la isla derecha es blanca porque Finder pinta
 las etiquetas de los iconos en negro también en modo oscuro; nada dentro de las cajas de 128 pt
@@ -35,5 +37,3 @@ python3 tools/dmg-background/draw_background.py --all /tmp/fondos   # todas
 Cada app guarda el SVG generado en su repositorio y lo convierte en su propio formato (TIFF
 HiDPI en las apps con `packaging/macos/dmg/generate.py`, PNG 1x/2x en Vinilo). Para cambiar un
 dibujo se edita este script y se regenera, no el SVG.
-
-Vortia queda fuera: su fondo (`packaging/macos/dmg-background.svg` en su repositorio) ya es suyo.
