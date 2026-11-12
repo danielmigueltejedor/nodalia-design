@@ -80,6 +80,17 @@ const RUNNING_FN: &str = r#"running() {
   /bin/ps -axo command= | /usr/bin/awk -v p="$1" 'index($0, p) == 1 { found = 1 } END { exit !found }'
 }"#;
 
+/// The `NODALIA_UPDATE_*` variables below exist so tests can steer the helper (a stand-in for
+/// `open`, no waiting, no signature). A shipped build must not honour them: whoever can set the
+/// environment of the app could otherwise switch the signature check off.
+fn without_test_hooks() -> &'static str {
+    if cfg!(debug_assertions) {
+        ""
+    } else {
+        "unset NODALIA_UPDATE_OPEN NODALIA_UPDATE_WAIT_STEPS NODALIA_UPDATE_GRACE_STEPS NODALIA_UPDATE_SKIP_SIGNATURE"
+    }
+}
+
 /// Swaps the installed bundle for the one inside the downloaded disk image once the running app
 /// has exited. Arguments: `<dmg> <mount-dir> <bundle> <parent-pid> <log-file> <result-file>`.
 ///
@@ -87,9 +98,10 @@ const RUNNING_FN: &str = r#"running() {
 /// short code [`take_last_failure`](crate::take_last_failure) reads at the next start), and on
 /// failure the previous app is put back and reopened (or, if even that fails, left beside the
 /// bundle and named in the log). The signature of the copy it installs is checked here too. It gives up if the app has not exited after
-/// about a minute. The new app must stay running for about five seconds before the old copy is deleted; otherwise the old one is restored. `NODALIA_UPDATE_OPEN`, `NODALIA_UPDATE_WAIT_STEPS`, `NODALIA_UPDATE_GRACE_STEPS` and `NODALIA_UPDATE_SKIP_SIGNATURE` exist for tests.
+/// about a minute. The new app must stay running for about five seconds before the old copy is deleted; otherwise the old one is restored. `NODALIA_UPDATE_OPEN`, `NODALIA_UPDATE_WAIT_STEPS`, `NODALIA_UPDATE_GRACE_STEPS` and `NODALIA_UPDATE_SKIP_SIGNATURE` exist for tests, and only debug builds honour them.
 #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub(crate) fn helper_script(bundle_name: &str, app_name: &str) -> String {
+    let hooks = without_test_hooks();
     format!(
         r#"#!/bin/bash
 DMG=$1
@@ -99,6 +111,7 @@ PARENT=$4
 LOG=$5
 RESULT=$6
 exec >>"$LOG" 2>&1
+{hooks}
 echo "== $(date '+%Y-%m-%d %H:%M:%S') update helper: $DMG -> $BUNDLE"
 case "$BUNDLE" in
   /*/"{bundle_name}") ;;
@@ -255,6 +268,11 @@ mod tests {
             assert_valid_bash(&helper_script(name, "Vinilo"));
         }
         let script = helper_script("Vinilo Native.app", "Vinilo");
+        assert_eq!(
+            script.contains("unset NODALIA_UPDATE_OPEN"),
+            !cfg!(debug_assertions),
+            "a shipped helper ignores the test hooks (notably the one that skips the signature)"
+        );
         assert!(script.contains("/*/\"Vinilo Native.app\") ;;"));
         assert!(script.contains("SOURCE=\"$MOUNT/Vinilo Native.app\""));
         let grace = script
@@ -288,7 +306,9 @@ mod tests {
         let bin_dir = dir.join("Contents/MacOS");
         std::fs::create_dir_all(&bin_dir).unwrap();
         let bin = bin_dir.join("sleep");
-        std::fs::copy("/bin/sleep", &bin).unwrap();
+        // A link rather than a copy: running a file that was just written can fail with
+        // "text file busy" while other tests fork. The command line shows the link's path.
+        std::os::unix::fs::symlink("/bin/sleep", &bin).unwrap();
         let mut child = std::process::Command::new(&bin).arg("30").spawn().unwrap();
         let check = |path: &std::path::Path| {
             std::process::Command::new("bash")
