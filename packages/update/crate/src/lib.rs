@@ -13,8 +13,13 @@
 mod apply;
 mod download;
 mod macos;
+mod notes;
 mod release;
 mod version;
+
+/// The update windows for egui apps.
+#[cfg(feature = "egui")]
+pub mod egui;
 
 use std::cmp::Ordering;
 use std::path::PathBuf;
@@ -22,6 +27,7 @@ use std::path::PathBuf;
 pub use apply::{apply, take_last_failure, Failure};
 pub use download::download;
 pub use macos::{parse_codesign_display, same_publisher, CodeIdentity};
+pub use notes::{notes_in, Language};
 pub use release::{asset_digest, parse as parse_release, preferred_assets, preferred_assets_for};
 pub use version::{compare as compare_versions, strip as strip_version};
 

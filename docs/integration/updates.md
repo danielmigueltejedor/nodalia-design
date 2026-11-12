@@ -49,3 +49,31 @@ const APP: nodalia_update::App = nodalia_update::App {
 ## Varias ediciones en la misma release
 
 Si una release lleva dos compilaciones de la misma app para la misma plataforma (Vinilo en macOS: `Native` y `Nodalia`), cada edición declara `edition: Some("native")` o `Some("nodalia")` y en macOS solo se ofrece el disco llamado `<edición>-macos-arm64.dmg`. Así una edición nunca propone instalar la otra. El `bundle` es el de su edición (`Vinilo Native.app`, `Vinilo Nodalia.app`) y el identificador de la app también difiere, de modo que la comprobación de firma sigue exigiendo el mismo identificador que el instalado.
+
+## Apps egui: la ventana ya hecha
+
+Las apps egui no tienen que dibujar nada: con la característica `egui`, `nodalia_update::egui::Updater` lleva el flujo entero y sus ventanas modales, en español o en inglés.
+
+```toml
+nodalia-update = { git = "https://github.com/danielmigueltejedor/nodalia-design", rev = "…", features = ["egui"] }
+```
+
+```rust
+let mut updater = nodalia_update::egui::Updater::new(APP).with_accent([0xe8, 0x57, 0x3f]);
+
+// Una vez arrancada la app (cada fotograma vale: solo actúa la primera vez).
+updater.check_at_start(ctx);
+// Desde «Buscar actualizaciones…».
+updater.check_now(ctx);
+// Cada fotograma.
+match updater.show(ctx, nodalia_update::Language::from_code(idioma), seguro_cerrar) {
+    nodalia_update::egui::Action::OpenUrl(url) => abrir(url),
+    nodalia_update::egui::Action::Exit => std::process::exit(0),
+    nodalia_update::egui::Action::None => {}
+}
+```
+
+- La comprobación al arrancar espera 20 segundos, se hace como mucho una vez al día y solo donde la app puede sustituirse; si no encuentra nada, o falla, no dice nada.
+- `seguro_cerrar` es si la app puede salir sin perder nada (trabajo sin guardar, diálogos, tareas). Mientras sea `false`, la versión descargada espera y la ventana explica por qué.
+- `is_open()` dice si hay una ventana abierta: son modales, así que las teclas no deben llegar al documento de detrás.
+- Las notas de la release se muestran en el idioma de la app si están escritas con los encabezados `**Español**` e `**English**` (`notes_in`).

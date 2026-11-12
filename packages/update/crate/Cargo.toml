@@ -8,7 +8,12 @@ description = "In-app updates for Nodalia apps: check GitHub Releases, verify th
 repository = "https://github.com/danielmigueltejedor/nodalia-design"
 publish = false
 
+[features]
+# `nodalia_update::egui`: the update windows for egui apps.
+egui = ["dep:egui"]
+
 [dependencies]
+egui = { version = "0.37", default-features = false, optional = true }
 sha2 = "0.10"
 serde_json = "1"
 ureq = { version = "3", features = ["platform-verifier"] }
