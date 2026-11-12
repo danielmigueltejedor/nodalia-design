@@ -80,7 +80,7 @@ pub(crate) fn read_identity(bundle: &std::path::Path) -> Result<CodeIdentity, St
 /// short code [`take_last_failure`](crate::take_last_failure) reads at the next start), and on
 /// failure the previous app is put back and reopened (or, if even that fails, left beside the
 /// bundle and named in the log). The signature of the copy it installs is checked here too. It gives up if the app has not exited after
-/// about a minute. `NODALIA_UPDATE_OPEN`, `NODALIA_UPDATE_WAIT_STEPS` and `NODALIA_UPDATE_SKIP_SIGNATURE` exist for tests.
+/// about a minute. The new app must stay running for about five seconds before the old copy is deleted; otherwise the old one is restored. `NODALIA_UPDATE_OPEN`, `NODALIA_UPDATE_WAIT_STEPS`, `NODALIA_UPDATE_GRACE_STEPS` and `NODALIA_UPDATE_SKIP_SIGNATURE` exist for tests.
 #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub(crate) fn helper_script(bundle_name: &str, app_name: &str) -> String {
     format!(
@@ -94,7 +94,7 @@ RESULT=$6
 exec >>"$LOG" 2>&1
 echo "== $(date '+%Y-%m-%d %H:%M:%S') update helper: $DMG -> $BUNDLE"
 case "$BUNDLE" in
-  /*/{bundle_name}) ;;
+  /*/"{bundle_name}") ;;
   *) echo "refusing unexpected bundle path"; printf 'internal\n' >"$RESULT"; exit 2 ;;
 esac
 NEW="$BUNDLE.nodalia-new"
@@ -160,16 +160,37 @@ fi
 
 /bin/mv "$BUNDLE" "$OLD" || fail replace
 /bin/mv "$NEW" "$BUNDLE" || fail replace
-if "$OPEN" "$BUNDLE"; then
+if ! "$OPEN" "$BUNDLE"; then
+  # Installed, but it would not start: the previous version stays beside it for recovery.
+  echo "updated, but $BUNDLE could not be started. The previous version is at: $OLD"
+  printf 'launch\n' >"$RESULT"
+  exit 1
+fi
+
+# `open` returning only says the launch was handed over. The backup is kept until the new app has
+# stayed up for a few seconds; if it is gone by then it crashed on start, and the old one goes back.
+steps="${{NODALIA_UPDATE_GRACE_STEPS:-10}}"
+while [ "$steps" -gt 0 ]; do
+  sleep 0.5
+  steps=$((steps - 1))
+done
+if /usr/bin/pgrep -f -- "$BUNDLE/Contents/MacOS/" >/dev/null 2>&1; then
   /bin/rm -rf "$OLD"
   /bin/rm -f "$DMG"
   printf 'ok\n' >"$RESULT"
   echo "updated; started $BUNDLE"
   /bin/rm -f "$0"
 else
-  # Installed, but it would not start: the previous version stays beside it for recovery.
-  echo "updated, but $BUNDLE could not be started. The previous version is at: $OLD"
-  printf 'launch\n' >"$RESULT"
+  echo "the new $BUNDLE did not stay running; putting the previous version back"
+  /bin/rm -rf "$BUNDLE"
+  if /bin/mv "$OLD" "$BUNDLE"; then
+    printf 'launch\n' >"$RESULT"
+    "$OPEN" "$BUNDLE"
+  else
+    echo "COULD NOT PUT THE PREVIOUS VERSION BACK. It is at: $OLD"
+    echo "To recover, move it to $BUNDLE."
+    printf 'replace\n' >"$RESULT"
+  fi
   exit 1
 fi
 "#
@@ -219,9 +240,22 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn the_helper_names_the_bundle_and_is_valid_bash() {
-        let script = helper_script("Vinilo.app", "Vinilo");
-        assert!(script.contains("/*/Vinilo.app) ;;"));
-        assert!(script.contains("SOURCE=\"$MOUNT/Vinilo.app\""));
+        for name in ["Vinilo.app", "Vinilo Native.app"] {
+            assert_valid_bash(&helper_script(name, "Vinilo"));
+        }
+        let script = helper_script("Vinilo Native.app", "Vinilo");
+        assert!(script.contains("/*/\"Vinilo Native.app\") ;;"));
+        assert!(script.contains("SOURCE=\"$MOUNT/Vinilo Native.app\""));
+        let grace = script
+            .find("pgrep")
+            .expect("it waits to see the app stay up");
+        let delete = script
+            .find("rm -rf \"$OLD\"\n  /bin/rm -f \"$DMG\"")
+            .expect("it deletes the backup");
+        assert!(
+            grace < delete,
+            "the backup goes only after the new app is seen running"
+        );
         let check = script
             .find("codesign --verify")
             .expect("the helper checks the signature");
@@ -232,7 +266,14 @@ mod tests {
             check < swap,
             "the copy is checked before it replaces anything"
         );
-        let path = std::env::temp_dir().join(format!("nodalia-helper-{}.sh", std::process::id()));
+    }
+
+    #[cfg(unix)]
+    fn assert_valid_bash(script: &str) {
+        static N: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+        let n = N.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let path =
+            std::env::temp_dir().join(format!("nodalia-helper-{}-{n}.sh", std::process::id()));
         std::fs::write(&path, script).unwrap();
         let ok = std::process::Command::new("bash")
             .arg("-n")

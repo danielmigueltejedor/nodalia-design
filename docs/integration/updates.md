@@ -53,6 +53,6 @@ Si una release lleva dos compilaciones de la misma app para la misma plataforma 
 ## Versiones, firma y recuperación
 
 - Una pre-release (`2.0.0-beta`) es anterior a su versión estable (`2.0.0`), como en semver.
-- En macOS el ayudante vuelve a comprobar la firma y el publicador de **la copia que va a instalar** (no solo la del disco montado antes), y no toca la app instalada si no coinciden. Si no puede devolver la versión anterior, la deja junto a la app y dice dónde en `update.log`. Si la nueva no arranca, conserva la anterior para recuperarla.
+- En macOS el ayudante vuelve a comprobar la firma y el publicador de **la copia que va a instalar** (no solo la del disco montado antes), y no toca la app instalada si no coinciden. Si no puede devolver la versión anterior, la deja junto a la app y dice dónde en `update.log`. Tras abrir la nueva espera unos 5 s y solo borra la anterior si el proceso sigue vivo; si ha caído al arrancar, restaura la anterior y la vuelve a abrir (resultado `launch`).
 - Solo se lanza un ayudante de macOS por proceso.
 - Una instalación gestionada (Flatpak, `.deb`…) recibe `Check::Available` aunque la release no tenga paquete para ella, para poder abrir la página de la release.
