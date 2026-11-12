@@ -29,7 +29,7 @@ export function qmlSource() {
     'QtObject {',
     `    /// "light" | "dark" | "light-hc" | "dark-hc". Bind it to the system colour scheme and contrast preference.`,
     '    property string mode: "light"',
-    `    /// ${densityNames.map(q).join(' | ')}`,
+    `    /// ${densityNames.map((name) => q(name)).join(' | ')}`,
     '    property string density: "regular"',
     '    /// True when the user asked the system for reduced motion: transitions collapse to 0 ms.',
     '    property bool reducedMotion: false',

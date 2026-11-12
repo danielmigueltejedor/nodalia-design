@@ -10,8 +10,11 @@ const outputs = ['packages/tokens/dist', 'packages/icons/dist', 'packages/gtk/di
 const files = (dir) => readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? files(join(dir, f)) : [join(dir, f)]));
 function build() {
   for (const o of outputs) rmSync(join(root, o), { recursive: true, force: true });
-  execFileSync('npm', ['run', 'build'], { cwd: root, stdio: 'ignore' });
-  return Object.fromEntries(outputs.flatMap((o) => files(join(root, o))).sort().map((f) => [f.slice(root.length), createHash('sha256').update(readFileSync(f)).digest('hex')]));
+  // npm's own entry point under this node, not whatever "npm" PATH would find first.
+  const npm = process.env.npm_execpath;
+  if (npm) execFileSync(process.execPath, [npm, 'run', 'build'], { cwd: root, stdio: 'ignore' });
+  else execFileSync('npm', ['run', 'build'], { cwd: root, stdio: 'ignore' });
+  return Object.fromEntries(outputs.flatMap((o) => files(join(root, o))).sort((a, b) => (a < b ? -1 : Number(a > b))).map((f) => [f.slice(root.length), createHash('sha256').update(readFileSync(f)).digest('hex')]));
 }
 
 const a = build();
