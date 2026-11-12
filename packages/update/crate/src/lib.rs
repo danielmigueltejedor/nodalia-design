@@ -22,7 +22,7 @@ use std::path::PathBuf;
 pub use apply::{apply, take_last_failure, Failure};
 pub use download::download;
 pub use macos::{parse_codesign_display, same_publisher, CodeIdentity};
-pub use release::{asset_digest, parse as parse_release, preferred_assets};
+pub use release::{asset_digest, parse as parse_release, preferred_assets, preferred_assets_for};
 pub use version::{compare as compare_versions, strip as strip_version};
 
 /// The app being updated.
@@ -36,6 +36,10 @@ pub struct App {
     pub bundle: &'static str,
     /// The running version, normally `env!("CARGO_PKG_VERSION")`.
     pub version: &'static str,
+    /// Set when one release carries several builds of the app for the same platform (the two
+    /// macOS editions of Vinilo, say): the package is then the one named `<edition>-macos-…`,
+    /// so an edition never offers to install the other.
+    pub edition: Option<&'static str>,
 }
 
 /// A published release.
@@ -149,7 +153,7 @@ pub fn install_kind(app: &App) -> InstallKind {
 pub fn check(app: &App) -> Result<Check, Error> {
     let url = format!("https://api.github.com/repos/{}/releases/latest", app.repo);
     let body = download::get(&url, "application/vnd.github+json")?;
-    let release = release::parse(&body, preferred_assets())?;
+    let release = release::parse(&body, &preferred_assets_for(app.edition))?;
     if compare_versions(&release.version, app.version) != Ordering::Greater {
         return Ok(Check::UpToDate);
     }

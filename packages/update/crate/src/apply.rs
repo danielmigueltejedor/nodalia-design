@@ -183,6 +183,7 @@ mod tests {
         repo: "o/r",
         bundle: "Probe.app",
         version: "1.0.0",
+        edition: None,
     };
 
     #[test]

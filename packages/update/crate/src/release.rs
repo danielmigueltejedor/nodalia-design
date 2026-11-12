@@ -48,8 +48,25 @@ pub(crate) fn is_sha256(text: &str) -> bool {
     text.len() == 64 && text.bytes().all(|b| b.is_ascii_hexdigit())
 }
 
+/// Like [`preferred_assets`], for an app whose release carries several builds per platform:
+/// on macOS every name is searched as `<edition>-<name>`, which is how the disk images are
+/// called (`Vinilo-2.0.1-native-macos-arm64.dmg`). Elsewhere, and without an edition, it is
+/// [`preferred_assets`].
+pub fn preferred_assets_for(edition: Option<&str>) -> Vec<String> {
+    let base = preferred_assets();
+    match edition {
+        Some(edition) if cfg!(target_os = "macos") => {
+            let edition = edition.to_ascii_lowercase();
+            base.iter()
+                .map(|name| format!("{edition}-{name}"))
+                .collect()
+        }
+        _ => base.iter().map(|name| (*name).to_owned()).collect(),
+    }
+}
+
 /// Reads the body of `releases/latest`.
-pub fn parse(json: &[u8], preferred: &[&str]) -> Result<Release, Error> {
+pub fn parse<S: AsRef<str>>(json: &[u8], preferred: &[S]) -> Result<Release, Error> {
     let root: Value = serde_json::from_slice(json).map_err(|_| Error::BadResponse)?;
     let tag = root
         .get("tag_name")
@@ -80,8 +97,9 @@ pub fn parse(json: &[u8], preferred: &[&str]) -> Result<Release, Error> {
     })
 }
 
-fn select_asset(assets: &[Value], preferred: &[&str]) -> Option<ReleaseAsset> {
+fn select_asset<S: AsRef<str>>(assets: &[Value], preferred: &[S]) -> Option<ReleaseAsset> {
     for needle in preferred {
+        let needle = needle.as_ref();
         for asset in assets {
             let name = asset
                 .get("name")
@@ -134,6 +152,33 @@ mod tests {
     }
 
     #[test]
+    fn an_edition_only_ever_picks_its_own_disk_image() {
+        let json = br#"{"tag_name":"v2.0.1","body":"","html_url":"https://e/r","assets":[
+            {"name":"Vinilo-2.0.1-native-macos-arm64.dmg","browser_download_url":"https://e/n","size":1},
+            {"name":"Vinilo-2.0.1-nodalia-macos-arm64.dmg","browser_download_url":"https://e/d","size":1}]}"#;
+        for (edition, expected) in [
+            ("nodalia", "Vinilo-2.0.1-nodalia-macos-arm64.dmg"),
+            ("native", "Vinilo-2.0.1-native-macos-arm64.dmg"),
+        ] {
+            let needles: Vec<String> = ["macos-arm64.dmg"]
+                .iter()
+                .map(|n| format!("{edition}-{n}"))
+                .collect();
+            let release = parse(json, &needles).unwrap();
+            assert_eq!(release.asset.unwrap().name, expected);
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn the_edition_prefixes_every_macos_name() {
+        assert!(preferred_assets_for(Some("Native"))
+            .iter()
+            .all(|n| n.starts_with("native-")));
+        assert_eq!(preferred_assets_for(None).len(), preferred_assets().len());
+    }
+
+    #[test]
     fn picks_the_package_not_its_checksum() {
         let release = parse(&body(), &["x86_64.appimage"]).unwrap();
         assert_eq!(release.version, "2.0.1");
@@ -155,8 +200,14 @@ mod tests {
     #[test]
     fn no_match_is_none_and_bad_json_is_an_error() {
         assert!(parse(&body(), &["windows.exe"]).unwrap().asset.is_none());
-        assert!(matches!(parse(b"[]", &[]), Err(Error::NoVersion)));
-        assert!(matches!(parse(b"nope", &[]), Err(Error::BadResponse)));
+        assert!(matches!(
+            parse(b"[]", &[] as &[&str]),
+            Err(Error::NoVersion)
+        ));
+        assert!(matches!(
+            parse(b"nope", &[] as &[&str]),
+            Err(Error::BadResponse)
+        ));
     }
 
     #[test]

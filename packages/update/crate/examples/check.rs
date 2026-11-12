@@ -15,6 +15,7 @@ fn main() {
         repo,
         bundle: "Example.app",
         version,
+        edition: None,
     };
     match check(&app) {
         Ok(result) => println!("{result:#?}"),

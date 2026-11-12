@@ -42,5 +42,10 @@ const APP: nodalia_update::App = nodalia_update::App {
     repo: "danielmigueltejedor/vinilo",
     bundle: "Vinilo.app",
     version: env!("CARGO_PKG_VERSION"),
+    edition: None,
 };
 ```
+
+## Varias ediciones en la misma release
+
+Si una release lleva dos compilaciones de la misma app para la misma plataforma (Vinilo en macOS: `Native` y `Nodalia`), cada edición declara `edition: Some("native")` o `Some("nodalia")` y en macOS solo se ofrece el disco llamado `<edición>-macos-arm64.dmg`. Así una edición nunca propone instalar la otra. El `bundle` es el de su edición (`Vinilo Native.app`, `Vinilo Nodalia.app`) y el identificador de la app también difiere, de modo que la comprobación de firma sigue exigiendo el mismo identificador que el instalado.
