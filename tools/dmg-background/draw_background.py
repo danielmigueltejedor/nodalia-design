@@ -209,7 +209,9 @@ def m_papel(c, d):
     o.append(f'<path d="M{x},{y} L{x + w - f},{y} L{x + w},{y + f} L{x + w},{y + h} L{x},{y + h} Z" fill="#FFFFFF"/>')
     o.append(f'<path d="M{x + w - f},{y} L{x + w - f},{y + f} L{x + w},{y + f} Z" fill="{d}"/>')
     o.append(f'<rect x="{x + 18}" y="{y + 22}" width="70" height="10" rx="2" fill="{INK}"/>')
-    for i, wv in enumerate((128, 120, 0, 96, 128, 110)):
+    for i, wv in enumerate((128, 120, 0, 96, 128, 110)):  # the third line is the highlighted one
+        if not wv:
+            continue
         yy = y + 52 + i * 18
         o.append(f'<rect x="{x + 18}" y="{yy}" width="{wv}" height="6" rx="3" fill="{d}"/>')
     # highlight over one line
