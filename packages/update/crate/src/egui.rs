@@ -131,6 +131,11 @@ impl Updater {
         self.status = Status::Offer(release);
     }
 
+    /// Puts the flow in this status without doing its work: for an app's tests and previews.
+    pub fn set_status(&mut self, status: Status) {
+        self.status = status;
+    }
+
     /// Once per run, whenever it is called first: reports a failed macOS install, then checks for
     /// a release after a short wait, at most once a day, and only where the app can replace itself
     /// (for the rest the package manager says when there is something new).
