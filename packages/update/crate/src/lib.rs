@@ -145,7 +145,9 @@ impl InstallKind {
 /// Looks at how the running process was started.
 pub fn install_kind(app: &App) -> InstallKind {
     if let Some(path) = std::env::var_os("APPIMAGE").filter(|p| !p.is_empty()) {
-        return InstallKind::AppImage(PathBuf::from(path));
+        if runs_from(std::env::var_os("APPDIR"), std::env::current_exe().ok()) {
+            return InstallKind::AppImage(PathBuf::from(path));
+        }
     }
     if cfg!(target_os = "macos") {
         if let Some(bundle) = macos::running_bundle(app) {
@@ -153,6 +155,16 @@ pub fn install_kind(app: &App) -> InstallKind {
         }
     }
     InstallKind::Managed
+}
+
+/// Whether this process runs from inside the mounted AppImage `APPDIR` names. `APPIMAGE` alone is
+/// not proof: a program started from another app's AppImage inherits its variables, and taking
+/// them at their word would replace that other app's file.
+fn runs_from(appdir: Option<std::ffi::OsString>, exe: Option<PathBuf>) -> bool {
+    match (appdir.filter(|d| !d.is_empty()), exe) {
+        (Some(dir), Some(exe)) => exe.starts_with(PathBuf::from(dir)),
+        _ => false,
+    }
 }
 
 /// Asks GitHub for the latest release and compares it with `app.version`.
@@ -185,4 +197,24 @@ fn home() -> PathBuf {
     std::env::var_os("HOME")
         .map(PathBuf::from)
         .unwrap_or_else(std::env::temp_dir)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn only_the_appimage_this_process_runs_from_counts() {
+        let exe = Some(PathBuf::from("/tmp/.mount_PlumaX/usr/bin/pluma"));
+        assert!(runs_from(Some("/tmp/.mount_PlumaX".into()), exe.clone()));
+        assert!(
+            !runs_from(Some("/tmp/.mount_OtherY".into()), exe.clone()),
+            "another app's variables"
+        );
+        assert!(!runs_from(None, exe));
+        assert!(!runs_from(
+            Some("".into()),
+            Some(PathBuf::from("/usr/bin/pluma"))
+        ));
+    }
 }
