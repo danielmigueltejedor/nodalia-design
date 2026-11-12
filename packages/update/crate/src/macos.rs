@@ -73,6 +73,13 @@ pub(crate) fn read_identity(bundle: &std::path::Path) -> Result<CodeIdentity, St
     Ok(identity)
 }
 
+/// Whether a process runs a program whose command line starts with the path given. The path is
+/// compared as plain text: a bundle in a folder with parentheses or dots in its name is not a
+/// pattern, as it would be for `pgrep -f`.
+const RUNNING_FN: &str = r#"running() {
+  /bin/ps -axo command= | /usr/bin/awk -v p="$1" 'index($0, p) == 1 { found = 1 } END { exit !found }'
+}"#;
+
 /// Swaps the installed bundle for the one inside the downloaded disk image once the running app
 /// has exited. Arguments: `<dmg> <mount-dir> <bundle> <parent-pid> <log-file> <result-file>`.
 ///
@@ -117,6 +124,8 @@ fail() {{
   "$OPEN" "$BUNDLE"
   exit 1
 }}
+
+{RUNNING_FN}
 
 # Who signed an app, as codesign prints it: the identifier and the team, nothing else.
 identity() {{
@@ -174,7 +183,7 @@ while [ "$steps" -gt 0 ]; do
   sleep 0.5
   steps=$((steps - 1))
 done
-if /usr/bin/pgrep -f -- "$BUNDLE/Contents/MacOS/" >/dev/null 2>&1; then
+if running "$BUNDLE/Contents/MacOS/"; then
   /bin/rm -rf "$OLD"
   /bin/rm -f "$DMG"
   printf 'ok\n' >"$RESULT"
@@ -183,12 +192,14 @@ if /usr/bin/pgrep -f -- "$BUNDLE/Contents/MacOS/" >/dev/null 2>&1; then
 else
   echo "the new $BUNDLE did not stay running; putting the previous version back"
   /bin/rm -rf "$BUNDLE"
-  if /bin/mv "$OLD" "$BUNDLE"; then
+  # Only put the backup back into an empty place: `mv` into a directory that is still there would
+  # tuck it inside and report success.
+  if [ ! -e "$BUNDLE" ] && /bin/mv "$OLD" "$BUNDLE"; then
     printf 'launch\n' >"$RESULT"
     "$OPEN" "$BUNDLE"
   else
     echo "COULD NOT PUT THE PREVIOUS VERSION BACK. It is at: $OLD"
-    echo "To recover, move it to $BUNDLE."
+    echo "To recover, remove what is left of $BUNDLE and move it there."
     printf 'replace\n' >"$RESULT"
   fi
   exit 1
@@ -247,7 +258,7 @@ mod tests {
         assert!(script.contains("/*/\"Vinilo Native.app\") ;;"));
         assert!(script.contains("SOURCE=\"$MOUNT/Vinilo Native.app\""));
         let grace = script
-            .find("pgrep")
+            .find("if running \"$BUNDLE")
             .expect("it waits to see the app stay up");
         let delete = script
             .find("rm -rf \"$OLD\"\n  /bin/rm -f \"$DMG\"")
@@ -266,6 +277,36 @@ mod tests {
             check < swap,
             "the copy is checked before it replaces anything"
         );
+    }
+
+    /// A bundle in a folder named like a regular expression is still found by its plain path, and
+    /// a different path is not mistaken for it.
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn running_matches_a_path_literally() {
+        let dir = std::env::temp_dir().join(format!("nodalia (run) {}.x", std::process::id()));
+        let bin_dir = dir.join("Contents/MacOS");
+        std::fs::create_dir_all(&bin_dir).unwrap();
+        let bin = bin_dir.join("sleep");
+        std::fs::copy("/bin/sleep", &bin).unwrap();
+        let mut child = std::process::Command::new(&bin).arg("30").spawn().unwrap();
+        let check = |path: &std::path::Path| {
+            std::process::Command::new("bash")
+                .arg("-c")
+                .arg(format!("{RUNNING_FN}\nrunning \"$1\""))
+                .arg("bash")
+                .arg(path)
+                .status()
+                .unwrap()
+                .success()
+        };
+        let found = check(&bin_dir);
+        let other = check(&dir.join("Elsewhere/MacOS"));
+        let _ = child.kill();
+        let _ = child.wait();
+        let _ = std::fs::remove_dir_all(&dir);
+        assert!(found, "the process under the bundle is seen");
+        assert!(!other, "another path is not matched");
     }
 
     #[cfg(unix)]
