@@ -142,6 +142,14 @@ fn start_macos_helper(app: &App, bundle: &Path, package: &Path) -> Result<(), Er
     let mount = dir.join("verify-mount");
     verify_macos_package(app, bundle, package, &mount)?;
 
+    // The digest `download` verified. The helper hashes the bytes it is about to mount against it,
+    // so a disk image swapped after the download cannot be installed.
+    let digest = fs::read_to_string(crate::verified_digest_path(package))
+        .map(|d| d.trim().to_ascii_lowercase())
+        .ok()
+        .filter(|d| crate::release::is_sha256(d))
+        .ok_or(Error::NoDigest)?;
+
     let script = dir.join("apply-macos-update.sh");
     let result = dir.join("last-update-result.txt");
     let _ = fs::remove_file(&result);
@@ -156,6 +164,7 @@ fn start_macos_helper(app: &App, bundle: &Path, package: &Path) -> Result<(), Er
         .arg(std::process::id().to_string())
         .arg(&log)
         .arg(&result)
+        .arg(&digest)
         .spawn()
         .map_err(|e| Error::Io(format!("Could not start the macOS update helper: {e}")))?;
     Ok(())

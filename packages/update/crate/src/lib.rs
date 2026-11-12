@@ -178,6 +178,13 @@ pub fn update_dir(app: &App) -> PathBuf {
     base.join(app.name.to_ascii_lowercase()).join("update")
 }
 
+/// Where [`download`] records the SHA-256 it verified for `package`.
+pub(crate) fn verified_digest_path(package: &std::path::Path) -> PathBuf {
+    let mut name = package.as_os_str().to_owned();
+    name.push(".verified-sha256");
+    PathBuf::from(name)
+}
+
 fn home() -> PathBuf {
     std::env::var_os("HOME")
         .map(PathBuf::from)

@@ -5,7 +5,7 @@ Todas las apps Nodalia se actualizan desde dentro con el mismo flujo, el que est
 ## El flujo
 
 1. **Comprobar.** `check(&App)` pide `releases/latest` a GitHub y compara el tag con la versión que corre. Devuelve `UpToDate` o `Available(Release)` con las notas, la página de la release y el paquete de esta máquina.
-2. **Descargar.** `download(&App, &Release, progreso)` baja el paquete a `~/.cache/<app>/update` (en macOS, `~/Library/Caches/<app>/update`) y calcula su SHA-256 mientras escribe. Solo lo conserva si coincide con el `digest` que GitHub publica para ese archivo; una release sin digest no se instala.
+2. **Descargar.** `download(&App, &Release, progreso)` baja el paquete a `~/.cache/<app>/update` (en macOS, `~/Library/Caches/<app>/update`) y calcula su SHA-256 mientras escribe. Solo lo conserva si coincide con el `digest` que GitHub publica para ese archivo (y deja ese digest junto al paquete, en `<paquete>.verified-sha256`); una release sin digest no se instala. En macOS el ayudante vuelve a comprobarlo: copia el disco a una carpeta privada, calcula su SHA-256 y solo entonces monta la copia, de modo que un disco cambiado después de la descarga no se instala.
 3. **Aplicar.** `apply(&App, paquete, antes_de_reiniciar)` sustituye la instalación y la arranca de nuevo. Si `antes_de_reiniciar` devuelve un motivo (trabajo sin guardar), no se toca nada. Con `Ok`, la app debe salir de inmediato con `std::process::exit(0)`.
 
 ## Qué se puede actualizar en el sitio

@@ -126,6 +126,13 @@ pub fn download(
             return Err(Error::Checksum);
         }
         fs::rename(&partial, &dest).map_err(|e| Error::Io(e.to_string()))?;
+        // What was verified, written beside the package: the macOS helper re-checks the bytes it
+        // installs against this instead of trusting that the file is unchanged since now.
+        let note = crate::verified_digest_path(&dest);
+        fs::write(&note, expected.to_ascii_lowercase()).map_err(|e| {
+            let _ = fs::remove_file(&dest);
+            Error::Io(e.to_string())
+        })?;
         Ok(dest)
     })();
     if result.is_err() {

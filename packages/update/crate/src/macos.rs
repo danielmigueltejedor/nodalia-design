@@ -92,7 +92,10 @@ fn without_test_hooks() -> &'static str {
 }
 
 /// Swaps the installed bundle for the one inside the downloaded disk image once the running app
-/// has exited. Arguments: `<dmg> <mount-dir> <bundle> <parent-pid> <log-file> <result-file>`.
+/// has exited. Arguments: `<dmg> <mount-dir> <bundle> <parent-pid> <log-file> <result-file>
+/// <sha256>`. The disk image is copied into a private folder and the copy is hashed against
+/// `<sha256>` (the digest the download verified) before it is mounted, so what is installed is
+/// what was verified, even if the file in the cache changed in between.
 ///
 /// It never fails silently: every step is logged, the outcome goes to `<result-file>` (`ok`, or a
 /// short code [`take_last_failure`](crate::take_last_failure) reads at the next start), and on
@@ -110,6 +113,8 @@ BUNDLE=$3
 PARENT=$4
 LOG=$5
 RESULT=$6
+EXPECTED=$7
+STAGE=
 exec >>"$LOG" 2>&1
 {hooks}
 echo "== $(date '+%Y-%m-%d %H:%M:%S') update helper: $DMG -> $BUNDLE"
@@ -126,6 +131,7 @@ fail() {{
   printf '%s\n' "$1" >"$RESULT"
   /usr/bin/hdiutil detach "$MOUNT" -force >/dev/null 2>&1
   [ -d "$NEW" ] && /bin/rm -rf "$NEW"
+  [ -n "$STAGE" ] && /bin/rm -rf "$STAGE"
   if [ ! -d "$BUNDLE" ] && [ -d "$OLD" ]; then
     if ! /bin/mv "$OLD" "$BUNDLE"; then
       # Reopening a bundle that is not there would show nothing and hide why.
@@ -159,7 +165,16 @@ fi
 
 /usr/bin/hdiutil detach "$MOUNT" -force >/dev/null 2>&1
 /bin/mkdir -p "$MOUNT" || fail mount
-/usr/bin/hdiutil attach "$DMG" -nobrowse -readonly -mountpoint "$MOUNT" || fail mount
+# A private copy (mktemp makes it owner-only), hashed and then mounted: there is no gap between
+# the check and the use for another process to put a different image into.
+STAGE=$(/usr/bin/mktemp -d "${{TMPDIR:-/tmp}}/nodalia-update.XXXXXX") || fail copy
+/bin/cp "$DMG" "$STAGE/update.dmg" || fail copy
+ACTUAL=$(/usr/bin/shasum -a 256 "$STAGE/update.dmg" | /usr/bin/awk '{{print $1}}')
+if [ -z "$EXPECTED" ] || [ "$ACTUAL" != "$EXPECTED" ]; then
+  echo "the disk image does not match the digest that was verified"
+  fail contents
+fi
+/usr/bin/hdiutil attach "$STAGE/update.dmg" -nobrowse -readonly -mountpoint "$MOUNT" || fail mount
 SOURCE="$MOUNT/{bundle_name}"
 [ -d "$SOURCE" ] || fail contents
 
@@ -167,6 +182,8 @@ SOURCE="$MOUNT/{bundle_name}"
 [ -e "$OLD" ] && /bin/rm -rf "$OLD"
 /usr/bin/ditto "$SOURCE" "$NEW" || fail copy
 /usr/bin/hdiutil detach "$MOUNT" -force >/dev/null 2>&1
+/bin/rm -rf "$STAGE"
+STAGE=
 
 # The copy that is about to be installed is the one that is checked, so nothing that changed the
 # disk image after the app looked at it can get through: valid signature, same publisher.
@@ -275,6 +292,14 @@ mod tests {
         );
         assert!(script.contains("/*/\"Vinilo Native.app\") ;;"));
         assert!(script.contains("SOURCE=\"$MOUNT/Vinilo Native.app\""));
+        let hash = script
+            .find("shasum -a 256")
+            .expect("the helper hashes the image it is about to mount");
+        let attach = script.find("hdiutil attach").expect("it mounts the image");
+        assert!(
+            hash < attach && script.contains("attach \"$STAGE/update.dmg\""),
+            "the digest is checked on the private copy that is then mounted, not on the cache file"
+        );
         let grace = script
             .find("if running \"$BUNDLE")
             .expect("it waits to see the app stay up");
