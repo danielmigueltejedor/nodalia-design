@@ -339,6 +339,57 @@ def m_vinilo(c, d):
     return "".join(o)
 
 
+def m_torno(c, d):
+    o = [f'<rect width="{AW}" height="{AH}" fill="{c}"/>']
+    ax = 112
+    # a turned part, bottom step first so each narrower step sits on the face below it
+    steps = [(56, 98, 30), (98, 168, 56), (168, 214, 80), (214, 296, 44), (296, 334, 26)]
+    for y0, y1, hw in reversed(steps):
+        ry = hw * 0.24
+        o.append(f'<ellipse cx="{ax}" cy="{y1}" rx="{hw}" ry="{ry:.1f}" fill="#FFFFFF" stroke="{INK}" stroke-width="2"/>')
+        o.append(f'<rect x="{ax - hw}" y="{y0}" width="{2 * hw}" height="{y1 - y0}" fill="#FFFFFF"/>')
+        o.append(f'<line x1="{ax - hw}" y1="{y0}" x2="{ax - hw}" y2="{y1}" stroke="{INK}" stroke-width="2"/>')
+        o.append(f'<line x1="{ax + hw}" y1="{y0}" x2="{ax + hw}" y2="{y1}" stroke="{INK}" stroke-width="2"/>')
+        o.append(f'<ellipse cx="{ax}" cy="{y0}" rx="{hw}" ry="{ry:.1f}" fill="#FFFFFF" stroke="{INK}" stroke-width="2"/>')
+    # the axis it was turned about
+    o.append(f'<line x1="{ax}" y1="14" x2="{ax}" y2="350" stroke="{INK}" stroke-width="1.2" stroke-dasharray="14 4 2 4"/>')
+    # revolve arrow round the axis
+    o.append(f'<path d="M{ax - 52},34 A52,12 0 0 0 {ax + 46},40" fill="none" stroke="{INK}" stroke-width="3" stroke-linecap="round"/>')
+    o.append(f'<path d="M{ax + 38},31 L{ax + 54},38 L{ax + 41},49 Z" fill="{INK}"/>')
+    # diameter of the flange
+    o.append(f'<line x1="{ax - 80}" y1="222" x2="{ax - 80}" y2="368" stroke="{INK}" stroke-width="1.2"/>')
+    o.append(f'<line x1="{ax + 80}" y1="222" x2="{ax + 80}" y2="368" stroke="{INK}" stroke-width="1.2"/>')
+    o.append(f'<line x1="{ax - 80}" y1="360" x2="{ax + 80}" y2="360" stroke="{INK}" stroke-width="1.5"/>')
+    o.append(arrowhead(ax + 80, 360, INK, 5))
+    o.append(f'<path d="M{ax - 80},360 L{ax - 72},355 L{ax - 72},365 Z" fill="{INK}"/>')
+    return "".join(o)
+
+
+def m_vortia(c, d):
+    o = [f'<rect width="{AW}" height="{AH}" fill="{c}"/>']
+    cx, cy = 112, 200
+    # streamlines, pushed apart by the wing and closing again behind it
+    for y0 in range(28, 384, 20):
+        side = -1 if y0 < cy else 1
+        k = math.exp(-abs(y0 - cy) / 70)
+        pts = []
+        for x in range(-8, AW + 9, 6):
+            bump = 30 * k * math.exp(-((x - 118) / 62) ** 2)
+            pts.append(f"{x},{y0 + side * bump:.1f}")
+        near = abs(y0 - cy) < 70
+        o.append(f'<polyline points="{" ".join(pts)}" fill="none" stroke="{"#FFFFFF" if near else d}" stroke-width="{1.6 if near else 1.4}"/>')
+    # the stagnation line splits at the leading edge and leaves from the trailing edge
+    o.append(f'<line x1="-8" y1="{cy + 9}" x2="36" y2="{cy + 9}" stroke="#FFFFFF" stroke-width="1.6"/>')
+    o.append(f'<line x1="198" y1="{cy - 7.5}" x2="{AW + 8}" y2="{cy - 4}" stroke="#FFFFFF" stroke-width="1.6"/>')
+    # the wing section, nose left, a few degrees nose-up
+    o.append(f'<g transform="rotate(-7 {cx} {cy})">'
+             f'<path d="M40,{cy} C40,{cy - 18} 86,{cy - 26} 126,{cy - 21} C162,{cy - 16} 188,{cy - 4} 198,{cy + 3} '
+             f'C170,{cy + 6} 120,{cy + 14} 80,{cy + 14} C54,{cy + 14} 40,{cy + 9} 40,{cy} Z" fill="#FFFFFF" stroke="{INK}" stroke-width="2"/>'
+             f'</g>')
+    o.append(f'<circle cx="41" cy="{cy + 9}" r="4" fill="{INK}"/>')
+    return "".join(o)
+
+
 # ---- the arrow between the two icons, in each app's own language --------------------------------
 
 AL, AR, AYc = 404, 494, 205  # 10 pt clear of both 128 pt icon boxes
@@ -427,6 +478,18 @@ def a_vinilo(c):
             + arrowhead(AR, AYc, c))
 
 
+def a_torno(c):
+    return (f'<line x1="{AL}" y1="{AYc}" x2="{AR - 12}" y2="{AYc}" stroke="{INK}" stroke-width="1.2" stroke-dasharray="10 3 2 3"/>'
+            f'<ellipse cx="{AL + 14}" cy="{AYc}" rx="5" ry="11" fill="none" stroke="{c}" stroke-width="2.4"/>'
+            + arrowhead(AR, AYc, INK))
+
+
+def a_vortia(c):
+    return (f'<path d="M{AL},{AYc + 6} C{AL + 22},{AYc + 6} {AL + 30},{AYc - 8} {AL + 50},{AYc - 8} C{AL + 64},{AYc - 8} {AL + 70},{AYc} {AR - 12},{AYc}" '
+            f'fill="none" stroke="{c}" stroke-width="2.4" stroke-linecap="round"/>'
+            + arrowhead(AR, AYc, INK))
+
+
 # Each colour is the middle of the app icon's background in nodalix-icon-theme, so the DMG
 # window and the icon inside it read as one thing. The darker shade is for a second ink.
 APPS = {
@@ -442,7 +505,9 @@ APPS = {
     "pluma": ("Pluma", "Ilustración vectorial", "#F2782F", "#C95F1E", m_pluma, a_pluma),
     "pulso": ("Pulso", "Animación y efectos visuales", "#7CC23A", "#5E9A27", m_pulso, a_pulso),
     "toma": ("Toma", "Edición de vídeo", "#DB45B5", "#B03091", m_toma, a_toma),
+    "torno": ("Torno", "Diseño 3D paramétrico", "#C2A845", "#9E8530", m_torno, a_torno),
     "vinilo": ("Vinilo", "Apple Music en tu escritorio", "#8B4AE6", "#6B33C2", m_vinilo, a_vinilo),
+    "vortia": ("Vortia", "Simulación de fluidos (CFD)", "#3A8DF4", "#2470D8", m_vortia, a_vortia),
 }
 
 
