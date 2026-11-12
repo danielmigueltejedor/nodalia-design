@@ -12,7 +12,7 @@ Todas las apps Nodalia se actualizan desde dentro con el mismo flujo, el que est
 
 | Instalación | Qué hace |
 |---|---|
-| AppImage (`$APPIMAGE`) | Aparta el AppImage actual, copia el nuevo en su lugar, lo arranca y borra la copia; si algo falla, lo devuelve |
+| AppImage (`$APPIMAGE`) | Aparta el AppImage actual, copia el nuevo en su lugar, lo arranca y, si aguanta los primeros segundos (o termina bien), borra la copia; si algo falla o se cierra con error, devuelve el anterior |
 | macOS (`Nombre.app`) | Comprueba que el `.app` del DMG esté firmado por el mismo editor que el instalado y delega el cambio en un script que espera a que la app salga |
 | Flatpak, `.deb`, `.rpm`, AUR, compilación de desarrollo | No se toca: `install_kind()` devuelve `Managed` y la app abre la página de la release |
 
@@ -22,7 +22,7 @@ Tras un fallo en macOS, el script deja un código que `take_last_failure()` lee 
 
 ## Nombres de los paquetes
 
-El crate elige el paquete por el nombre del asset, sin distinguir mayúsculas: `macos-arm64.dmg` en Apple Silicon (o `macos-universal.dmg`) y `x86_64.AppImage` en Linux. Es el mismo esquema que Vortia: `Nombre-X.Y.Z-x86_64.AppImage`, `Nombre-X.Y.Z-macos-arm64.dmg`. Los `.sha256` que acompañan a cada asset se ignoran.
+El crate elige el paquete por el final del nombre del asset, sin distinguir mayúsculas: `macos-arm64.dmg` en Apple Silicon (o `macos-universal.dmg`) y `x86_64.AppImage` en Linux x86-64 (`aarch64.AppImage` en ARM; nunca el de otra arquitectura). Un `.zsync` o `.sha256` junto al paquete no es el paquete. Es el mismo esquema que Vortia: `Nombre-X.Y.Z-x86_64.AppImage`, `Nombre-X.Y.Z-macos-arm64.dmg`. Los `.sha256` que acompañan a cada asset se ignoran.
 
 ## Lo que pone la app
 
@@ -48,4 +48,11 @@ const APP: nodalia_update::App = nodalia_update::App {
 
 ## Varias ediciones en la misma release
 
-Si una release lleva dos compilaciones de la misma app para la misma plataforma (Vinilo en macOS: `Native` y `Nodalia`), cada edición declara `edition: Some("native")` o `Some("nodalia")` y en macOS solo se ofrece el disco llamado `<edición>-macos-arm64.dmg`. Así una edición nunca propone instalar la otra. El `bundle` es el de su edición (`Vinilo Native.app`, `Vinilo Nodalia.app`) y el identificador de la app también difiere, de modo que la comprobación de firma sigue exigiendo el mismo identificador que el instalado.
+Si una release lleva dos compilaciones de la misma app para la misma plataforma (Vinilo en macOS: `Native` y `Nodalia`), cada edición declara `edition: Some("native")` o `Some("nodalia")` y en macOS solo se ofrece el disco llamado `<versión>-<edición>-macos-arm64.dmg` (la versión completa antes de la edición evita que `native` coincida con `non-native`). Así una edición nunca propone instalar la otra. El `bundle` es el de su edición (`Vinilo Native.app`, `Vinilo Nodalia.app`) y el identificador de la app también difiere, de modo que la comprobación de firma sigue exigiendo el mismo identificador que el instalado.
+
+## Versiones, firma y recuperación
+
+- Una pre-release (`2.0.0-beta`) es anterior a su versión estable (`2.0.0`), como en semver.
+- En macOS el ayudante vuelve a comprobar la firma y el publicador de **la copia que va a instalar** (no solo la del disco montado antes), y no toca la app instalada si no coinciden. Si no puede devolver la versión anterior, la deja junto a la app y dice dónde en `update.log`. Si la nueva no arranca, conserva la anterior para recuperarla.
+- Solo se lanza un ayudante de macOS por proceso.
+- Una instalación gestionada (Flatpak, `.deb`…) recibe `Check::Available` aunque la release no tenga paquete para ella, para poder abrir la página de la release.

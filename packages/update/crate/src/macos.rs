@@ -78,8 +78,9 @@ pub(crate) fn read_identity(bundle: &std::path::Path) -> Result<CodeIdentity, St
 ///
 /// It never fails silently: every step is logged, the outcome goes to `<result-file>` (`ok`, or a
 /// short code [`take_last_failure`](crate::take_last_failure) reads at the next start), and on
-/// failure the previous app is put back and reopened. It gives up if the app has not exited after
-/// about a minute. `NODALIA_UPDATE_OPEN` and `NODALIA_UPDATE_WAIT_STEPS` exist for tests.
+/// failure the previous app is put back and reopened (or, if even that fails, left beside the
+/// bundle and named in the log). The signature of the copy it installs is checked here too. It gives up if the app has not exited after
+/// about a minute. `NODALIA_UPDATE_OPEN`, `NODALIA_UPDATE_WAIT_STEPS` and `NODALIA_UPDATE_SKIP_SIGNATURE` exist for tests.
 #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub(crate) fn helper_script(bundle_name: &str, app_name: &str) -> String {
     format!(
@@ -104,10 +105,22 @@ fail() {{
   echo "FAILED at: $1"
   printf '%s\n' "$1" >"$RESULT"
   /usr/bin/hdiutil detach "$MOUNT" -force >/dev/null 2>&1
-  if [ ! -d "$BUNDLE" ] && [ -d "$OLD" ]; then /bin/mv "$OLD" "$BUNDLE"; fi
   [ -d "$NEW" ] && /bin/rm -rf "$NEW"
+  if [ ! -d "$BUNDLE" ] && [ -d "$OLD" ]; then
+    if ! /bin/mv "$OLD" "$BUNDLE"; then
+      # Reopening a bundle that is not there would show nothing and hide why.
+      echo "COULD NOT PUT THE PREVIOUS VERSION BACK. It is at: $OLD"
+      echo "To recover, move it to $BUNDLE."
+      exit 1
+    fi
+  fi
   "$OPEN" "$BUNDLE"
   exit 1
+}}
+
+# Who signed an app, as codesign prints it: the identifier and the team, nothing else.
+identity() {{
+  /usr/bin/codesign -dv --verbose=4 "$1" 2>&1 | /usr/bin/grep -E '^(Identifier|TeamIdentifier)=' | /usr/bin/sort
 }}
 
 # The application must be gone before its files are replaced.
@@ -131,18 +144,34 @@ SOURCE="$MOUNT/{bundle_name}"
 [ -e "$NEW" ] && /bin/rm -rf "$NEW"
 [ -e "$OLD" ] && /bin/rm -rf "$OLD"
 /usr/bin/ditto "$SOURCE" "$NEW" || fail copy
-/bin/mv "$BUNDLE" "$OLD" || fail replace
-if ! /bin/mv "$NEW" "$BUNDLE"; then
-  /bin/mv "$OLD" "$BUNDLE"
-  fail replace
-fi
 /usr/bin/hdiutil detach "$MOUNT" -force >/dev/null 2>&1
-/bin/rm -rf "$OLD"
-/bin/rm -f "$DMG"
-printf 'ok\n' >"$RESULT"
-echo "updated; starting $BUNDLE"
-"$OPEN" "$BUNDLE"
-/bin/rm -f "$0"
+
+# The copy that is about to be installed is the one that is checked, so nothing that changed the
+# disk image after the app looked at it can get through: valid signature, same publisher.
+if [ -z "$NODALIA_UPDATE_SKIP_SIGNATURE" ]; then
+  /usr/bin/codesign --verify --deep --strict "$NEW" || fail signature
+  NEW_ID=$(identity "$NEW")
+  OLD_ID=$(identity "$BUNDLE")
+  if [ -z "$NEW_ID" ] || [ "$NEW_ID" != "$OLD_ID" ]; then
+    echo "the new app is signed by a different publisher"
+    fail signature
+  fi
+fi
+
+/bin/mv "$BUNDLE" "$OLD" || fail replace
+/bin/mv "$NEW" "$BUNDLE" || fail replace
+if "$OPEN" "$BUNDLE"; then
+  /bin/rm -rf "$OLD"
+  /bin/rm -f "$DMG"
+  printf 'ok\n' >"$RESULT"
+  echo "updated; started $BUNDLE"
+  /bin/rm -f "$0"
+else
+  # Installed, but it would not start: the previous version stays beside it for recovery.
+  echo "updated, but $BUNDLE could not be started. The previous version is at: $OLD"
+  printf 'launch\n' >"$RESULT"
+  exit 1
+fi
 "#
     )
 }
@@ -187,11 +216,22 @@ mod tests {
         ));
     }
 
+    #[cfg(unix)]
     #[test]
     fn the_helper_names_the_bundle_and_is_valid_bash() {
         let script = helper_script("Vinilo.app", "Vinilo");
         assert!(script.contains("/*/Vinilo.app) ;;"));
         assert!(script.contains("SOURCE=\"$MOUNT/Vinilo.app\""));
+        let check = script
+            .find("codesign --verify")
+            .expect("the helper checks the signature");
+        let swap = script
+            .find("/bin/mv \"$BUNDLE\" \"$OLD\"")
+            .expect("it swaps the bundle");
+        assert!(
+            check < swap,
+            "the copy is checked before it replaces anything"
+        );
         let path = std::env::temp_dir().join(format!("nodalia-helper-{}.sh", std::process::id()));
         std::fs::write(&path, script).unwrap();
         let ok = std::process::Command::new("bash")

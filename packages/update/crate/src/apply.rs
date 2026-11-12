@@ -2,6 +2,10 @@
 
 use std::fs;
 use std::path::Path;
+use std::process::Child;
+#[cfg(target_os = "macos")]
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::{Duration, Instant};
 
 use crate::{App, Error, InstallKind};
 
@@ -45,9 +49,23 @@ pub fn apply(
     }
 }
 
+/// How long a freshly started AppImage has to stay up, or exit cleanly, before the one it
+/// replaced is let go. A release that verifies but dies on start must leave the old one usable.
+const STARTUP_GRACE: Duration = Duration::from_secs(3);
+
 /// Moves the running AppImage aside, puts the new one in its place and starts it. The running
-/// file stays open under its new name, so this is safe on Linux; any failure puts it back.
+/// file stays open under its new name, so this is safe on Linux; any failure puts it back, and
+/// so does a new version that crashes during its first seconds.
 pub(crate) fn apply_appimage(app: &App, current: &Path, package: &Path) -> Result<(), Error> {
+    apply_appimage_within(app, current, package, STARTUP_GRACE)
+}
+
+fn apply_appimage_within(
+    app: &App,
+    current: &Path,
+    package: &Path,
+    grace: Duration,
+) -> Result<(), Error> {
     let io = |what: &str, e: std::io::Error| Error::Io(format!("{what}: {e}"));
     let backup = current.with_extension(format!("{}-backup", app.name.to_ascii_lowercase()));
     let _ = fs::remove_file(&backup);
@@ -61,18 +79,64 @@ pub(crate) fn apply_appimage(app: &App, current: &Path, package: &Path) -> Resul
         use std::os::unix::fs::PermissionsExt;
         let _ = fs::set_permissions(current, fs::Permissions::from_mode(0o755));
     }
-    let _ = fs::remove_file(package);
-    if let Err(e) = std::process::Command::new(current).spawn() {
+    let restore = || {
         let _ = fs::remove_file(current);
         let _ = fs::rename(&backup, current);
-        return Err(io("Could not launch the updated AppImage", e));
+    };
+    let mut child = match std::process::Command::new(current).spawn() {
+        Ok(child) => child,
+        Err(e) => {
+            restore();
+            return Err(io("Could not launch the updated AppImage", e));
+        }
+    };
+    if let Err(why) = survives_start(&mut child, grace) {
+        restore();
+        return Err(Error::Io(format!(
+            "The updated AppImage stopped right after starting ({why}); the previous version was put back."
+        )));
     }
+    let _ = fs::remove_file(package);
     let _ = fs::remove_file(&backup);
     Ok(())
 }
 
+/// Waits up to `grace` for the new process: still running, or finished cleanly, is a start;
+/// finishing with an error is not.
+fn survives_start(child: &mut Child, grace: Duration) -> Result<(), String> {
+    let deadline = Instant::now() + grace;
+    loop {
+        match child.try_wait() {
+            Ok(Some(status)) if status.success() => return Ok(()),
+            Ok(Some(status)) => return Err(status.to_string()),
+            Ok(None) if Instant::now() >= deadline => return Ok(()),
+            Ok(None) => std::thread::sleep(Duration::from_millis(50)),
+            // Cannot tell: the process exists, which is all a start needs to be.
+            Err(_) => return Ok(()),
+        }
+    }
+}
+
+/// An update is already on its way in this process: a second helper would race the first over
+/// the same staged copy and backup.
+#[cfg(target_os = "macos")]
+static MACOS_UPDATE_STARTED: AtomicBool = AtomicBool::new(false);
+
 #[cfg(target_os = "macos")]
 fn apply_macos(app: &App, bundle: &Path, package: &Path) -> Result<(), Error> {
+    if MACOS_UPDATE_STARTED.swap(true, Ordering::SeqCst) {
+        return Err(Error::Io("An update is already being installed.".into()));
+    }
+    let started = start_macos_helper(app, bundle, package);
+    if started.is_err() {
+        // Nothing has been changed: a later attempt may run. Once the helper is up it stays set.
+        MACOS_UPDATE_STARTED.store(false, Ordering::SeqCst);
+    }
+    started
+}
+
+#[cfg(target_os = "macos")]
+fn start_macos_helper(app: &App, bundle: &Path, package: &Path) -> Result<(), Error> {
     use std::process::Command;
     let dir = crate::update_dir(app);
     let mount = dir.join("verify-mount");
@@ -245,6 +309,28 @@ mod tests {
         let missing = dir.join("nope");
         assert!(apply_appimage(&APP, &current, &missing).is_err());
         assert_eq!(fs::read_to_string(&current).unwrap(), "old");
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_new_appimage_that_crashes_on_start_leaves_the_old_one_in_place() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = std::env::temp_dir().join(format!("nodalia-update-crash-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let current = dir.join("Probe.AppImage");
+        let package = dir.join("new.AppImage");
+        fs::write(&current, "#!/bin/sh\nexit 0\n").unwrap();
+        fs::write(&package, "#!/bin/sh\nexit 3\n").unwrap();
+        fs::set_permissions(&package, fs::Permissions::from_mode(0o755)).unwrap();
+
+        let result = apply_appimage_within(&APP, &current, &package, Duration::from_secs(10));
+
+        assert!(result.is_err(), "a crash on start is not an update");
+        assert_eq!(fs::read_to_string(&current).unwrap(), "#!/bin/sh\nexit 0\n");
+        assert!(package.exists(), "the download stays for another try");
+        assert!(!current.with_extension("probe-backup").exists());
         let _ = fs::remove_dir_all(dir);
     }
 }

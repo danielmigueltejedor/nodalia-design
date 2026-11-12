@@ -51,7 +51,7 @@ pub struct Release {
     /// The release notes, Markdown.
     pub notes: String,
     pub page: String,
-    /// The package for this machine, if the release has one.
+    /// The package for this machine, if the release has one. A managed install may see `None`.
     pub asset: Option<ReleaseAsset>,
 }
 
@@ -79,7 +79,8 @@ pub enum Error {
     BadResponse,
     /// The latest release has no version tag.
     NoVersion,
-    /// A newer release exists, but has no package for this platform.
+    /// A newer release exists, but has no package for this platform, and this install replaces
+    /// itself.
     NoPackage(String),
     /// The release publishes no SHA-256 for the package: nothing is installed unverified.
     NoDigest,
@@ -157,7 +158,9 @@ pub fn check(app: &App) -> Result<Check, Error> {
     if compare_versions(&release.version, app.version) != Ordering::Greater {
         return Ok(Check::UpToDate);
     }
-    if release.asset.is_none() {
+    // A managed install is only ever pointed at the release page, which needs no package; only
+    // one that would replace itself has to have one.
+    if release.asset.is_none() && install_kind(app).can_apply_in_place() {
         return Err(Error::NoPackage(release.version));
     }
     Ok(Check::Available(release))

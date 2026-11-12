@@ -280,6 +280,11 @@ mod header_imp {
             bar.set_show_title_buttons(false);
             let start = gtk::WindowControls::new(gtk::PackType::Start);
             let end = gtk::WindowControls::new(gtk::PackType::End);
+            // macOS draws its own traffic lights; the widget only reserves their place.
+            if cfg!(target_os = "macos") {
+                start.set_use_native_controls(true);
+                end.set_use_native_controls(true);
+            }
             // Centred at their own 28 px: a header taller than that (a field, a subtitle) would
             // otherwise stretch the round buttons into pills.
             start.set_valign(gtk::Align::Center);

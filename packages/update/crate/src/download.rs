@@ -1,8 +1,9 @@
 //! HTTP: the release lookup and the verified download.
 
-use std::fs::{self, File};
+use std::fs;
 use std::io::{Read, Write};
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use sha2::{Digest, Sha256};
@@ -10,6 +11,9 @@ use sha2::{Digest, Sha256};
 use crate::{App, Error, Release};
 
 const USER_AGENT: &str = "Nodalia-Updater";
+
+/// Tells two downloads in one process apart, so neither can write into the other's partial file.
+static DOWNLOADS: AtomicU64 = AtomicU64::new(0);
 
 /// The operating system's certificate store, so a company or distribution trust anchor works.
 fn tls() -> ureq::tls::TlsConfig {
@@ -64,11 +68,21 @@ pub fn download(
         .filter(|n| !n.is_empty())
         .ok_or(Error::BadResponse)?;
     let dest = dir.join(name);
-    let partial = dir.join(format!("{name}.part"));
+    // Unique per call: two downloads of one asset must not truncate each other's file, nor
+    // publish bytes that were not the ones they hashed.
+    let partial = dir.join(format!(
+        "{name}.{}-{}.part",
+        std::process::id(),
+        DOWNLOADS.fetch_add(1, Ordering::Relaxed)
+    ));
 
     let agent: ureq::Agent = ureq::Agent::config_builder()
         .tls_config(tls())
-        // Large packages: no overall deadline, a stalled connection still gives up.
+        // Large packages: no overall deadline, but every wait for the server is bounded, so a
+        // stalled connection, a server that never answers or one that stops mid-body gives up.
+        .timeout_resolve(Some(Duration::from_secs(15)))
+        .timeout_connect(Some(Duration::from_secs(15)))
+        .timeout_recv_response(Some(Duration::from_secs(30)))
         .timeout_recv_body(Some(Duration::from_secs(60)))
         .build()
         .into();
@@ -86,7 +100,11 @@ pub fn download(
 
     let result = (|| {
         let mut reader = response.into_body().into_reader();
-        let mut file = File::create(&partial).map_err(|e| Error::Io(e.to_string()))?;
+        let mut file = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&partial)
+            .map_err(|e| Error::Io(e.to_string()))?;
         let mut hasher = Sha256::new();
         let mut buffer = vec![0u8; 64 * 1024];
         let mut received = 0u64;
