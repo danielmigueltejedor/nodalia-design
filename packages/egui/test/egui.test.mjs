@@ -1,12 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { MODES, SOURCE_DIR, loadTokens, resolve, parseHex } from '@nodalia/tokens/lib';
+import { MODES, SOURCE_DIR, loadTokens, rawValue, resolve, parseHex } from '@nodalia/tokens/lib';
 import { ICONS_OUTPUT, OUTPUT, iconsSource, rustSource } from '../scripts/build.mjs';
 
 const tokens = loadTokens(SOURCE_DIR);
 const src = rustSource();
-const colours = [...tokens.values()].filter((t) => t.type === 'color' && /^(color\.|component\.window\.)/.test(t.path));
+const colours = [...tokens.values()].filter((t) => t.type === 'color' && t.path.startsWith('color.'));
 
 test('the committed tokens.rs matches the tokens (run `npm run build -w @nodalia/egui`)', () => {
   assert.equal(readFileSync(OUTPUT, 'utf8'), src);
@@ -53,4 +53,21 @@ test('the committed icons/data.rs matches the icon set (run `npm run build -w @n
   const names = [...iconsSource().matchAll(/^ {8}name: "([a-z-]+)",$/gm)].map((m) => m[1]);
   assert.deepEqual(names, [...names].sort());
   assert.ok(names.includes('line') && names.includes('dim-continue'));
+});
+
+test('window-control colours preserve shared semantic aliases', () => {
+  const block = /pub mod window_color \{\n([\s\S]*?)\n\}/.exec(src)[1];
+  for (const token of [...tokens.values()].filter((t) => t.type === 'color' && t.path.startsWith('component.window.'))) {
+    const name = token.path.split('.').at(-1).replaceAll('-', '_');
+    const semantic = /^\{color\.([^}]+)\}$/.exec(rawValue(token, 'light'));
+    if (semantic && MODES.every((mode) => rawValue(token, mode) === rawValue(token, 'light'))) {
+      const field = semantic[1].replaceAll(/[.-]/g, '_');
+      assert.ok(block.includes(`pub const fn ${name}(mode: Mode) -> Rgba {\n        mode.palette().${field}\n    }`));
+    } else if (MODES.every((mode) => resolve(tokens, token.path, mode) === resolve(tokens, token.path, 'light'))) {
+      const { r, g, b, a } = parseHex(resolve(tokens, token.path, 'light'));
+      assert.ok(block.includes(`pub const ${name.toUpperCase()}: Rgba = Rgba::new(${r}, ${g}, ${b}, ${Math.round(a * 255)});`));
+    } else {
+      assert.ok(block.includes(`pub const fn ${name}(mode: Mode) -> Rgba {\n        match mode {`));
+    }
+  }
 });

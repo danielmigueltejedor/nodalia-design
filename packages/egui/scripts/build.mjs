@@ -4,7 +4,7 @@
 import { writeFileSync } from 'node:fs';
 import { ICONS } from '../../icons/src/icons.mjs';
 import { boldBody } from '../../icons/src/bold.mjs';
-import { MODES, SOURCE_DIR, DEFAULT_ACCENT, accentSets, loadTokens, resolve, parseHex, px, ms } from '@nodalia/tokens/lib';
+import { MODES, SOURCE_DIR, DEFAULT_ACCENT, accentSets, loadTokens, rawValue, resolve, parseHex, px, ms } from '@nodalia/tokens/lib';
 
 const tokens = loadTokens(SOURCE_DIR);
 const all = [...tokens.values()];
@@ -20,8 +20,7 @@ const shadow = (v) => `Shadow { color: ${rgba(v.color)}, offset_x: ${float(px(v.
 
 const colors = all.filter((t) => t.type === 'color' && t.path.startsWith('color.'));
 const elevations = all.filter((t) => t.type === 'shadow' && t.path.startsWith('elevation.'));
-const paletteColors = [...colors, ...all.filter((t) => t.type === 'color' && t.path.startsWith('component.window.'))];
-const colorField = (t) => snake(t.path.replace(/^(color\.|component\.)/, ''));
+const colorField = (t) => snake(t.path.slice('color.'.length));
 
 const densityNames = [...new Set(all.filter((t) => t.path.startsWith('density.')).map((t) => t.path.split('.')[1]))];
 const densityKeys = [...new Set(all.filter((t) => t.path.startsWith('density.')).map((t) => t.path.split('.')[2]))];
@@ -32,6 +31,37 @@ const accents = accentSets(tokens, SOURCE_DIR);
 function dimensionModule(name, prefix, doc) {
   const items = group(prefix).filter((t) => t.type === 'dimension');
   return [`/// ${doc}`, `pub mod ${name} {`, ...items.map((t) => `    pub const ${upper(t.path.slice(prefix.length + 1))}: f32 = ${float(px(light(t)))};`), '}', ''];
+}
+
+// Group modes that resolve to the same colour. A fixed component colour needs no mode table.
+function windowColorSource(token) {
+  const name = snake(token.path.slice('component.window.'.length));
+  const alias = rawValue(token, 'light');
+  const semantic = /^\{(color\.[^}]+)\}$/.exec(alias);
+  if (semantic && MODES.every((mode) => rawValue(token, mode) === alias)) {
+    return [
+      `    pub const fn ${name}(mode: Mode) -> Rgba {`,
+      `        mode.palette().${snake(semantic[1].slice('color.'.length))}`,
+      '    }',
+    ];
+  }
+  const modesByColor = new Map();
+  for (const mode of MODES) {
+    const value = resolve(tokens, token.path, mode);
+    const modes = modesByColor.get(value) ?? [];
+    modes.push(`Mode::${pascal(mode)}`);
+    modesByColor.set(value, modes);
+  }
+  if (modesByColor.size === 1) {
+    return [`    pub const ${name.toUpperCase()}: Rgba = ${rgba(modesByColor.keys().next().value)};`];
+  }
+  return [
+    `    pub const fn ${name}(mode: Mode) -> Rgba {`,
+    '        match mode {',
+    ...[...modesByColor].map(([value, modes]) => `            ${modes.join(' | ')} => ${rgba(value)},`),
+    '        }',
+    '    }',
+  ];
 }
 
 export function rustSource() {
@@ -95,10 +125,10 @@ export function rustSource() {
     '    }',
     '}',
     '',
-    '/// Semantic colours, elevations, and window-control colours of one mode.',
+    '/// Every semantic colour and elevation of one mode.',
     '#[derive(Clone, Copy, Debug, PartialEq)]',
     'pub struct Palette {',
-    ...paletteColors.map((t) => `    pub ${colorField(t)}: Rgba,`),
+    ...colors.map((t) => `    pub ${colorField(t)}: Rgba,`),
     ...elevations.map((t) => `    pub ${snake(t.path)}: Shadow,`),
     '}',
     '',
@@ -106,7 +136,7 @@ export function rustSource() {
   for (const mode of MODES) {
     lines.push(
       `pub const ${upper(mode)}: Palette = Palette {`,
-      ...paletteColors.map((t) => `    ${colorField(t)}: ${rgba(resolve(tokens, t.path, mode))},`),
+      ...colors.map((t) => `    ${colorField(t)}: ${rgba(resolve(tokens, t.path, mode))},`),
       ...elevations.map((t) => `    ${snake(t.path)}: ${shadow(resolve(tokens, t.path, mode))},`),
       '};',
       '',
@@ -171,6 +201,12 @@ export function rustSource() {
     ...dimensionModule('line_height', 'font.line-height', 'Line heights, in logical pixels.'),
     ...dimensionModule('size', 'size', 'Fixed sizes (icons, targets, panels), in logical pixels.'),
     ...dimensionModule('component', 'component', 'Component metrics, in logical pixels.'),
+    '/// Window-control colours from the shared component tokens.',
+    'pub mod window_color {',
+    '    use super::{Mode, Rgba};',
+    ...group('component.window').filter((t) => t.type === 'color').flatMap(windowColorSource),
+    '}',
+    '',
     '/// Font weights.',
     'pub mod font_weight {',
     ...group('font.weight').map((t) => `    pub const ${upper(t.path.slice('font.weight.'.length))}: u16 = ${light(t)};`),
