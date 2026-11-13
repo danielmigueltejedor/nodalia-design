@@ -262,6 +262,7 @@ impl Updater {
 
     /// Takes what the threads sent. [`Updater::show`] does it too; this is for apps that ask
     /// [`Updater::is_open`] before drawing.
+    #[must_use = "an `Action::Exit` dropped here leaves the window on \"Installing…\" for good"]
     pub fn poll(&mut self) -> Action {
         let mut action = Action::None;
         while let Ok(msg) = self.rx.try_recv() {
@@ -319,6 +320,7 @@ impl Updater {
     ///
     /// `safe_to_close` is whether the app could quit now without losing anything: a downloaded
     /// update installs only then, and waits with an explanation otherwise.
+    #[must_use = "the app must open the URL or exit as the action says"]
     pub fn show(&mut self, ctx: &egui::Context, language: Language, safe_to_close: bool) -> Action {
         let polled = self.poll();
         if polled != Action::None {
@@ -754,7 +756,7 @@ mod tests {
                 "{:?}",
                 updater.status()
             );
-            updater.poll();
+            let _ = updater.poll();
             std::thread::sleep(Duration::from_millis(5));
         }
         updater.check_at_start(&ctx);
@@ -828,7 +830,7 @@ mod tests {
             user: true,
             result: Ok(Check::UpToDate),
         });
-        updater.poll();
+        let _ = updater.poll();
         assert_eq!(updater.status(), &Status::UpToDate);
 
         updater.status = Status::Checking { user: true };
@@ -836,7 +838,7 @@ mod tests {
             user: true,
             result: Err("offline".into()),
         });
-        updater.poll();
+        let _ = updater.poll();
         assert_eq!(updater.status(), &Status::CheckFailed("offline".into()));
 
         updater.status = Status::Checking { user: true };
@@ -844,7 +846,7 @@ mod tests {
             user: true,
             result: Ok(Check::Available(release())),
         });
-        updater.poll();
+        let _ = updater.poll();
         assert_eq!(updater.status(), &Status::Offer(release()));
     }
 
@@ -861,7 +863,7 @@ mod tests {
             user: false,
             result: Ok(Check::Available(release())),
         });
-        updater.poll();
+        let _ = updater.poll();
         assert_eq!(updater.status(), &downloading);
         updater.offer(release());
         assert_eq!(
@@ -882,12 +884,12 @@ mod tests {
         let _ = updater
             .tx
             .send(Msg::Downloaded("0.0.1".into(), Ok(PathBuf::from("old"))));
-        updater.poll();
+        let _ = updater.poll();
         assert!(matches!(updater.status(), Status::Downloading { .. }));
         let _ = updater
             .tx
             .send(Msg::Downloaded(release().version, Ok(PathBuf::from("new"))));
-        updater.poll();
+        let _ = updater.poll();
         assert_eq!(
             updater.status(),
             &Status::Ready {
