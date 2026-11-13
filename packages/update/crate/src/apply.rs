@@ -61,6 +61,13 @@ pub fn apply(
     }
 }
 
+/// Set on the copy an in-place update starts, to the process id of the version it replaces.
+///
+/// An app that hands a second launch over to the instance already running (one window per user)
+/// must not do that for this launch: the running instance is the old version, about to exit. It
+/// waits for that process to end and starts on its own instead.
+pub const RELAUNCH_FROM: &str = "NODALIA_UPDATE_RELAUNCH_FROM";
+
 /// How long a freshly started AppImage has to stay up, or exit cleanly, before the one it
 /// replaced is let go. A release that verifies but dies on start must leave the old one usable.
 const STARTUP_GRACE: Duration = Duration::from_secs(3);
@@ -96,7 +103,10 @@ fn apply_appimage_within(
         let _ = fs::remove_file(current);
         let _ = fs::rename(&backup, current);
     };
-    let mut child = match std::process::Command::new(current).spawn() {
+    let mut child = match std::process::Command::new(current)
+        .env(RELAUNCH_FROM, std::process::id().to_string())
+        .spawn()
+    {
         Ok(child) => child,
         Err(e) => {
             restore();
@@ -320,14 +330,18 @@ mod tests {
         fs::write(&current, "#!/bin/sh\nexit 0\n").unwrap();
         fs::write(
             &package,
-            format!("#!/bin/sh\ntouch '{}'\n", marker.display()),
+            format!(
+                "#!/bin/sh\nprintf '%s' \"${}\" > '{}'\n",
+                RELAUNCH_FROM,
+                marker.display()
+            ),
         )
         .unwrap();
         fs::set_permissions(&package, fs::Permissions::from_mode(0o755)).unwrap();
 
         apply_appimage(&APP, &current, &package).unwrap();
 
-        assert!(fs::read_to_string(&current).unwrap().contains("touch"));
+        assert!(fs::read_to_string(&current).unwrap().contains("printf"));
         assert!(!package.exists(), "the package is consumed");
         assert!(
             !current.with_extension("probe-backup").exists(),
@@ -340,6 +354,11 @@ mod tests {
             std::thread::sleep(std::time::Duration::from_millis(100));
         }
         assert!(marker.exists(), "the new AppImage was started");
+        assert_eq!(
+            fs::read_to_string(&marker).unwrap(),
+            std::process::id().to_string(),
+            "the new copy knows which process it replaces, so it does not hand itself over to it"
+        );
         let _ = fs::remove_dir_all(dir);
     }
 
