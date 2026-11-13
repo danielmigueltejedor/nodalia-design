@@ -37,7 +37,9 @@ fn every_part_draws_in_both_modes_at_the_suite_measures() {
                     &look,
                     "ws",
                     "Essentials",
-                    &["Essentials", "Motion"],
+                    &["Essentials", "Motion", "Mine"],
+                    2,
+                    &["New Workspace…"],
                     130.0
                 ),
                 None

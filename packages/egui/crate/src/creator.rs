@@ -12,8 +12,11 @@
 //! use nodalia_theme::{Accent, Mode};
 //!
 //! let look = Look::new(Mode::Light.palette_with(Accent::Lienzo));
-//! if let Some(i) = cr::workspace_selector(ui, &look, "workspace", "Essentials", &["Essentials", "Painting"], 130.0) {
-//!     // switch to workspace i
+//! let names = ["Essentials", "Painting"];
+//! if let Some(cr::WorkspacePick::Workspace(i)) =
+//!     cr::workspace_selector(ui, &look, "workspace", "Essentials", &names, names.len(), &[], 130.0)
+//! {
+//!     // switch to names[i]
 //! }
 //! if cr::primary_button(ui, &look, "OK", true).clicked() {
 //!     // commit
@@ -373,17 +376,29 @@ pub fn search_field(
         .inner
 }
 
-/// The app bar's workspace selector: the current workspace in a field-shaped pill with a chevron,
-/// opening the list of `options` (presets, then saved workspaces) with a check by `current`.
-/// Returns the index picked.
+/// What the [`workspace_selector`] list was used for.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum WorkspacePick {
+    /// The workspace at this index of `workspaces`.
+    Workspace(usize),
+    /// The action at this index of `actions` (Reset, New Workspace…, Manage Workspaces…).
+    Action(usize),
+}
+
+/// The app bar's workspace selector: the current workspace in a field-shaped pill with a chevron.
+/// Its list shows `workspaces` (presets, then the user's own from `saved_from`, after a line) with
+/// a check by `current`, then `actions` after a line.
+#[allow(clippy::too_many_arguments)]
 pub fn workspace_selector(
     ui: &mut Ui,
     look: &Look,
     id: &str,
     current: &str,
-    options: &[&str],
+    workspaces: &[&str],
+    saved_from: usize,
+    actions: &[&str],
     width: f32,
-) -> Option<usize> {
+) -> Option<WorkspacePick> {
     let p = &look.palette;
     let (rect, resp) = ui.allocate_exact_size(vec2(width, layout::CONTROL_HEIGHT), Sense::click());
     let resp = resp.on_hover_cursor(egui::CursorIcon::PointingHand);
@@ -427,11 +442,11 @@ pub fn workspace_selector(
     );
     let mut picked = None;
     egui::Popup::menu(&resp).id(popup_id).show(|ui| {
-        ui.set_min_width(width.max(180.0));
-        for (i, name) in options.iter().enumerate() {
-            let row = ui.horizontal(|ui| {
+        ui.set_min_width(width.max(200.0));
+        let row = |ui: &mut Ui, text: &str, checked: bool| {
+            ui.horizontal(|ui| {
                 let (mark, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                if *name == current {
+                if checked {
                     if let Some(icon) = icons::get("check") {
                         icons::paint(
                             ui.painter(),
@@ -441,10 +456,26 @@ pub fn workspace_selector(
                         );
                     }
                 }
-                ui.selectable_label(false, *name)
-            });
-            if row.inner.clicked() {
-                picked = Some(i);
+                ui.add(egui::Button::new(text).frame(false))
+            })
+            .inner
+            .clicked()
+        };
+        for (i, name) in workspaces.iter().enumerate() {
+            if i == saved_from && i > 0 {
+                ui.separator();
+            }
+            if row(ui, name, *name == current) {
+                picked = Some(WorkspacePick::Workspace(i));
+                ui.close();
+            }
+        }
+        if !actions.is_empty() {
+            ui.separator();
+        }
+        for (i, name) in actions.iter().enumerate() {
+            if row(ui, name, false) {
+                picked = Some(WorkspacePick::Action(i));
                 ui.close();
             }
         }
