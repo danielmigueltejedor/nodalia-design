@@ -1686,6 +1686,10 @@ export const ICONS = {
     '<path d="M7 9 17 3.5V9z"/>',
     '<path d="M7 15l10 5.5V15z" fill="currentColor" fill-opacity="0.18"/>',
   ] },
+  "ungroup": { group: "design", body: [
+    '<rect x="3.5" y="3.5" width="8" height="8" rx="1"/>',
+    '<rect x="12.5" y="12.5" width="8" height="8" rx="1"/>',
+  ] },
   "chevrons-left": { group: "general", body: [
     '<path d="M11.5 6l-6 6 6 6"/>',
     '<path d="M18.5 6l-6 6 6 6"/>',
