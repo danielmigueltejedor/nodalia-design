@@ -1,6 +1,6 @@
 # Iconografía
 
-**Estado: 255 iconos funcionales incluidos en `@nodalia/icons`.** Son dibujos originales de este proyecto (MIT). No se incluyen fuentes ni imágenes de terceros.
+**Estado: 501 iconos funcionales incluidos en `@nodalia/icons`.** Son dibujos originales de este proyecto (MIT). No se incluyen fuentes ni imágenes de terceros.
 
 ## El conjunto
 
@@ -13,7 +13,7 @@
 | `text` | Formato de texto, párrafo, tablas, comentarios (Letra, Pliego) |
 | `data` | Hojas de cálculo y datos (Celdas) |
 | `slides` | Presentaciones (Lámina) |
-| `design` | Dibujo vectorial e imagen: pluma, pincel, alinear, transformar (Pluma, Lienzo) |
+| `design` | Dibujo vectorial e imagen: pluma, nodos, formas, Buscatrazos, degradados, trazos, licuar, alinear y distribuir, transformar (Pluma, Lienzo) |
 | `photo` | Revelado: exposición, contraste, temperatura (Luz) |
 | `media` | Reproducción, audio, vídeo y línea de tiempo (Vinilo, Toma, Pulso) |
 | `mail` | Correo (Buzón) |
@@ -21,7 +21,7 @@
 | `simulation`, `results` | Simulación y resultados (Vortia) |
 | `document` | PDF y maquetación (Papel, Pliego) |
 
-Los 55 primeros se han usado en Vortia 0.5.0. Los demás están dibujados con las mismas normas y revisados en hoja, pero **ninguna app los ha usado todavía**. Un icono que falte se añade aquí, no en la app.
+Los 55 primeros se han usado en Vortia 0.5.0, y los de dibujo vectorial (herramientas, Buscatrazos, degradados, extremos y uniones de trazo, alinear y distribuir) en Pluma. Los demás están dibujados con las mismas normas y revisados en hoja, pero **ninguna app los ha usado todavía**. Un icono que falte se añade aquí, no en la app.
 
 | Salida | Para qué |
 | --- | --- |
