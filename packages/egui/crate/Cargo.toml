@@ -12,6 +12,8 @@ publish = false
 default = []
 # Builds `egui::Style` and `egui::Visuals` from the tokens. Without it the crate has no dependencies.
 egui = ["dep:egui"]
+# The engineering suite's shared parts (`engineering`), with IBM Plex Sans and Mono embedded (~670 KB).
+engineering = ["egui"]
 
 [dependencies]
 egui = { version = "0.37", default-features = false, optional = true }
