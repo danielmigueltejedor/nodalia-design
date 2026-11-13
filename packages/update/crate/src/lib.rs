@@ -26,7 +26,7 @@ pub mod egui;
 use std::cmp::Ordering;
 use std::path::PathBuf;
 
-pub use apply::{apply, take_last_failure, Failure};
+pub use apply::{apply, take_last_failure, Failure, RELAUNCH_FROM};
 pub use download::download;
 pub use macos::{parse_codesign_display, same_publisher, CodeIdentity};
 pub use notes::{

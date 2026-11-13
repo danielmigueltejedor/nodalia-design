@@ -2907,4 +2907,203 @@ export const ICONS = {
     '<rect x="4" y="4" width="10" height="10" rx="1"/>',
     '<rect x="10" y="10" width="10" height="10" rx="1"/>',
   ] },
+  // --- sheet: spreadsheets (Celdas) ---
+  "border-all": { group: "sheet", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1"/>',
+    '<path d="M12 4v16M4 12h16"/>',
+  ] },
+  "border-none": { group: "sheet", body: [
+    '<path d="M4 4h16v16H4zM12 4v16M4 12h16" stroke-dasharray="1.5 2.5"/>',
+  ] },
+  "border-outside": { group: "sheet", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1"/>',
+    '<path d="M12 6.5v11M6.5 12h11" stroke-dasharray="1.5 2.5"/>',
+  ] },
+  "border-thick": { group: "sheet", body: [
+    '<path d="M4 16V4h16v12M12 4v12M4 12h16" stroke-dasharray="1.5 2.5"/>',
+    '<rect x="3.5" y="17.5" width="17" height="3" rx="1" fill="currentColor" stroke="none"/>',
+  ] },
+  "align-top": { group: "sheet", body: [
+    '<path d="M4 4h16"/>',
+    '<path d="M12 20V8.5M8.5 12 12 8.5l3.5 3.5"/>',
+  ] },
+  "align-middle": { group: "sheet", body: [
+    '<path d="M4 12h16"/>',
+    '<path d="M12 3.5V8.5M9.5 6 12 8.5 14.5 6M12 20.5v-5M9.5 18l2.5-2.5 2.5 2.5"/>',
+  ] },
+  "align-bottom": { group: "sheet", body: [
+    '<path d="M4 20h16"/>',
+    '<path d="M12 4v11.5M8.5 12 12 15.5l3.5-3.5"/>',
+  ] },
+  "text-angle": { group: "sheet", body: [
+    '<path d="M3.5 12.5 7 4l3.5 8.5M4.9 9.25h4.2"/>',
+    '<path d="M7 20.5 19.5 8M14 8h5.5v5.5"/>',
+  ] },
+  "currency": { group: "sheet", body: [
+    '<rect x="3" y="6.5" width="18" height="11" rx="1.5"/>',
+    '<circle cx="12" cy="12" r="2.5"/>',
+    '<path d="M6.25 9.5v5M17.75 9.5v5"/>',
+  ] },
+  "comma-style": { group: "sheet", body: [
+    '<path d="M3.5 8.5 6 6v10"/>',
+    '<path d="M9.5 14.5V16l-1 2"/>',
+    '<rect x="11.5" y="9" width="3.5" height="7" rx="1.75"/>',
+    '<rect x="16.5" y="9" width="3.5" height="7" rx="1.75"/>',
+  ] },
+  "decimal-increase": { group: "sheet", body: [
+    '<circle cx="5" cy="10.5" r="1.1" fill="currentColor" stroke="none"/>',
+    '<rect x="8" y="4" width="4" height="7.5" rx="2"/>',
+    '<rect x="14.5" y="4" width="4" height="7.5" rx="2"/>',
+    '<path d="M20 17.5H8M10.5 15 8 17.5l2.5 2.5"/>',
+  ] },
+  "decimal-decrease": { group: "sheet", body: [
+    '<circle cx="5" cy="10.5" r="1.1" fill="currentColor" stroke="none"/>',
+    '<rect x="8" y="4" width="4" height="7.5" rx="2"/>',
+    '<path d="M4 17.5h12M13.5 15l2.5 2.5-2.5 2.5"/>',
+  ] },
+  "conditional-format": { group: "sheet", body: [
+    '<rect x="3.5" y="4" width="17" height="16" rx="1.5"/>',
+    '<path d="M3.5 9.25h17M3.5 14.75h17M9 4v16"/>',
+    '<rect x="11" y="5.5" width="7.5" height="2.25" rx="0.5" fill="currentColor" stroke="none"/>',
+    '<rect x="11" y="10.9" width="4" height="2.25" rx="0.5" fill="currentColor" stroke="none"/>',
+    '<rect x="11" y="16.25" width="5.75" height="2.25" rx="0.5" fill="currentColor" stroke="none"/>',
+  ] },
+  "format-as-table": { group: "sheet", body: [
+    '<path d="M3.5 9V5.5A1.5 1.5 0 0 1 5 4h14a1.5 1.5 0 0 1 1.5 1.5V9z" fill="currentColor" fill-opacity="0.35" stroke="none"/>',
+    '<rect x="3.5" y="4" width="17" height="16" rx="1.5"/>',
+    '<path d="M3.5 9h17M3.5 14.5h17M9.5 9v11M15 9v11"/>',
+  ] },
+  "cell-format": { group: "sheet", body: [
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/>',
+    '<path d="M3.5 9h17M9 3.5V20.5"/>',
+    '<path d="M11.5 15h7M13.5 13l-2 2 2 2M16.5 13l2 2-2 2"/>',
+  ] },
+  "fill-down": { group: "sheet", body: [
+    '<rect x="5" y="3.5" width="14" height="5" rx="1"/>',
+    '<path d="M12 11v9M8.5 16.5 12 20l3.5-3.5"/>',
+  ] },
+  "sort-filter": { group: "sheet", body: [
+    '<path d="M6.5 4.5v14M3.5 15.5l3 3 3-3"/>',
+    '<path d="M12 5h8.5l-3.25 4.5V15l-2 1.25V9.5z"/>',
+  ] },
+  "function": { group: "sheet", body: [
+    '<path d="M11.5 4h-1.25A2.25 2.25 0 0 0 8 6.25v11.5A2.25 2.25 0 0 1 5.75 20H5"/>',
+    '<path d="M5 10h6"/>',
+    '<path d="M13 10.5l6 7M19 10.5l-6 7"/>',
+  ] },
+  "pivot-table": { group: "sheet", body: [
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/>',
+    '<path d="M3.5 8h17M8 3.5v17"/>',
+    '<path d="M11.5 11.5v2.5a3.5 3.5 0 0 0 3.5 3.5h2.5"/>',
+    '<path d="M10 13l1.5-1.5L13 13M16 16l1.5 1.5L16 19"/>',
+  ] },
+  "chart-bar": { group: "sheet", body: [
+    '<path d="M4 3.5v17"/>',
+    '<rect x="4" y="5.5" width="10" height="3.5" rx="0.5"/>',
+    '<rect x="4" y="10.25" width="15" height="3.5" rx="0.5"/>',
+    '<rect x="4" y="15" width="7.5" height="3.5" rx="0.5"/>',
+  ] },
+  "chart-scatter": { group: "sheet", body: [
+    '<path d="M4 4v16h16"/>',
+    '<circle cx="8.5" cy="15" r="1.25" fill="currentColor" stroke="none"/>',
+    '<circle cx="11.5" cy="11" r="1.25" fill="currentColor" stroke="none"/>',
+    '<circle cx="14.5" cy="13.5" r="1.25" fill="currentColor" stroke="none"/>',
+    '<circle cx="17" cy="7.5" r="1.25" fill="currentColor" stroke="none"/>',
+  ] },
+  "note": { group: "sheet", body: [
+    '<path d="M4.5 4.5h15v10l-5 5h-10z"/>',
+    '<path d="M14.5 19.5v-5h5"/>',
+    '<path d="M8 9h8M8 12.5h4"/>',
+  ] },
+  "sparkline": { group: "sheet", body: [
+    '<rect x="3.5" y="6" width="17" height="12" rx="1.5"/>',
+    '<path d="M6.5 14.5l3-4 3 2.5 2.5-4 2.5 2.5"/>',
+  ] },
+  "form-button": { group: "sheet", body: [
+    '<rect x="3.5" y="7" width="17" height="10" rx="2.5"/>',
+    '<path d="M8 12h8"/>',
+  ] },
+  "spin-button": { group: "sheet", body: [
+    '<rect x="6.5" y="3.5" width="11" height="17" rx="2"/>',
+    '<path d="M6.5 12h11"/>',
+    '<path d="M9.5 9 12 6.5 14.5 9M9.5 15l2.5 2.5 2.5-2.5"/>',
+  ] },
+  "trace-precedents": { group: "sheet", body: [
+    '<rect x="3.5" y="4" width="6.5" height="5" rx="1"/>',
+    '<rect x="14" y="15" width="6.5" height="5" rx="1"/>',
+    '<circle cx="6.75" cy="6.5" r="1.1" fill="currentColor" stroke="none"/>',
+    '<path d="M6.75 9v4.5a4 4 0 0 0 4 4H14M11.5 15 14 17.5 11.5 20"/>',
+  ] },
+  "sort-ascending": { group: "sheet", body: [
+    '<path d="M3.5 11 6 4l2.5 7M4.4 8.75h3.2"/>',
+    '<path d="M3.75 13.5h4.5l-4.5 6.5h4.5"/>',
+    '<path d="M16 4v16M12.5 16.5 16 20l3.5-3.5"/>',
+  ] },
+  "sort-descending": { group: "sheet", body: [
+    '<path d="M3.75 4h4.5l-4.5 6.5h4.5"/>',
+    '<path d="M3.5 20 6 13l2.5 7M4.4 17.75h3.2"/>',
+    '<path d="M16 4v16M12.5 16.5 16 20l3.5-3.5"/>',
+  ] },
+  "remove-duplicates": { group: "sheet", body: [
+    '<rect x="3.5" y="4" width="11" height="16" rx="1.5"/>',
+    '<path d="M3.5 9.25h11M3.5 14.75h11M9 4v16"/>',
+    '<path d="M16.5 9.5l4 4M20.5 9.5l-4 4"/>',
+  ] },
+  "text-to-columns": { group: "sheet", body: [
+    '<path d="M4 5h16"/>',
+    '<path d="M9 8l-1.5 2.5M15 8l1.5 2.5"/>',
+    '<rect x="3.5" y="13" width="7.5" height="7" rx="1"/>',
+    '<rect x="13" y="13" width="7.5" height="7" rx="1"/>',
+  ] },
+  "data-validation": { group: "sheet", body: [
+    '<rect x="3.5" y="4" width="17" height="7" rx="1.5"/>',
+    '<path d="M4.5 16.5l2.25 2.25 4-4.5"/>',
+    '<path d="M15 14.5l4.5 4.5M19.5 14.5 15 19"/>',
+  ] },
+  "subtotal": { group: "sheet", body: [
+    '<path d="M4 5.5h8M4 10h8M4 14.5h8"/>',
+    '<path d="M4 19h16"/>',
+    '<path d="M20 6.5V5h-5l3 4-3 4h5v-1.5"/>',
+  ] },
+  "freeze-panes": { group: "sheet", body: [
+    '<path d="M5 3.5h14A1.5 1.5 0 0 1 20.5 5v4h-17V5A1.5 1.5 0 0 1 5 3.5z" fill="currentColor" fill-opacity="0.35" stroke="none"/>',
+    '<path d="M3.5 9H9v11.5H5A1.5 1.5 0 0 1 3.5 19z" fill="currentColor" fill-opacity="0.35" stroke="none"/>',
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/>',
+    '<path d="M3.5 9h17M9 3.5v17"/>',
+  ] },
+  "print-area": { group: "sheet", body: [
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/>',
+    '<rect x="7" y="7" width="10" height="10" rx="0.5" stroke-dasharray="1.5 2"/>',
+  ] },
+  "spreadsheet": { group: "sheet", body: [
+    '<path d="M14 3.5H6.5A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V8.5z"/>',
+    '<path d="M14 3.5v5h5"/>',
+    '<path d="M8 12h8M8 15.5h8M12 12v5.5"/>',
+  ] },
+  "coins": { group: "sheet", body: [
+    '<circle cx="9.5" cy="9.5" r="5.5"/>',
+    '<path d="M15 9.5a5.5 5.5 0 1 1-5.5 5.5"/>',
+  ] },
+  "math-trig": { group: "sheet", body: [
+    '<rect x="7" y="3.5" width="10" height="17" rx="5"/>',
+    '<path d="M7 12h10"/>',
+  ] },
+  "macro": { group: "sheet", body: [
+    '<path d="M14 3.5H6.5A1.5 1.5 0 0 0 5 5v14a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V8.5z"/>',
+    '<path d="M14 3.5v5h5"/>',
+    '<path d="M10 11v6.5l5-3.25z"/>',
+  ] },
+  "relative-reference": { group: "sheet", body: [
+    '<rect x="3.5" y="3.5" width="7" height="7" rx="1"/>',
+    '<rect x="13.5" y="13.5" width="7" height="7" rx="1" stroke-dasharray="1.5 2"/>',
+    '<path d="M10.5 10.5l4 4M14.5 10.5v4h-4"/>',
+  ] },
+  "step-into": { group: "sheet", body: [
+    '<path d="M4.5 5h6a4 4 0 0 1 4 4v6M11 11.5l3.5 3.5 3.5-3.5"/>',
+    '<circle cx="14.5" cy="19.25" r="1.25" fill="currentColor" stroke="none"/>',
+  ] },
+  "run-to-cursor": { group: "sheet", body: [
+    '<path d="M4 12h12M12.5 8.5 16 12l-3.5 3.5"/>',
+    '<path d="M19.5 5v14"/>',
+  ] },
 };
