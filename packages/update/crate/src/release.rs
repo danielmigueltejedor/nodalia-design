@@ -49,7 +49,19 @@ pub fn preferred_assets() -> &'static [&'static str] {
     {
         &[]
     }
-    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    {
+        &["windows-x64.msi", "windows-amd64.msi", "windows-x86_64.msi"]
+    }
+    #[cfg(all(windows, target_arch = "aarch64"))]
+    {
+        &["windows-arm64.msi", "windows-aarch64.msi"]
+    }
+    #[cfg(all(windows, not(any(target_arch = "x86_64", target_arch = "aarch64"))))]
+    {
+        &[]
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux", windows)))]
     {
         &[]
     }
@@ -94,10 +106,33 @@ pub fn platform_markers() -> &'static [&'static str] {
     {
         &[".appimage", ".deb", ".rpm", ".flatpak", ".pkg.tar.zst"]
     }
-    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    #[cfg(windows)]
+    {
+        &[".msi", "-portable.zip", ".exe"]
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux", windows)))]
     {
         &[]
     }
+}
+
+/// Whether the body of `releases` lists no published release at all (a repository that has not
+/// released yet). Drafts and pre-releases do not count.
+pub(crate) fn is_empty_list(json: &[u8]) -> bool {
+    serde_json::from_slice::<Value>(json)
+        .ok()
+        .and_then(|list| {
+            list.as_array().map(|releases| {
+                !releases.iter().any(|r| {
+                    !r.get("draft").and_then(Value::as_bool).unwrap_or(false)
+                        && !r
+                            .get("prerelease")
+                            .and_then(Value::as_bool)
+                            .unwrap_or(false)
+                })
+            })
+        })
+        .unwrap_or(false)
 }
 
 /// Reads the body of `releases` (newest first) and returns the newest published release that
@@ -362,6 +397,38 @@ mod tests {
         if cfg!(any(target_os = "macos", target_os = "linux")) {
             assert_eq!(release.version, "0.1.1");
         }
+    }
+
+    #[test]
+    fn a_repository_without_releases_is_an_empty_list() {
+        assert!(is_empty_list(b"[]"));
+        assert!(is_empty_list(br#"[{"tag_name":"v1.0.0","draft":true}]"#));
+        assert!(!is_empty_list(br#"[{"tag_name":"v1.0.0"}]"#));
+        assert!(
+            !is_empty_list(b"{\"message\":\"Not Found\"}"),
+            "an error is not an empty list"
+        );
+    }
+
+    #[test]
+    fn windows_picks_the_msi_not_the_portable_zip_or_symbols() {
+        let json = br#"{"tag_name":"v0.3.2","body":"","html_url":"https://e/r","assets":[
+            {"name":"lienzo-0.3.2-windows-x64-portable.zip","browser_download_url":"https://e/z","size":1},
+            {"name":"lienzo-0.3.2-windows-x64-symbols.zip","browser_download_url":"https://e/s","size":1},
+            {"name":"lienzo-0.3.2-windows-arm64.msi","browser_download_url":"https://e/a","size":1},
+            {"name":"lienzo-0.3.2-windows-x64.msi","browser_download_url":"https://e/m","size":1}]}"#;
+        let release = parse(json, &["windows-x64.msi"]).unwrap();
+        assert_eq!(release.asset.unwrap().name, "lienzo-0.3.2-windows-x64.msi");
+        let arm = parse(json, &["windows-arm64.msi"]).unwrap();
+        assert_eq!(arm.asset.unwrap().name, "lienzo-0.3.2-windows-arm64.msi");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_has_packages_and_markers() {
+        assert!(!preferred_assets().is_empty());
+        assert!(preferred_assets().iter().all(|n| n.ends_with(".msi")));
+        assert!(platform_markers().contains(&".msi"));
     }
 
     #[test]

@@ -10,7 +10,10 @@ use std::time::{Duration, Instant};
 use crate::{App, Error, InstallKind};
 
 /// Why the last update was not installed, read at the next start. Words are the app's.
+///
+/// More reasons may come: match with a `_` arm that says the update was not installed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Failure {
     /// The app did not close in time: nothing was changed.
     StillRunning,
@@ -23,6 +26,10 @@ pub enum Failure {
     /// macOS did not allow replacing the app (System Settings → Privacy & Security → App
     /// Management).
     Replace,
+    /// The installer (Windows: `msiexec`) failed; the installed version stays.
+    Install,
+    /// The person declined the installer or its administrator prompt; nothing was changed.
+    Cancelled,
     Other,
 }
 
@@ -45,7 +52,12 @@ pub fn apply(
     match kind {
         InstallKind::AppImage(current) => apply_appimage(app, &current, package),
         InstallKind::MacBundle(bundle) => apply_macos(app, &bundle, package),
-        InstallKind::Managed => Err(Error::NotUpdatable),
+        InstallKind::WindowsMsi { dir, per_machine } => {
+            apply_windows(app, &dir, per_machine, package)
+        }
+        InstallKind::Portable(_) | InstallKind::NotWritable(_) | InstallKind::Managed => {
+            Err(Error::NotUpdatable)
+        }
     }
 }
 
@@ -174,7 +186,12 @@ fn start_macos_helper(app: &App, bundle: &Path, package: &Path) -> Result<(), Er
 /// Mounts the disk image read-only and checks that the app inside is validly signed by the same
 /// publisher as the installed one.
 #[cfg(target_os = "macos")]
-fn verify_macos_package(app: &App, bundle: &Path, dmg: &Path, mount: &Path) -> Result<(), Error> {
+pub(crate) fn verify_macos_package(
+    app: &App,
+    bundle: &Path,
+    dmg: &Path,
+    mount: &Path,
+) -> Result<(), Error> {
     use std::process::Command;
     let sig = |why: String| Error::Signature(why);
     let _ = fs::create_dir_all(mount);
@@ -222,6 +239,16 @@ fn verify_macos_package(app: &App, bundle: &Path, dmg: &Path, mount: &Path) -> R
     Ok(())
 }
 
+#[cfg(windows)]
+fn apply_windows(app: &App, dir: &Path, per_machine: bool, package: &Path) -> Result<(), Error> {
+    crate::windows::start_helper(app, dir, per_machine, package)
+}
+
+#[cfg(not(windows))]
+fn apply_windows(_: &App, _: &Path, _: bool, _: &Path) -> Result<(), Error> {
+    Err(Error::NotUpdatable)
+}
+
 #[cfg(not(target_os = "macos"))]
 fn apply_macos(_: &App, _: &Path, _: &Path) -> Result<(), Error> {
     Err(Error::NotUpdatable)
@@ -230,9 +257,12 @@ fn apply_macos(_: &App, _: &Path, _: &Path) -> Result<(), Error> {
 /// Reads and clears what the macOS helper left behind. `None` after a good update, or when there
 /// was no update; the helper's log is [`update_dir`](crate::update_dir)`/update.log`.
 pub fn take_last_failure(app: &App) -> Option<Failure> {
-    let file = crate::update_dir(app).join("last-update-result.txt");
-    let code = fs::read_to_string(&file).ok()?;
-    let _ = fs::remove_file(&file);
+    take_last_failure_in(&crate::update_dir(app).join("last-update-result.txt"))
+}
+
+pub(crate) fn take_last_failure_in(file: &Path) -> Option<Failure> {
+    let code = fs::read_to_string(file).ok()?;
+    let _ = fs::remove_file(file);
     failure_from_code(code.trim())
 }
 
@@ -244,6 +274,8 @@ fn failure_from_code(code: &str) -> Option<Failure> {
         "contents" => Some(Failure::Contents),
         "copy" => Some(Failure::Copy),
         "replace" => Some(Failure::Replace),
+        "install" => Some(Failure::Install),
+        "cancelled" => Some(Failure::Cancelled),
         _ => Some(Failure::Other),
     }
 }
@@ -269,6 +301,8 @@ mod tests {
             failure_from_code("still-running"),
             Some(Failure::StillRunning)
         );
+        assert_eq!(failure_from_code("install"), Some(Failure::Install));
+        assert_eq!(failure_from_code("cancelled"), Some(Failure::Cancelled));
         assert_eq!(failure_from_code("???"), Some(Failure::Other));
     }
 

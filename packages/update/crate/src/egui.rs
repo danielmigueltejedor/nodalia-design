@@ -7,8 +7,8 @@
 //!
 //! Nothing is installed without a click, and never while `safe_to_close` is false (unsaved work,
 //! a dialog, a job running): the downloaded package then waits until it is. Installs that a
-//! package manager owns (Flatpak, `.deb`, `.rpm`, the AUR, Windows installers, a dev build) are
-//! pointed at the release page instead. An automatic check stays silent unless there is
+//! package manager owns (Flatpak, `.deb`, `.rpm`, the AUR, a dev build), portable copies and
+//! copies in a folder this user cannot write are pointed at the release page instead. An automatic check stays silent unless there is
 //! something to install.
 
 use std::path::PathBuf;
@@ -177,9 +177,8 @@ impl Updater {
             self.status = Status::LastFailed(failure);
             return;
         }
-        let replaceable =
-            self.source.is_some() || crate::install_kind(&self.app).can_apply_in_place();
-        if !replaceable || !due(self.last_check(), now()) {
+        let checks = self.source.is_some() || crate::install_kind(&self.app).checks_at_start();
+        if !checks || !due(self.last_check(), now()) {
             return;
         }
         self.spawn_check(ctx, false, self.startup_delay);
@@ -323,7 +322,8 @@ impl Updater {
             return polled;
         }
         let words = Words::new(language);
-        let in_place = crate::install_kind(&self.app).can_apply_in_place();
+        let kind = crate::install_kind(&self.app);
+        let in_place = kind.can_apply_in_place();
         let mut next: Option<Status> = None;
         let mut action = Action::None;
         let mut install: Option<(Release, PathBuf)> = None;
@@ -377,7 +377,7 @@ impl Updater {
                             });
                         if !in_place {
                             ui.add_space(8.0);
-                            ui.label(egui::RichText::new(words.managed).weak());
+                            ui.label(egui::RichText::new(words.elsewhere(&kind)).weak());
                         }
                     }
                     Status::Downloading {
@@ -514,6 +514,8 @@ struct Words {
     install_failed_title: &'static str,
     no_notes: &'static str,
     managed: &'static str,
+    portable: &'static str,
+    not_writable: &'static str,
     ready_body: &'static str,
     wait_body: &'static str,
     installing_body: &'static str,
@@ -537,6 +539,8 @@ impl Words {
                 install_failed_title: "No se pudo instalar la actualización",
                 no_notes: "Hay una versión nueva disponible.",
                 managed: "Esta instalación la actualiza el gestor de paquetes del sistema. Descarga la versión nueva desde la página de la versión o actualiza con tu gestor.",
+                portable: "Esta copia es portable. Descarga la versión nueva desde la página de la versión y sustituye la carpeta.",
+                not_writable: "La app no puede sustituirse donde está (una carpeta sin permiso de escritura, la imagen de disco o una copia que macOS abre desde otra ubicación). Descarga la versión nueva desde la página de la versión; en macOS, arrastra la app a Aplicaciones.",
                 ready_body: "La versión nueva está descargada y verificada. La app se cerrará y se abrirá de nuevo.",
                 wait_body: "La versión nueva está descargada y verificada. Guarda tu trabajo, cierra los diálogos y espera a que terminen las tareas en curso para reiniciar.",
                 installing_body: "Instalando y reiniciando…",
@@ -556,6 +560,8 @@ impl Words {
                 install_failed_title: "Could Not Install the Update",
                 no_notes: "A new version is available.",
                 managed: "Your system's package manager updates this installation. Download the new version from its release page, or update with your package manager.",
+                portable: "This is a portable copy. Download the new version from its release page and replace the folder.",
+                not_writable: "The app cannot replace itself where it is (a folder you cannot write to, the disk image, or a copy macOS opens from elsewhere). Download the new version from its release page; on macOS, drag the app to Applications.",
                 ready_body: "The new version is downloaded and verified. The app will close and open again.",
                 wait_body: "The new version is downloaded and verified. Save your work, close any dialogs and let running jobs finish to restart.",
                 installing_body: "Installing and restarting…",
@@ -609,6 +615,14 @@ impl Words {
         }
     }
 
+    fn elsewhere(&self, kind: &crate::InstallKind) -> &'static str {
+        match kind {
+            crate::InstallKind::Portable(_) => self.portable,
+            crate::InstallKind::NotWritable(_) => self.not_writable,
+            _ => self.managed,
+        }
+    }
+
     fn last_failed(&self, failure: Failure) -> &'static str {
         match (self.spanish, failure) {
             (true, Failure::StillRunning) => "La app no se cerró a tiempo; no se ha cambiado nada.",
@@ -616,13 +630,17 @@ impl Words {
             (true, Failure::Contents) => "La imagen de disco no contiene esta app.",
             (true, Failure::Copy) => "No se pudo copiar la versión nueva junto a la instalada.",
             (true, Failure::Replace) => "macOS no permitió sustituir la app. Permítelo en Ajustes del Sistema → Privacidad y seguridad → Gestión de apps.",
-            (true, Failure::Other) => "La última actualización no se instaló.",
+            (true, Failure::Install) => "El instalador no pudo instalar la versión nueva; sigue la versión anterior.",
+            (true, Failure::Cancelled) => "Se canceló la instalación; no se ha cambiado nada.",
+            (true, _) => "La última actualización no se instaló.",
             (false, Failure::StillRunning) => "The app did not close in time; nothing was changed.",
             (false, Failure::Mount) => "The update's disk image could not be opened.",
             (false, Failure::Contents) => "The disk image does not contain this app.",
             (false, Failure::Copy) => "The new version could not be copied next to the installed one.",
             (false, Failure::Replace) => "macOS did not allow replacing the app. Allow it in System Settings → Privacy & Security → App Management.",
-            (false, Failure::Other) => "The last update was not installed.",
+            (false, Failure::Install) => "The installer could not install the new version; the previous one stays.",
+            (false, Failure::Cancelled) => "The installation was cancelled; nothing was changed.",
+            (false, _) => "The last update was not installed.",
         }
     }
 }

@@ -12,7 +12,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 - `nodalia-gtk`: crate de Rust para GTK 4.20 sin libadwaita. Instala las hojas, sigue las preferencias de claro, oscuro y contraste, y aporta navegación, barras, panel lateral, hoja inferior, diálogos, puntos de ruptura, filas de preferencias, páginas de estado y avisos con la API de libadwaita.
 - `@nodalia/gtk`: `tools/check-gtk.py` carga todas las hojas en un GTK 4 real, estiliza widgets con ellas y falla con cualquier error; corre en CI.
 
+- `nodalia-update` (Windows): las instalaciones hechas con el MSI se actualizan desde la app. Descarga el MSI de la versión, comprueba su SHA-256, espera a que la app se cierre, lo instala con `msiexec` en la misma carpeta y para el mismo usuario o equipo, y vuelve a abrir la app. Una copia portable (con `portable.txt`) recibe el aviso y la página de la versión.
+- `nodalia-update`: CI ejecuta el crate en Linux, macOS y Windows, con la instalación de cada sistema de principio a fin (imagen de disco firmada ad hoc y ayudante real en macOS, ayudante del MSI en Windows, AppImage en Linux).
+
 ### Cambiado
+- `nodalia-update`: una app que no puede sustituirse donde está (carpeta sin permiso de escritura, la propia imagen de disco o una copia trasladada por macOS) ya no intenta instalar y falla: lo explica y abre la página de la versión. `InstallKind` gana `WindowsMsi`, `Portable` y `NotWritable`; `Failure` gana `Install` y `Cancelled` y pasa a ser `#[non_exhaustive]`.
+- `nodalia-update`: un repositorio sin versiones publicadas responde «no hay actualizaciones» en vez de «The latest release has no version tag».
 - `nodalia-gtk`: en macOS los semáforos del sistema quedan separados del borde de la isla tanto como del borde superior, con el mismo aire antes del título.
 - NDL en GTK ya no se apoya en libadwaita (principio 9 y regla 4 de `AGENTS.md`). Las hojas siguen emitiendo sus colores con nombre.
 
