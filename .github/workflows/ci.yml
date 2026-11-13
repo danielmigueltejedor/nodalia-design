@@ -36,9 +36,9 @@ jobs:
         working-directory: packages/egui/crate
         run: |
           cargo fmt --check
-          cargo clippy --all-targets --features engineering -- -D warnings
+          cargo clippy --all-targets --features engineering,creator -- -D warnings
           cargo test
-          cargo test --features engineering
+          cargo test --features engineering,creator
       - name: Install Chromium for browser tests
         run: npx playwright-core install --with-deps chromium
       - name: Browser tests (mode cascade, accessibility with axe, keyboard behaviour, demos)
