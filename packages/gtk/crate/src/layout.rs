@@ -313,6 +313,12 @@ mod sheet_imp {
     const DRAG_START: f64 = 8.0;
     /// The share of the sheet's height a drag has to cover to open or close it.
     const SETTLE_AFTER: f64 = 1.0 / 3.0;
+    /// A release faster than this, in sheet heights per second, is a flick: it opens or closes
+    /// the way it was going, however short the drag.
+    const FLICK: f64 = 1.1;
+    /// The shortest and longest a release may take to settle, in ms.
+    const SETTLE_MIN_MS: f64 = 120.0;
+    const SETTLE_MAX_MS: f64 = 320.0;
 
     #[derive(glib::Properties)]
     #[properties(wrapper_type = super::BottomSheet)]
@@ -346,6 +352,11 @@ mod sheet_imp {
         pub drag_from: Cell<Option<f64>>,
         /// Set once the press became a drag, so its release is not also taken as a click.
         pub dragged: Cell<bool>,
+        /// How far the pointer had already moved when the press became a drag, so the sheet
+        /// starts from where it is instead of jumping by the threshold.
+        pub drag_slack: Cell<f64>,
+        /// The last two (time in ms, progress) of a drag, for the speed it is released at.
+        pub drag_samples: Cell<[(u32, f64); 2]>,
     }
 
     impl Default for BottomSheet {
@@ -375,6 +386,8 @@ mod sheet_imp {
                 reported: Cell::new(-1),
                 drag_from: Cell::new(None),
                 dragged: Cell::new(false),
+                drag_slack: Cell::new(0.0),
+                drag_samples: Cell::new([(0, 0.0); 2]),
             }
         }
     }
@@ -397,6 +410,22 @@ mod sheet_imp {
 
         /// Moves to `open` from wherever the sheet is now, which after a drag is in between.
         fn settle(&self, open: bool) {
+            self.settle_with(open, None);
+        }
+
+        /// As `settle`, carrying on at `velocity` (sheet heights per second) when a drag let go
+        /// of it moving, so the hand-off from the pointer to the animation has no seam: the
+        /// ease-out starts at three times its average speed, so a duration of three times the
+        /// remaining distance over the release speed starts it at exactly that speed.
+        fn settle_with(&self, open: bool, velocity: Option<f64>) {
+            let target = if open { 1.0 } else { 0.0 };
+            let remaining = (target - self.progress.get()).abs();
+            let towards = velocity.filter(|v| (*v > 0.0) == open && v.abs() > 0.05);
+            let ms = match towards {
+                Some(v) => 3.0 * remaining / v.abs() * 1000.0,
+                None => f64::from(SLIDE_MS) * remaining.sqrt(),
+            };
+            let ms = ms.clamp(SETTLE_MIN_MS, SETTLE_MAX_MS) as u32;
             self.open.set(open);
             let obj = self.obj();
             if open {
@@ -404,7 +433,7 @@ mod sheet_imp {
             } else {
                 obj.remove_css_class("open");
             }
-            self.run(&self.anim, &self.progress, if open { 1.0 } else { 0.0 });
+            self.run(&self.anim, &self.progress, target, ms);
             if open {
                 self.sheet_box.grab_focus();
             }
@@ -449,16 +478,33 @@ mod sheet_imp {
                     }
                     imp.sheet_box.set_child_visible(true);
                     imp.drag_from.set(Some(imp.progress.get()));
+                    imp.drag_slack.set(dy);
+                    let now = gesture.current_event_time();
+                    imp.drag_samples.set([(now, imp.progress.get()); 2]);
                     imp.dragged.set(true);
                 }
                 let from = imp.drag_from.get().unwrap_or_default();
                 // What shows of the sheet, so it moves with the pointer one to one.
                 let height = f64::from(imp.sheet_box.height().min(this.height()).max(1));
-                imp.progress.set((from - dy / height).clamp(0.0, 1.0));
+                let progress = (from - (dy - imp.drag_slack.get()) / height).clamp(0.0, 1.0);
+                if progress == imp.progress.get() {
+                    return;
+                }
+                imp.progress.set(progress);
+                // The speed is measured over at least 40 ms: two motion events a few ms apart
+                // say more about the mouse's sampling than about the hand.
+                let [older, last] = imp.drag_samples.get();
+                let now = gesture.current_event_time();
+                let base = if now.wrapping_sub(older.0) > 40 {
+                    last
+                } else {
+                    older
+                };
+                imp.drag_samples.set([base, (now, progress)]);
                 this.queue_allocate();
             });
             let weak = self.obj().downgrade();
-            drag.connect_drag_end(move |_, _, _| {
+            drag.connect_drag_end(move |gesture, _, _| {
                 let Some(this) = weak.upgrade() else { return };
                 let imp = this.imp();
                 let Some(from) = imp.drag_from.take() else {
@@ -466,12 +512,15 @@ mod sheet_imp {
                 };
                 let travelled = (imp.progress.get() - from).abs();
                 let was_open = imp.open.get();
-                let open = if travelled >= SETTLE_AFTER {
-                    !was_open
-                } else {
-                    was_open
+                let velocity =
+                    release_velocity(imp.drag_samples.get(), gesture.current_event_time());
+                let open = match velocity {
+                    Some(v) if v.abs() >= FLICK => v > 0.0,
+                    _ if travelled >= SETTLE_AFTER => !was_open,
+                    _ => was_open,
                 };
-                imp.settle(open);
+                imp.open.set(open);
+                imp.settle_with(open, velocity);
                 // A property setter notifies by itself; this path does not go through one.
                 if open != was_open {
                     this.notify_open();
@@ -488,6 +537,7 @@ mod sheet_imp {
                 &self.bar_anim,
                 &self.bar_progress,
                 if reveal { 1.0 } else { 0.0 },
+                SLIDE_MS,
             );
         }
 
@@ -496,11 +546,12 @@ mod sheet_imp {
             self.handle.set_visible(show);
         }
 
-        fn run(&self, slot: &RefCell<Option<TimedAnimation>>, value: &Cell<f64>, to: f64) {
+        fn run(&self, slot: &RefCell<Option<TimedAnimation>>, value: &Cell<f64>, to: f64, ms: u32) {
             let obj = self.obj();
             if let Some(anim) = slot.borrow().as_ref() {
                 anim.set_value_from(value.get());
                 anim.set_value_to(to);
+                anim.set_duration(ms);
                 anim.play();
                 return;
             }
@@ -510,7 +561,7 @@ mod sheet_imp {
                 &*obj,
                 value.get(),
                 to,
-                SLIDE_MS,
+                ms,
                 CallbackAnimationTarget::new(move |v| {
                     if let Some(this) = weak.upgrade() {
                         let imp = this.imp();
@@ -527,6 +578,21 @@ mod sheet_imp {
             anim.play();
             slot.replace(Some(anim));
         }
+    }
+
+    /// The speed of the last stretch of a drag, in sheet heights per second (positive is
+    /// opening), or `None` if the pointer had stopped before it let go.
+    fn release_velocity(samples: [(u32, f64); 2], released: u32) -> Option<f64> {
+        let [(t0, p0), (t1, p1)] = samples;
+        // Held still before letting go: no flick, whatever the last motion was.
+        if released.wrapping_sub(t1) > 80 {
+            return None;
+        }
+        let dt = t1.wrapping_sub(t0);
+        if dt == 0 || dt > 200 {
+            return None;
+        }
+        Some((p1 - p0) / (f64::from(dt) / 1000.0))
     }
 
     #[glib::object_subclass]
