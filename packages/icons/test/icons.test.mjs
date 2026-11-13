@@ -129,3 +129,14 @@ test('accents name elements that exist, and the CAD set is complete', () => {
   assert.ok(cad.length >= 93, `${cad.length} CAD icons`);
   for (const shared of ['line', 'circle', 'rectangle', 'fillet', 'chamfer', 'dimension']) assert.ok(ICONS[shared].accent, shared);
 });
+
+// A name given twice in icons.mjs silently keeps only the later drawing.
+test('no icon name is defined twice', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const source = await readFile(new URL('../src/icons.mjs', import.meta.url), 'utf8');
+  const seen = new Set();
+  for (const [, name] of source.matchAll(/^ {2}"([a-z-]+)": \{/gm)) {
+    assert.ok(!seen.has(name), `${name} is defined twice`);
+    seen.add(name);
+  }
+});

@@ -821,6 +821,458 @@ export const ICONS = {
     '<rect x="3.5" y="5.5" width="17" height="13" rx="1"/>',
     '<path d="M8 9.5h8M12 9.5v6"/>',
   ] },
+  "clear-formatting": { group: "text", body: [
+    '<path d="M4 18 8.5 5.5 13 18M5.6 13.5h5.8"/>',
+    '<path d="M14.5 15l5 5M19.5 15l-5 5"/>',
+  ] },
+  "change-case": { group: "text", body: [
+    '<path d="M3.5 18 7.5 6l4 12M4.9 14h5.2"/>',
+    '<circle cx="16.75" cy="15.25" r="2.75"/>',
+    '<path d="M19.5 12.5V18"/>',
+  ] },
+  "grow-font": { group: "text", body: [
+    '<path d="M3.5 19 8 6.5l4.5 12.5M5.1 14.75h5.8"/>',
+    '<path d="M17.5 13V5.5M14.75 8.25l2.75-2.75 2.75 2.75"/>',
+  ] },
+  "shrink-font": { group: "text", body: [
+    '<path d="M3.5 19 8 6.5l4.5 12.5M5.1 14.75h5.8"/>',
+    '<path d="M17.5 5.5V13M14.75 10.25l2.75 2.75 2.75-2.75"/>',
+  ] },
+  "subscript": { group: "text", body: [
+    '<path d="M4 6l7.5 9M11.5 6 4 15"/>',
+    '<path d="M15.5 15.25a1.75 1.75 0 1 1 3 1.25l-3 3h3.75"/>',
+  ] },
+  "superscript": { group: "text", body: [
+    '<path d="M4 9l7.5 9M11.5 9 4 18"/>',
+    '<path d="M15.5 5.25a1.75 1.75 0 1 1 3 1.25l-3 3h3.75"/>',
+  ] },
+  "format-painter": { group: "text", body: [
+    '<rect x="4" y="4" width="12" height="5" rx="1"/>',
+    '<path d="M16 6.5h2.5a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H11v3"/>',
+    '<rect x="9.5" y="14.5" width="3" height="6" rx="1"/>',
+  ] },
+  "list-multilevel": { group: "text", body: [
+    '<circle cx="5" cy="6" r="1.1" fill="currentColor" stroke="none"/>',
+    '<path d="M8.5 6H20"/>',
+    '<circle cx="8.5" cy="12" r="1.1" fill="currentColor" stroke="none"/>',
+    '<path d="M12 12h8"/>',
+    '<circle cx="12" cy="18" r="1.1" fill="currentColor" stroke="none"/>',
+    '<path d="M15.5 18H20"/>',
+  ] },
+  "line-spacing": { group: "text", body: [
+    '<path d="M11 6h9M11 12h9M11 18h9"/>',
+    '<path d="M6 4v16M3.5 6.5 6 4l2.5 2.5M3.5 17.5 6 20l2.5-2.5"/>',
+  ] },
+  "space-before": { group: "text", body: [
+    '<path d="M4 4.5h16"/>',
+    '<path d="M12 7v4.5M9.75 9.25 12 11.5l2.25-2.25"/>',
+    '<path d="M4 15h16M4 19.5h11"/>',
+  ] },
+  "space-after": { group: "text", body: [
+    '<path d="M4 4.5h16M4 9h11"/>',
+    '<path d="M12 17v-4.5M9.75 14.75 12 12.5l2.25 2.25"/>',
+    '<path d="M4 19.5h16"/>',
+  ] },
+  "page-color": { group: "text", body: [
+    '<path d="M14 20.5H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h8.5L19 8v4"/>',
+    '<path d="M14.5 3.5V8H19"/>',
+    '<path d="M18 14.5s-2.5 2.75-2.5 4.25a2.5 2.5 0 0 0 5 0c0-1.5-2.5-4.25-2.5-4.25z"/>',
+  ] },
+  "borders": { group: "text", body: [
+    '<path d="M4 4h16M20 4v16M4 4v16M12 4v16M4 12h16" stroke-dasharray="1.5 2.5"/>',
+    '<path d="M3.5 20h17"/>',
+  ] },
+  "styles": { group: "text", body: [
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/>',
+    '<path d="M6.5 16 9.75 8l3.25 8M7.6 13.5h4.3"/>',
+    '<circle cx="16" cy="14" r="2"/>',
+    '<path d="M18 12v4"/>',
+  ] },
+  "replace": { group: "text", body: [
+    '<circle cx="9" cy="9" r="4.5"/>',
+    '<path d="M12.25 12.25l2 2"/>',
+    '<path d="M13.5 18.5H20M18 16.5l2 2-2 2"/>',
+  ] },
+  "dialog-launcher": { group: "text", body: [
+    '<path d="M19.5 13v5.5a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1H11"/>',
+    '<path d="M11 13l8.5-8.5M14.5 4.5h5v5"/>',
+  ] },
+  "text-effects": { group: "text", body: [
+    '<path d="M4 19 9 5.5 14 19M5.8 14.5h6.4"/>',
+    '<path d="M18 4.5v4M16 6.5h4M18.5 12v3M17 13.5h3"/>',
+  ] },
+  "text-outline": { group: "text", body: [
+    '<path d="M4.5 19.5 10 4.5h4l5.5 15h-3.5l-1.2-3.5H9.2L8 19.5z"/>',
+    '<path d="M10.2 13h3.6L12 7.75z"/>',
+  ] },
+  "cover-page": { group: "text", body: [
+    '<rect x="5" y="3.5" width="14" height="17" rx="1"/>',
+    '<path d="M5 11h14"/>',
+    '<path d="M8 15h8M8 17.75h5"/>',
+    '<path d="M8 6.5h5"/>',
+  ] },
+  "online-picture": { group: "text", body: [
+    '<rect x="3.5" y="5" width="12" height="10" rx="1.5"/>',
+    '<path d="M3.5 12.5 7 9.5l3 2.5 2.5-2 3 2.5"/>',
+    '<circle cx="17" cy="17" r="3.5"/>',
+    '<path d="M13.5 17h7M17 13.5c-1 1-1.5 2.2-1.5 3.5s.5 2.5 1.5 3.5c1-1 1.5-2.2 1.5-3.5s-.5-2.5-1.5-3.5z"/>',
+  ] },
+  "insert-icon": { group: "text", body: [
+    '<circle cx="8" cy="8" r="3.5"/>',
+    '<rect x="13" y="4.5" width="7" height="7" rx="1"/>',
+    '<path d="M8 13.5l4 6.5H4z"/>',
+    '<path d="M16.5 13.5l.9 2.1 2.1.3-1.6 1.5.4 2.2-1.8-1.1-1.8 1.1.4-2.2-1.6-1.5 2.1-.3z"/>',
+  ] },
+  "cube": { group: "text", body: [
+    '<path d="M12 3.5l7.5 4.25v8.5L12 20.5l-7.5-4.25v-8.5z"/>',
+    '<path d="M4.5 7.75 12 12l7.5-4.25M12 12v8.5"/>',
+  ] },
+  "smart-art": { group: "text", body: [
+    '<rect x="9" y="3.5" width="6" height="4.5" rx="1"/>',
+    '<rect x="3.5" y="16" width="6" height="4.5" rx="1"/>',
+    '<rect x="14.5" y="16" width="6" height="4.5" rx="1"/>',
+    '<path d="M12 8v4M6.5 16v-4h11v4"/>',
+  ] },
+  "header": { group: "text", body: [
+    '<rect x="4.5" y="3.5" width="15" height="17" rx="1"/>',
+    '<path d="M4.5 9h15" stroke-dasharray="1.5 2.5"/>',
+    '<path d="M7.5 6.25h6"/>',
+  ] },
+  "footer": { group: "text", body: [
+    '<rect x="4.5" y="3.5" width="15" height="17" rx="1"/>',
+    '<path d="M4.5 15h15" stroke-dasharray="1.5 2.5"/>',
+    '<path d="M7.5 17.75h6"/>',
+  ] },
+  "page-number": { group: "text", body: [
+    '<path d="M13.5 3.5h-7a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-11z"/>',
+    '<path d="M13.5 3.5v5h5"/>',
+    '<path d="M10.5 12l-1 6M14 12l-1 6M8.5 14h6.5M8 16.5h6.5"/>',
+  ] },
+  "quick-parts": { group: "text", body: [
+    '<rect x="4" y="4" width="7" height="7" rx="1"/>',
+    '<rect x="13" y="4" width="7" height="7" rx="1"/>',
+    '<rect x="4" y="13" width="7" height="7" rx="1"/>',
+    '<path d="M16.5 13.5v6M13.5 16.5h6"/>',
+  ] },
+  "word-art": { group: "text", body: [
+    '<path d="M4 17.5c4-3 12-3 16 0"/>',
+    '<path d="M7.5 14 12 4l4.5 10M9.1 10.5h5.8"/>',
+  ] },
+  "drop-cap": { group: "text", body: [
+    '<path d="M3.5 13 7 4l3.5 9M4.8 10h4.4"/>',
+    '<path d="M13 5h7M13 9h7M13 13h7M4 17h16M4 20.5h12"/>',
+  ] },
+  "object": { group: "text", body: [
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/>',
+    '<rect x="7" y="8" width="5" height="5" rx="0.5"/>',
+    '<path d="M14.5 9h3M14.5 12h3M7 16h10.5"/>',
+  ] },
+  "equation": { group: "text", body: [
+    '<path d="M3.5 13h2.5l2.5 6 4-14.5h8"/>',
+    '<path d="M14 9.5l5 6M19 9.5l-5 6"/>',
+  ] },
+  "special-character": { group: "text", body: [
+    '<path d="M4.5 19.5h4.75v-2.3A6.25 6.25 0 1 1 14.75 17.2v2.3h4.75"/>',
+  ] },
+  "cross-reference": { group: "text", body: [
+    '<rect x="3.5" y="3.5" width="8" height="10" rx="1"/>',
+    '<rect x="12.5" y="10.5" width="8" height="10" rx="1"/>',
+    '<path d="M6 16.5V18a1 1 0 0 0 1 1h3"/>',
+    '<path d="M8.5 17.5 10 19l-1.5 1.5"/>',
+  ] },
+  "orientation": { group: "text", body: [
+    '<rect x="3.5" y="3.5" width="9" height="12" rx="1"/>',
+    '<rect x="7.5" y="12" width="13" height="8.5" rx="1"/>',
+  ] },
+  "page-size": { group: "text", body: [
+    '<rect x="7.5" y="7.5" width="12.5" height="13" rx="1"/>',
+    '<path d="M4 7.5v13M7.5 4H20"/>',
+  ] },
+  "line-numbers": { group: "text", body: [
+    '<path d="M11 5.5h9M11 10h9M11 14.5h9M11 19h9"/>',
+    '<path d="M7.5 3.5v17" stroke-dasharray="1.5 2.5"/>',
+    '<path d="M3.5 5.5h1M3.5 10h1M3.5 14.5h1M3.5 19h1"/>',
+  ] },
+  "hyphenation": { group: "text", body: [
+    '<path d="M4 5.5h16M4 10h10M4 14.5h16M4 19h8"/>',
+    '<path d="M16.5 10h3.5"/>',
+  ] },
+  "indent-left": { group: "text", body: [
+    '<path d="M9 5.5h11M9 10h11M9 14.5h11M9 19h11"/>',
+    '<path d="M4.5 4v16"/>',
+  ] },
+  "indent-right": { group: "text", body: [
+    '<path d="M4 5.5h11M4 10h11M4 14.5h11M4 19h11"/>',
+    '<path d="M19.5 4v16"/>',
+  ] },
+  "position": { group: "text", body: [
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/>',
+    '<rect x="7.5" y="7.5" width="6" height="6" rx="0.5"/>',
+    '<path d="M16 8h1.5M16 11.5h1.5M7.5 16.5h10"/>',
+  ] },
+  "wrap-text": { group: "text", body: [
+    '<rect x="8.5" y="8.5" width="7" height="7" rx="0.5"/>',
+    '<path d="M4 4.5h16M4 8.5h2M18 8.5h2M4 12h2M18 12h2M4 15.5h2M18 15.5h2M4 19.5h16"/>',
+  ] },
+  "bring-forward": { group: "text", body: [
+    '<path d="M14.5 9.5H19a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1h-8.5a1 1 0 0 1-1-1v-4.5"/>',
+    '<rect x="4" y="4" width="10.5" height="10.5" rx="1"/>',
+  ] },
+  "send-backward": { group: "text", body: [
+    '<path d="M9.5 14.5H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h8.5a1 1 0 0 1 1 1v4.5"/>',
+    '<rect x="9.5" y="9.5" width="10.5" height="10.5" rx="1"/>',
+  ] },
+  "table-of-contents": { group: "text", body: [
+    '<path d="M4 5.5h9M4 10h9M7 14.5h6M7 19h6"/>',
+    '<path d="M17.5 5.5H20M17.5 10H20M17.5 14.5H20M17.5 19H20"/>',
+  ] },
+  "add-text": { group: "text", body: [
+    '<path d="M4 6V4.5h11V6M9.5 4.5v13M7.5 17.5h4"/>',
+    '<path d="M18 13v6M15 16h6"/>',
+  ] },
+  "footnote": { group: "text", body: [
+    '<path d="M4 4.5h16M4 9h16M4 13.5h12"/>',
+    '<path d="M4 17h5"/>',
+    '<path d="M4 20.5h14"/>',
+  ] },
+  "endnote": { group: "text", body: [
+    '<path d="M4 4.5h16M4 9h16M4 13.5h12"/>',
+    '<path d="M4 17h16" stroke-dasharray="1.5 2.5"/>',
+    '<path d="M4 20.5h14"/>',
+  ] },
+  "citation": { group: "text", body: [
+    '<path d="M4.5 15v-3.5a4 4 0 0 1 4-4"/>',
+    '<path d="M4.5 11.5H8V15H4.5z"/>',
+    '<path d="M11 15v-3.5a4 4 0 0 1 4-4"/>',
+    '<path d="M11 11.5h3.5V15H11z"/>',
+    '<path d="M18 14v6M15 17h6"/>',
+  ] },
+  "sources": { group: "text", body: [
+    '<rect x="4" y="4.5" width="4" height="15" rx="0.75"/>',
+    '<rect x="9.5" y="4.5" width="4" height="15" rx="0.75"/>',
+    '<path d="M15.25 5.6l3.2-.85 2.5 13.6-3.2.85z"/>',
+  ] },
+  "caption": { group: "text", body: [
+    '<rect x="3.5" y="3.5" width="17" height="11" rx="1.5"/>',
+    '<path d="M3.5 11.5 8 8l3 2.5 3-2 6.5 4"/>',
+    '<path d="M6 18.5h12"/>',
+  ] },
+  "table-of-figures": { group: "text", body: [
+    '<rect x="4" y="4" width="6" height="5" rx="0.75"/>',
+    '<path d="M13 5.5h7M13 8h4"/>',
+    '<rect x="4" y="14" width="6" height="5" rx="0.75"/>',
+    '<path d="M13 15.5h7M13 18h4"/>',
+  ] },
+  "index": { group: "text", body: [
+    '<path d="M5 18.5V5a1.5 1.5 0 0 1 1.5-1.5H17v16H6.5A1.5 1.5 0 0 1 5 18z"/>',
+    '<path d="M17 6h2.5v3H17M17 11h2.5v3H17"/>',
+  ] },
+  "table-of-authorities": { group: "text", body: [
+    '<path d="M12 4v15.5M8 19.5h8M5 7h14"/>',
+    '<path d="M5 7 3 12.5h4z"/>',
+    '<path d="M19 7l-2 5.5h4z"/>',
+  ] },
+  "thesaurus": { group: "text", body: [
+    '<path d="M3.5 12 6.5 4l3 8M4.6 9.25h3.8"/>',
+    '<path d="M14.5 20l3-8 3 8M15.6 17.25h3.8"/>',
+    '<path d="M12 6.5h3.5a2 2 0 0 1 2 2v1M5.5 15v1.5a2 2 0 0 0 2 2H10"/>',
+  ] },
+  "accessibility": { group: "text", body: [
+    '<circle cx="12" cy="12" r="8.5"/>',
+    '<circle cx="12" cy="7.5" r="1.25"/>',
+    '<path d="M7.5 10h9M12 10v3.5l-2.5 4M12 13.5l2.5 4"/>',
+  ] },
+  "comment-add": { group: "text", body: [
+    '<path d="M11 4.5H5.5A1.5 1.5 0 0 0 4 6v9a1.5 1.5 0 0 0 1.5 1.5h1V20l4.5-3.5h7.5A1.5 1.5 0 0 0 20 15v-3"/>',
+    '<path d="M17 3.5v6M14 6.5h6"/>',
+  ] },
+  "comment-delete": { group: "text", body: [
+    '<path d="M11 4.5H5.5A1.5 1.5 0 0 0 4 6v9a1.5 1.5 0 0 0 1.5 1.5h1V20l4.5-3.5h7.5A1.5 1.5 0 0 0 20 15v-3"/>',
+    '<path d="M15 4l4 4M19 4l-4 4"/>',
+  ] },
+  "comment-next": { group: "text", body: [
+    '<path d="M5.5 4.5h13A1.5 1.5 0 0 1 20 6v9a1.5 1.5 0 0 1-1.5 1.5H11L6.5 20v-3.5h-1A1.5 1.5 0 0 1 4 15V6a1.5 1.5 0 0 1 1.5-1.5z"/>',
+    '<path d="M10.5 8 13 10.5 10.5 13"/>',
+  ] },
+  "comment-previous": { group: "text", body: [
+    '<path d="M5.5 4.5h13A1.5 1.5 0 0 1 20 6v9a1.5 1.5 0 0 1-1.5 1.5H11L6.5 20v-3.5h-1A1.5 1.5 0 0 1 4 15V6a1.5 1.5 0 0 1 1.5-1.5z"/>',
+    '<path d="M13.5 8 11 10.5l2.5 2.5"/>',
+  ] },
+  "comments": { group: "text", body: [
+    '<path d="M8 4.5h10.5A1.5 1.5 0 0 1 20 6v7"/>',
+    '<path d="M5.5 8h10A1.5 1.5 0 0 1 17 9.5v6a1.5 1.5 0 0 1-1.5 1.5H10l-3.5 3v-3h-1A1.5 1.5 0 0 1 4 15.5v-6A1.5 1.5 0 0 1 5.5 8z"/>',
+  ] },
+  "track-changes": { group: "text", body: [
+    '<path d="M13 20.5H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1V10"/>',
+    '<path d="M8 7.5h7M8 11h5"/>',
+    '<path d="M17.5 12.5 20 15l-5 5h-2.5v-2.5z"/>',
+  ] },
+  "markup": { group: "text", body: [
+    '<path d="M13 20.5H5a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h8"/>',
+    '<path d="M7 7.5h5M7 11h5M7 14.5h4"/>',
+    '<path d="M16 5h3.5a1 1 0 0 1 1 1v4.5a1 1 0 0 1-1 1h-1.75L16 13.25V11.5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/>',
+  ] },
+  "change-accept": { group: "text", body: [
+    '<path d="M13 20.5H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v8"/>',
+    '<path d="M8 7.5h7M8 11h5"/>',
+    '<path d="M14 17.5l2 2 4-4.5"/>',
+  ] },
+  "change-reject": { group: "text", body: [
+    '<path d="M13 20.5H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v8"/>',
+    '<path d="M8 7.5h7M8 11h5"/>',
+    '<path d="M14.5 14.5l5 5M19.5 14.5l-5 5"/>',
+  ] },
+  "change-next": { group: "text", body: [
+    '<path d="M5 4.5h10M5 9h10M5 13.5h6"/>',
+    '<path d="M16 14v6M13.5 17.5 16 20l2.5-2.5"/>',
+  ] },
+  "change-previous": { group: "text", body: [
+    '<path d="M5 4.5h10M5 9h10M5 13.5h6"/>',
+    '<path d="M16 20v-6M13.5 16.5 16 14l2.5 2.5"/>',
+  ] },
+  "block-authors": { group: "text", body: [
+    '<circle cx="9" cy="8" r="3.5"/>',
+    '<path d="M3.5 19.5a5.5 5.5 0 0 1 9-4.25"/>',
+    '<rect x="14" y="14" width="6.5" height="5.5" rx="1"/>',
+    '<path d="M15.5 14v-1.5a1.75 1.75 0 0 1 3.5 0V14"/>',
+  ] },
+  "focus-mode": { group: "text", body: [
+    '<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/>',
+    '<path d="M8.5 10h7M8.5 14h5"/>',
+  ] },
+  "gridlines": { group: "text", body: [
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/>',
+    '<path d="M9.25 3.5v17M14.75 3.5v17M3.5 9.25h17M3.5 14.75h17" stroke-dasharray="1.5 2"/>',
+  ] },
+  "sync-scroll": { group: "text", body: [
+    '<path d="M7.5 4v16M4.5 7l3-3 3 3M4.5 17l3 3 3-3"/>',
+    '<path d="M16.5 4v16M13.5 7l3-3 3 3M13.5 17l3 3 3-3"/>',
+  ] },
+  "split-window": { group: "text", body: [
+    '<rect x="3.5" y="4" width="17" height="16" rx="1.5"/>',
+    '<path d="M3.5 12h17"/>',
+    '<path d="M7 8h6M7 16h6"/>',
+  ] },
+  "split-cells": { group: "text", body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<path d="M12 5v14"/>',
+    '<path d="M9.5 12h-4M7.5 10l-2 2 2 2M14.5 12h4M16.5 10l2 2-2 2"/>',
+  ] },
+  "text-direction": { group: "text", body: [
+    '<path d="M5 4.5h9M9.5 4.5v9"/>',
+    '<path d="M17.5 5v13M15 15.5l2.5 2.5 2.5-2.5"/>',
+    '<path d="M4.5 19h8"/>',
+  ] },
+  "chevron-double-right": { group: "general", body: [
+    '<path d="M6 6.5l5.5 5.5L6 17.5M12.5 6.5 18 12l-5.5 5.5"/>',
+  ] },
+  "row-height": { group: "text", body: [
+    '<path d="M10 6.5h10M10 17.5h10"/>',
+    '<rect x="10" y="9.5" width="10" height="5" rx="0.75"/>',
+    '<path d="M5.5 4.5v15M3.5 6.5l2-2 2 2M3.5 17.5l2 2 2-2"/>',
+  ] },
+  "column-width": { group: "text", body: [
+    '<path d="M6.5 10v10M17.5 10v10"/>',
+    '<rect x="9.5" y="10" width="5" height="10" rx="0.75"/>',
+    '<path d="M4.5 5.5h15M6.5 3.5l-2 2 2 2M17.5 3.5l2 2-2 2"/>',
+  ] },
+  "repeat-header": { group: "text", body: [
+    '<rect x="3.5" y="4" width="17" height="16" rx="1.5"/>',
+    '<path d="M3.5 8.5h17"/>',
+    '<path d="M3.5 13h17"/>',
+    '<path d="M8 16.5h8"/>',
+  ] },
+  "split-table": { group: "text", body: [
+    '<path d="M3.5 9.5V5.5a1 1 0 0 1 1-1h15a1 1 0 0 1 1 1v4h-17M12 4.5v5"/>',
+    '<path d="M3.5 14.5v4a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-4h-17M12 14.5v5"/>',
+  ] },
+  "text-left-to-right": { group: "text", body: [
+    '<path d="M9.5 13V4.5M13.5 13V4.5M15.5 4.5H9a3 3 0 0 0 0 6h.5"/>',
+    '<path d="M4 17.5h15.5M17 15l2.5 2.5L17 20"/>',
+  ] },
+  "text-right-to-left": { group: "text", body: [
+    '<path d="M10.5 13V4.5M14.5 13V4.5M16.5 4.5H10a3 3 0 0 0 0 6h.5"/>',
+    '<path d="M20 17.5H4.5M7 15l-2.5 2.5L7 20"/>',
+  ] },
+  "unlink": { group: "text", body: [
+    '<path d="M10 7.5 11.5 6a4 4 0 0 1 5.5 5.5L15.5 13"/>',
+    '<path d="M14 16.5 12.5 18A4 4 0 0 1 7 12.5L8.5 11"/>',
+    '<path d="M4.5 4.5l2 2M17.5 17.5l2 2"/>',
+  ] },
+  "enclose-character": { group: "text", body: [
+    '<circle cx="12" cy="12" r="8.5"/>',
+    '<path d="M8.5 16 12 7.5l3.5 8.5M9.6 13.25h4.8"/>',
+  ] },
+  "address-block": { group: "text", body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<path d="M7 9.5h6M7 12.5h10M7 15.5h8"/>',
+  ] },
+  "greeting-line": { group: "text", body: [
+    '<path d="M4 6.5h9"/>',
+    '<path d="M4 11h16M4 15h16M4 19h10"/>',
+    '<path d="M15.5 6.5h2"/>',
+  ] },
+  "merge-field": { group: "text", body: [
+    '<path d="M8 4.5H7a2 2 0 0 0-2 2v3a2 2 0 0 1-2 2 2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h1"/>',
+    '<path d="M16 4.5h1a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2 2 2 0 0 0-2 2v3a2 2 0 0 1-2 2h-1"/>',
+    '<path d="M9.5 12h5"/>',
+  ] },
+  "match-fields": { group: "text", body: [
+    '<rect x="3.5" y="4.5" width="6" height="4.5" rx="1"/>',
+    '<rect x="3.5" y="15" width="6" height="4.5" rx="1"/>',
+    '<rect x="14.5" y="4.5" width="6" height="4.5" rx="1"/>',
+    '<rect x="14.5" y="15" width="6" height="4.5" rx="1"/>',
+    '<path d="M9.5 6.75h5M9.5 17.25l5-10.5"/>',
+  ] },
+  "alt-text": { group: "text", body: [
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/>',
+    '<path d="M6.5 15 9 8.5l2.5 6.5M7.3 13h3.4"/>',
+    '<path d="M14 8.5v6.5M14 15h3"/>',
+  ] },
+  "align-text": { group: "text", body: [
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/>',
+    '<path d="M7.5 10h9M7.5 14h9"/>',
+  ] },
+  "content-combo-box": { group: "text", body: [
+    '<rect x="3.5" y="7" width="17" height="10" rx="1.5"/>',
+    '<path d="M15 7v10"/>',
+    '<path d="M6.5 12h5"/>',
+    '<path d="M16.5 11l1.25 1.5L19 11"/>',
+  ] },
+  "content-drop-down": { group: "text", body: [
+    '<rect x="3.5" y="4" width="17" height="7" rx="1.5"/>',
+    '<path d="M15.5 6.75l1.25 1.5 1.25-1.5"/>',
+    '<path d="M5.5 14.5h13M5.5 18h9"/>',
+  ] },
+  "content-repeat": { group: "text", body: [
+    '<rect x="3.5" y="4" width="12" height="7" rx="1"/>',
+    '<rect x="3.5" y="13" width="12" height="7" rx="1"/>',
+    '<path d="M19 8v8M16.75 13.75 19 16l2.25-2.25"/>',
+  ] },
+  "connector-elbow": { group: "design", body: [
+    '<circle cx="5" cy="6" r="1.5"/>',
+    '<circle cx="19" cy="18" r="1.5"/>',
+    '<path d="M6.5 6H12v12h5.5"/>',
+  ] },
+  "connector-elbow-arrow": { group: "design", body: [
+    '<circle cx="5" cy="6" r="1.5"/>',
+    '<path d="M6.5 6H12v12h7.5M17 15.5l2.5 2.5-2.5 2.5"/>',
+  ] },
+  "connector-curved": { group: "design", body: [
+    '<circle cx="5" cy="6" r="1.5"/>',
+    '<circle cx="19" cy="18" r="1.5"/>',
+    '<path d="M6.5 6C14 6 10 18 17.5 18"/>',
+  ] },
+  "connector-curved-arrow": { group: "design", body: [
+    '<circle cx="5" cy="6" r="1.5"/>',
+    '<path d="M6.5 6C14 6 10 18 19.5 18M17 15.5l2.5 2.5-2.5 2.5"/>',
+  ] },
+  "diamond": { group: "design", body: [
+    '<path d="M12 3.5 20.5 12 12 20.5 3.5 12z"/>',
+  ] },
+  "rounded-rectangle": { group: "design", body: [
+    '<rect x="3.5" y="6" width="17" height="12" rx="4"/>',
+  ] },
   // --- data ---
   "sum": { group: "data", body: [
     '<path d="M17.5 6.5V5h-11l6 7-6 7h11v-1.5"/>',
