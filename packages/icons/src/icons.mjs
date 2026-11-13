@@ -1341,6 +1341,156 @@ export const ICONS = {
     '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/>',
     '<path d="M3.5 9.5h17M10 9.5v10"/>',
   ] },
+  // A slide with its lower right corner left open for a badge.
+  "new-slide": { group: "slides", body: [
+    '<path d="M12.5 19H5a1.5 1.5 0 0 1-1.5-1.5v-11A1.5 1.5 0 0 1 5 5h14a1.5 1.5 0 0 1 1.5 1.5v6"/>',
+    '<path d="M17.5 14.5v6M14.5 17.5h6"/>',
+  ] },
+  "delete-slide": { group: "slides", body: [
+    '<path d="M12.5 19H5a1.5 1.5 0 0 1-1.5-1.5v-11A1.5 1.5 0 0 1 5 5h14a1.5 1.5 0 0 1 1.5 1.5v6"/>',
+    '<path d="M15 15l5 5M20 15l-5 5"/>',
+  ] },
+  "reset-slide": { group: "slides", body: [
+    '<path d="M12.5 19H5a1.5 1.5 0 0 1-1.5-1.5v-11A1.5 1.5 0 0 1 5 5h14a1.5 1.5 0 0 1 1.5 1.5v6"/>',
+    '<path d="M14 17.25a3.25 3.25 0 1 0 3.25-3.25h-1.5"/>',
+    '<path d="M16.85 12.9 15.75 14l1.1 1.1"/>',
+  ] },
+  "duplicate-slide": { group: "slides", fill: [0], body: [
+    '<rect x="3.5" y="9" width="13" height="10" rx="1.5"/>',
+    '<path d="M7.5 9V5A1.5 1.5 0 0 1 9 3.5h10A1.5 1.5 0 0 1 20.5 5v8.5a1.5 1.5 0 0 1-1.5 1.5h-2.5"/>',
+  ] },
+  "hide-slide": { group: "slides", body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<path d="M4 3l16 18"/>',
+  ] },
+  "section": { group: "slides", fill: [0], body: [
+    '<rect x="3.5" y="4" width="17" height="6" rx="1.5"/>',
+    '<rect x="3.5" y="13" width="7.5" height="6.5" rx="1"/>',
+    '<rect x="13" y="13" width="7.5" height="6.5" rx="1"/>',
+  ] },
+  "slide-master": { group: "slides", fill: [0], body: [
+    '<rect x="3.5" y="3.5" width="12" height="8.5" rx="1.5"/>',
+    '<path d="M7 12v6h3.5"/>',
+    '<rect x="10.5" y="14.5" width="10" height="7" rx="1.25"/>',
+  ] },
+  "notes-master": { group: "slides", fill: [2], body: [
+    '<rect x="3.5" y="4.5" width="13" height="17" rx="1.5"/>',
+    '<path d="M7.5 4.5V4A1.5 1.5 0 0 1 9 2.5h9.5A1.5 1.5 0 0 1 20 4v14a1.5 1.5 0 0 1-1.5 1.5h-2"/>',
+    '<rect x="6.5" y="7.5" width="7" height="4.5" rx="0.75"/>',
+    '<path d="M6.5 15h7M6.5 18h4.5"/>',
+  ] },
+  "handout-master": { group: "slides", body: [
+    '<rect x="5" y="3" width="14" height="18" rx="1.5"/>',
+    '<rect x="7.75" y="6" width="3" height="4" rx="0.5"/>',
+    '<rect x="13.25" y="6" width="3" height="4" rx="0.5"/>',
+    '<rect x="7.75" y="13.5" width="3" height="4" rx="0.5"/>',
+    '<rect x="13.25" y="13.5" width="3" height="4" rx="0.5"/>',
+  ] },
+  "view-normal": { group: "slides", fill: [2], body: [
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/>',
+    '<path d="M8.5 4.5v15"/>',
+    '<rect x="11" y="7" width="7" height="6" rx="0.75"/>',
+    '<path d="M11 16.5h7"/>',
+  ] },
+  "view-notes-page": { group: "slides", fill: [1], body: [
+    '<rect x="5" y="3" width="14" height="18" rx="1.5"/>',
+    '<rect x="7.5" y="5.5" width="9" height="6" rx="0.75"/>',
+    '<path d="M8 14.5h8M8 17.5h5"/>',
+  ] },
+  "play-from-start": { group: "slides", fill: [1], body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<path d="M10.5 9v6l5-3z"/>',
+  ] },
+  "play-from-current": { group: "slides", fill: [2], body: [
+    '<rect x="3.5" y="9" width="13" height="10" rx="1.5"/>',
+    '<path d="M7.5 9V5A1.5 1.5 0 0 1 9 3.5h10A1.5 1.5 0 0 1 20.5 5v8.5a1.5 1.5 0 0 1-1.5 1.5h-2.5"/>',
+    '<path d="M8.5 11.5v5l4-2.5z"/>',
+  ] },
+  "rehearse-timings": { group: "slides", body: [
+    '<path d="M12.5 19H5a1.5 1.5 0 0 1-1.5-1.5v-11A1.5 1.5 0 0 1 5 5h14a1.5 1.5 0 0 1 1.5 1.5v6"/>',
+    '<circle cx="17.25" cy="17.5" r="3.5"/>',
+    '<path d="M17.25 15.75v1.75l1 .75"/>',
+  ] },
+  "custom-show": { group: "slides", body: [
+    '<rect x="3.5" y="4.5" width="17" height="12" rx="1.5"/>',
+    '<path d="M12 16.5V20M8 20h8"/>',
+    '<path d="M7.5 8.5h1M11 8.5h5.5M7.5 12.5h1M11 12.5h5.5"/>',
+  ] },
+  "apply-to-all": { group: "slides", fill: [0], body: [
+    '<rect x="3.5" y="10" width="13" height="10" rx="1.5"/>',
+    '<path d="M6.5 10V8.5A1.5 1.5 0 0 1 8 7h10a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 18 17h-1.5"/>',
+    '<path d="M9.5 7V5.5A1.5 1.5 0 0 1 11 4h9a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 20 14h-.5"/>',
+  ] },
+  "add-animation": { group: "slides", fill: [0], body: [
+    '<path d="M10.3 7.58l2.08 4.32 4.72.64-3.44 3.28.84 4.68-4.2-2.2-4.2 2.2.84-4.68L3.5 12.54l4.72-.64z"/>',
+    '<path d="M17.5 3v6M14.5 6h6"/>',
+  ] },
+  "anim-entrance": { group: "slides", fill: [0], body: [
+    '<path d="M13.7 5.54l2.08 4.32 4.72.64-3.44 3.28.84 4.68-4.2-2.2-4.2 2.2.84-4.68L6.9 10.5l4.72-.64z"/>',
+    '<path d="M2.5 9h2.5M2.5 13h3M3.5 17h3"/>',
+  ] },
+  "anim-emphasis": { group: "slides", fill: [0], body: [
+    '<path d="M12 5.54l2.08 4.32 4.72.64-3.44 3.28.84 4.68-4.2-2.2-4.2 2.2.84-4.68L5.2 10.5l4.72-.64z"/>',
+    '<path d="M4 4.5l1.25 1.25M20 4.5l-1.25 1.25M3 16h1.5M21 16h-1.5"/>',
+  ] },
+  "anim-exit": { group: "slides", fill: [0], body: [
+    '<path d="M10.3 5.54l2.08 4.32 4.72.64-3.44 3.28.84 4.68-4.2-2.2-4.2 2.2.84-4.68L3.5 10.5l4.72-.64z"/>',
+    '<path d="M19 9h2.5M18.5 13h3M17.5 17h3"/>',
+  ] },
+  "anim-path": { group: "slides", body: [
+    '<circle cx="5" cy="17.5" r="1.5" fill="currentColor" stroke="none"/>',
+    '<path d="M6.5 16C9.5 9 15 14.5 17.75 5.5" stroke-dasharray="1.5 2.5"/>',
+    '<path d="M15.5 7.75l2.25-2.25 2.25 2.25"/>',
+  ] },
+  "animation-painter": { group: "slides", fill: [3], body: [
+    '<rect x="4" y="4" width="12" height="5" rx="1"/>',
+    '<path d="M16 6.5h2.5a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H11v3"/>',
+    '<rect x="9.5" y="14.5" width="3" height="6" rx="1"/>',
+    '<path d="M18 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/>',
+  ] },
+  "animation-pane": { group: "slides", body: [
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/>',
+    '<circle cx="6.75" cy="8.5" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="6.75" cy="12" r="1" fill="currentColor" stroke="none"/>',
+    '<circle cx="6.75" cy="15.5" r="1" fill="currentColor" stroke="none"/>',
+    '<path d="M9.5 8.5h5M12 12h5.5M10.5 15.5h4"/>',
+  ] },
+  "char-spacing": { group: "text", body: [
+    '<path d="M4 13.5 7 5l3 8.5M5 11h4"/>',
+    '<path d="M14 5l3 8.5L20 5"/>',
+    '<path d="M4 18h16M6 16l-2 2 2 2M18 16l2 2-2 2"/>',
+  ] },
+  "chart-elements": { group: "data", body: [
+    '<path d="M4 4v16h16.5"/>',
+    '<path d="M8 16.5v-4M12 16.5V9M16 16.5v-3"/>',
+    '<path d="M17.5 3.5v6M14.5 6.5h6"/>',
+  ] },
+  "compress-pictures": { group: "photo", body: [
+    '<rect x="8.5" y="8.5" width="7" height="7" rx="1"/>',
+    '<path d="M8.5 14l2.25-2 2 1.75 1.25-1 1.5 1.25"/>',
+    '<path d="M3.5 3.5l3 3M6.5 3.75V6.5H3.75"/>',
+    '<path d="M20.5 20.5l-3-3M17.5 20.25V17.5h2.75"/>',
+  ] },
+  "delete-table": { group: "data", body: [
+    '<path d="M12.5 19H5a1.5 1.5 0 0 1-1.5-1.5v-11A1.5 1.5 0 0 1 5 5h14a1.5 1.5 0 0 1 1.5 1.5v6"/>',
+    '<path d="M3.5 10h17M3.5 14.5h9M9.5 5v14M15 5v7.5"/>',
+    '<path d="M15 15l5 5M20 15l-5 5"/>',
+  ] },
+  "grayscale": { group: "photo", body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<path d="M9.5 5h5v14h-5z" fill="currentColor" fill-opacity="0.35"/>',
+    '<path d="M14.5 5H19a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 19 19h-4.5z" fill="currentColor"/>',
+  ] },
+  "translate": { group: "general", body: [
+    '<rect x="3" y="3" width="10" height="10" rx="1.5"/>',
+    '<path d="M5.5 11 8 5.5l2.5 5.5M6.4 9h3.2"/>',
+    '<path d="M13 11h6.5A1.5 1.5 0 0 1 21 12.5v7a1.5 1.5 0 0 1-1.5 1.5h-7a1.5 1.5 0 0 1-1.5-1.5V13"/>',
+    '<path d="M14 14.5h5M16.5 14.5V18.5M14.5 18.5h4"/>',
+  ] },
+  "action": { group: "general", fill: [0], body: [
+    '<path d="M9 8l4.32 12.16 1.84-4.96 4.96-1.84z"/>',
+    '<path d="M6.5 6.5 4.75 4.75M9.5 4.5v-2M4.5 9.5h-2"/>',
+  ] },
   // --- design ---
   "pen": { group: "design", body: [
     '<path d="M12 3.5l5 9-2.5 6h-5L7 12.5z"/>',
