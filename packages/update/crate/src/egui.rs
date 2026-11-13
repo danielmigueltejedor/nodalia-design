@@ -26,6 +26,9 @@ const STARTUP_DELAY: Duration = Duration::from_secs(20);
 
 const WIDTH: f32 = 420.0;
 
+/// The notes scroll past this, so the buttons under them are always on screen.
+const NOTES_HEIGHT: f32 = 260.0;
+
 /// What the app must do after [`Updater::show`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Action {
@@ -366,14 +369,17 @@ impl Updater {
                         ui.label(words.last_failed(*failure));
                     }
                     Status::Offer(release) => {
-                        let mut notes = crate::notes_in(&release.notes, language);
-                        if notes.is_empty() {
-                            notes = words.no_notes.to_owned();
-                        }
+                        let blocks = crate::notes_blocks(&release.notes, language);
                         egui::ScrollArea::vertical()
-                            .max_height(240.0)
+                            .max_height(NOTES_HEIGHT)
+                            .auto_shrink([false, true])
                             .show(ui, |ui| {
-                                ui.label(notes);
+                                if blocks.is_empty() {
+                                    ui.label(words.no_notes);
+                                }
+                                for (i, block) in blocks.iter().enumerate() {
+                                    draw_block(ui, block, i == 0);
+                                }
                             });
                         if !in_place {
                             ui.add_space(8.0);
@@ -484,6 +490,46 @@ impl Updater {
             .and_then(|text| text.trim().parse().ok())
             .unwrap_or(0)
     }
+}
+
+/// One block of release notes, left-aligned, with its emphasis.
+fn draw_block(ui: &mut egui::Ui, block: &crate::Block, first: bool) {
+    let (spans, prefix, heading) = match block {
+        crate::Block::Heading(spans) => (spans, "", true),
+        crate::Block::Bullet(spans) => (spans, "•  ", false),
+        crate::Block::Paragraph(spans) => (spans, "", false),
+    };
+    if heading && !first {
+        ui.add_space(6.0);
+    }
+    let style = ui.style().clone();
+    let mut job = egui::text::LayoutJob::default();
+    job.wrap.max_width = ui.available_width();
+    let mut push = |text: egui::RichText| {
+        text.append_to(
+            &mut job,
+            &style,
+            egui::FontSelection::Default,
+            egui::Align::Center,
+        );
+    };
+    if !prefix.is_empty() {
+        push(egui::RichText::new(prefix));
+    }
+    for span in spans {
+        let mut text = egui::RichText::new(&span.text);
+        if span.bold || heading {
+            text = text.strong();
+        }
+        if span.italic {
+            text = text.italics();
+        }
+        if span.code {
+            text = text.code();
+        }
+        push(text);
+    }
+    ui.add(egui::Label::new(job).wrap());
 }
 
 fn write_stamp(path: &std::path::Path) {

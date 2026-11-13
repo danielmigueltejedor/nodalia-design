@@ -25,6 +25,7 @@ fn widgets() {
     window_controls_are_not_stretched();
     alert_answers_after_its_handle_is_dropped();
     alert_is_centred_over_the_window();
+    long_alert_keeps_its_buttons_in_view();
 }
 
 fn find_buttons(widget: &gtk::Widget, found: &mut Vec<gtk::Button>) {
@@ -84,6 +85,40 @@ fn alert_is_centred_over_the_window() {
     let top = bounds.y() as i32;
     let bottom = 600 - (top + height);
     assert!((top - bottom).abs() <= 2, "top {top}, bottom {bottom}");
+    alert.dialog().force_close();
+}
+
+/// A body far taller than the window scrolls; the buttons stay inside the window. Vinilo 0.2.3
+/// put its whole release notes in the body and the buttons ended up below the screen.
+fn long_alert_keeps_its_buttons_in_view() {
+    let window = ndl::Window::new();
+    window.set_content(Some(&gtk::Label::new(Some("content"))));
+    let body = "A line of release notes that wraps over the dialog. ".repeat(200);
+    let alert = ndl::AlertDialog::new(Some("Update"), Some(&body));
+    alert.add_response("later", "Later");
+    alert.add_response("install", "Install");
+    alert.present(Some(&window));
+    let dialog = alert.dialog().clone();
+    let Some(host) = dialog.parent() else {
+        panic!("presented on the window's dialog layer");
+    };
+    host.measure(gtk::Orientation::Vertical, 800);
+    host.allocate(800, 600, -1, None);
+    let mut buttons = Vec::new();
+    find_buttons(dialog.upcast_ref(), &mut buttons);
+    assert_eq!(buttons.len(), 2);
+    for button in buttons {
+        let Some(bounds) = button.compute_bounds(&host) else {
+            panic!("the button has bounds in its host");
+        };
+        assert!(button.height() > 0, "the button is drawn");
+        let bottom = bounds.y() + bounds.height();
+        assert!(
+            bounds.y() >= 0.0 && bottom <= 600.0,
+            "button at {}..{bottom}",
+            bounds.y()
+        );
+    }
     alert.dialog().force_close();
 }
 
