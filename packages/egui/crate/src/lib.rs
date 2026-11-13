@@ -22,6 +22,8 @@ pub use tokens::*;
 pub mod for_egui;
 pub mod icons;
 #[cfg(feature = "egui")]
+pub mod office;
+#[cfg(feature = "egui")]
 pub mod window_controls;
 
 impl Density {
