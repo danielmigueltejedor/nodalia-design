@@ -1681,6 +1681,11 @@ export const ICONS = {
     '<path d="M17.5 17.5L21 21"/>',
   ] },
   // --- vector illustration (drawn for Pluma, shared by every app) ---
+  "flip-vertical": { group: "design", accent: [2], body: [
+    '<path d="M3.5 12h17" stroke-dasharray="2 3"/>',
+    '<path d="M7 9 17 3.5V9z"/>',
+    '<path d="M7 15l10 5.5V15z" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
   "chevrons-left": { group: "general", body: [
     '<path d="M11.5 6l-6 6 6 6"/>',
     '<path d="M18.5 6l-6 6 6 6"/>',

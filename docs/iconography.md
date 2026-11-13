@@ -1,6 +1,6 @@
 # Iconografía
 
-**Estado: 499 iconos funcionales incluidos en `@nodalia/icons`.** Son dibujos originales de este proyecto (MIT). No se incluyen fuentes ni imágenes de terceros.
+**Estado: 500 iconos funcionales incluidos en `@nodalia/icons`.** Son dibujos originales de este proyecto (MIT). No se incluyen fuentes ni imágenes de terceros.
 
 ## El conjunto
 
