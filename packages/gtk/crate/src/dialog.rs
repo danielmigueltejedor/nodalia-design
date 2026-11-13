@@ -134,13 +134,12 @@ mod imp {
             // The dialog is `content-width` wide, not as wide as the box that holds it. Text that
             // wraps is measured at the width it gets, or the height comes out short and the
             // buttons are cut off.
-            let for_size = if orientation == gtk::Orientation::Vertical
-                && self.content_width.get() > 0
-            {
-                self.content_width.get()
-            } else {
-                for_size
-            };
+            let for_size =
+                if orientation == gtk::Orientation::Vertical && self.content_width.get() > 0 {
+                    self.content_width.get()
+                } else {
+                    for_size
+                };
             let (min, nat) = self.child.borrow().as_ref().map_or((0, 0), |c| {
                 let m = c.measure(orientation, for_size);
                 (m.0, m.1)
