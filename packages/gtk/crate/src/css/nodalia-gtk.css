@@ -348,9 +348,10 @@ passwordentry {
 entry:focus-within,
 spinbutton:focus-within,
 passwordentry:focus-within {
-  border-color: var(--ndl-color-border-focus);
-  /* Only the border changes colour: a second ring (outline or shadow) renders soft on
-     fractional scales and reads as a halo. */
+  /* No coloured ring at all: a 1px accent line round a rounded field is drawn soft on
+     fractional scales and reads as a halo. The field shows it has the focus with a neutral
+     border and its own background, and the text cursor. */
+  border-color: var(--ndl-color-border-strong);
   outline: none;
   background-color: var(--ndl-color-control-field-bg);
 }
