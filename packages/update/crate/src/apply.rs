@@ -284,6 +284,7 @@ fn failure_from_code(code: &str) -> Option<Failure> {
 mod tests {
     use super::*;
 
+    #[cfg_attr(not(unix), allow(dead_code))]
     const APP: App = App {
         name: "Probe",
         repo: "o/r",
