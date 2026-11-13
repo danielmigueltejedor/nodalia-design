@@ -16,6 +16,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). V
 - `nodalia-gtk`: en macOS los semáforos del sistema quedan separados del borde de la isla tanto como del borde superior, con el mismo aire antes del título.
 - NDL en GTK ya no se apoya en libadwaita (principio 9 y regla 4 de `AGENTS.md`). Las hojas siguen emitiendo sus colores con nombre.
 
+### Corregido
+- `nodalia-update` (macOS): la actualización dentro de la app ya no falla con «has an invalid code signature» en apps firmadas ad hoc. La comprobación usaba `codesign --verify --strict`, que rechaza los metadatos del Finder (`com.apple.FinderInfo`) que llevan todos los ficheros de una imagen de disco; ahora comprueba el sello sin `--strict` (firma, ficheros sellados y código anidado siguen verificándose). El error indica la app y el motivo que da `codesign`.
+
 ## [0.1.0-alpha.1]
 
 Primera versión etiquetada: una app puede fijarla y descargar su paquete desde la release.
