@@ -111,7 +111,8 @@ impl<'a> Entry<'a> {
 /// (Account, Preferences).
 #[derive(Clone, Debug, PartialEq)]
 pub struct Nav<'a> {
-    /// The label of the first row, which leaves the view.
+    /// The label of the first row, which leaves the view. Empty hides the row, for a start
+    /// screen with nothing to go back to.
     pub back: &'a str,
     pub top: Vec<Entry<'a>>,
     /// Drawn from the bottom of the island, in the order given (top to bottom).
@@ -162,7 +163,10 @@ pub fn file_view(
         ))
         .show(ui, |ui| {
             ui.spacing_mut().item_spacing.y = 0.0;
-            if nav_row(ui, look, "arrow-left", nav.back, false).clicked() {
+            if nav.back.is_empty() {
+                // Nothing to go back to (a start screen): keep the row's place.
+                ui.add_space(NAV_ROW);
+            } else if nav_row(ui, look, "arrow-left", nav.back, false).clicked() {
                 picked = Some(BACK.to_string());
             }
             ui.add_space(10.0);
@@ -195,7 +199,9 @@ pub fn file_view(
                             bottom: 32,
                         })
                         .show(ui, |ui| {
-                            ui.set_max_width(CONTENT_WIDTH);
+                            // `set_max_width` can also widen: in a window narrower than the
+                            // column it would push the page past the island's right edge.
+                            ui.set_max_width(ui.available_width().min(CONTENT_WIDTH));
                             page(ui);
                         });
                 });
@@ -547,6 +553,37 @@ mod tests {
             assert_eq!(picked, None);
         });
         assert!(drawn);
+    }
+
+    #[test]
+    fn a_narrow_window_keeps_the_page_inside_and_an_empty_back_hides_the_row() {
+        let look = Look::new(Mode::Light.palette_with(Accent::Lamina));
+        let nav = Nav {
+            back: "",
+            top: vec![Entry::item("home", "Home", "home")],
+            bottom: vec![],
+            selected: Some("home"),
+        };
+        let ctx = egui::Context::default();
+        let input = egui::RawInput {
+            screen_rect: Some(Rect::from_min_size(pos2(0.0, 0.0), vec2(700.0, 600.0))),
+            ..Default::default()
+        };
+        let mut page_right = 0.0;
+        let mut picked = None;
+        let mut output = ctx.run_ui(input, |ui| {
+            picked = file_view(ui, &look, &nav, |ui| {
+                let (r, _) =
+                    ui.allocate_exact_size(vec2(ui.available_width(), 10.0), Sense::hover());
+                page_right = r.right();
+            });
+        });
+        output.textures_delta.clear();
+        assert!(
+            page_right <= 700.0 - GAP,
+            "the page column ends at {page_right}, past the island"
+        );
+        assert_eq!(picked, None, "no Back row to click");
     }
 
     #[test]
