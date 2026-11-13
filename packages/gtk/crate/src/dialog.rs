@@ -372,6 +372,9 @@ struct AlertInner {
 #[derive(Clone)]
 pub struct AlertDialog(Rc<AlertInner>);
 
+/// The tallest the heading, body and extra child get before they scroll.
+pub const ALERT_MAX_CONTENT_HEIGHT: i32 = 420;
+
 impl AlertDialog {
     pub fn new(heading: Option<&str>, body: Option<&str>) -> Self {
         let dialog = Dialog::new();
@@ -398,7 +401,17 @@ impl AlertDialog {
         let buttons = gtk::Box::new(gtk::Orientation::Horizontal, 8);
         buttons.add_css_class("ndl-alert-buttons");
         buttons.set_homogeneous(true);
-        column.append(&text);
+        // A long body or extra child scrolls inside the dialog; the buttons stay under it,
+        // always on screen, however much text the app hands over.
+        let scroller = gtk::ScrolledWindow::builder()
+            .hscrollbar_policy(gtk::PolicyType::Never)
+            .propagate_natural_height(true)
+            .max_content_height(ALERT_MAX_CONTENT_HEIGHT)
+            .vexpand(true)
+            .child(&text)
+            .build();
+        scroller.add_css_class("ndl-alert-scroller");
+        column.append(&scroller);
         column.append(&buttons);
         dialog.set_child(Some(&column));
         let this = Self(Rc::new(AlertInner {

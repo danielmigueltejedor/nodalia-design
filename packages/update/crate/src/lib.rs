@@ -29,7 +29,9 @@ use std::path::PathBuf;
 pub use apply::{apply, take_last_failure, Failure};
 pub use download::download;
 pub use macos::{parse_codesign_display, same_publisher, CodeIdentity};
-pub use notes::{notes_in, Language};
+pub use notes::{
+    notes_blocks, notes_in, notes_markup, plain as notes_plain, Block, Language, Span,
+};
 pub use release::{
     asset_digest, parse as parse_release, parse_list as parse_release_list, platform_markers,
     preferred_assets, preferred_assets_for, systems_for_package, PACKAGES,
