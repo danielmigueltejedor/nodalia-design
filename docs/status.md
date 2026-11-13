@@ -37,7 +37,7 @@ Totales en la última ejecución completa: 66 tests unitarios, 14 tests Rust y 5
 
 ## Limitaciones conocidas
 
-- Los adaptadores de egui y Qt Widgets solo aportan estilo, no componentes. Los límites de Qt están en [Qt Widgets](integration/qt-widgets.md).
+- El adaptador egui también ofrece los controles de ventana NDL. La aplicación gestiona las operaciones de su ventana. Qt Widgets aporta estilo. Los límites de Qt están en [Qt Widgets](integration/qt-widgets.md).
 - No hay fuentes incluidas (los tokens nombran Inter y Sora, que caen a la del sistema si no están instaladas). Los 192 iconos añadidos después de Vortia no se han usado todavía en ninguna app: pueden necesitar ajustes al verlos en contexto. Ver [iconografía](iconography.md).
 - Componentes no implementados: combobox con autocompletado, submenús, tablas ordenables, gestor de notificaciones, acoplamiento de paneles por arrastre. Ver [componentes](components.md).
 - Capas, árbol de operaciones e historial aparecen como **composiciones en las demostraciones**, no como componentes empaquetados.

@@ -21,6 +21,8 @@
   --ndl-component-control-radius: 10px;
   --ndl-component-window-radius: 20px;
   --ndl-component-window-gap: 8px;
+  --ndl-component-window-control-size: 28px;
+  --ndl-component-window-control-icon: 24px;
   --ndl-component-splitter-hit: 8px;
   --ndl-space-none: 0;
   --ndl-space-xxs: 2px;
