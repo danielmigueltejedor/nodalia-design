@@ -129,6 +129,8 @@ pub(crate) fn start_helper(
     std::fs::write(&script, helper_script())
         .map_err(|e| Error::Io(format!("Could not write the Windows update helper: {e}")))?;
     std::process::Command::new(system32("WindowsPowerShell\\v1.0\\powershell.exe"))
+        // A PowerShell 7 module path would shadow Windows PowerShell's own modules.
+        .env_remove("PSModulePath")
         .args([
             "-NoProfile",
             "-NonInteractive",
@@ -198,7 +200,12 @@ try {
   New-Item -ItemType Directory -Path $stage | Out-Null
   $copy = Join-Path $stage 'update.msi'
   Copy-Item -LiteralPath $Msi -Destination $copy
-  $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $copy).Hash.ToLowerInvariant()
+  # .NET rather than Get-FileHash: that one lives in a script module, which Windows PowerShell
+  # cannot load when a PowerShell 7 parent left its own PSModulePath behind.
+  $sha = [Security.Cryptography.SHA256]::Create()
+  $stream = [IO.File]::OpenRead($copy)
+  try { $actual = (($sha.ComputeHash($stream) | ForEach-Object { $_.ToString('x2') }) -join '') }
+  finally { $stream.Dispose(); $sha.Dispose() }
   if ([string]::IsNullOrEmpty($Expected) -or $actual -ne $Expected) {
     Note 'the package does not match the digest that was verified'
     Finish 'contents'
@@ -279,7 +286,7 @@ mod tests {
     #[test]
     fn the_helper_hashes_the_copy_it_installs_and_keeps_the_scope() {
         let script = helper_script();
-        let hash = script.find("Get-FileHash").unwrap();
+        let hash = script.find("ComputeHash").unwrap();
         let install = script.find("Start-Process @start").unwrap();
         assert!(
             hash < install,
