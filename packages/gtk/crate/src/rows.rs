@@ -784,6 +784,47 @@ fn build_entry_row(row: &gtk::ListBoxRow, parts: &Parts, editable: &gtk::Editabl
         }
     });
     row.add_controller(focus);
+    keep_title_in_step(parts, editable);
+}
+
+/// An empty field that is not being edited shows its title as the placeholder, centred in the
+/// row, instead of a small title above nothing. The title moves up once there is something to
+/// label: when the field has text or focus.
+fn keep_title_in_step(parts: &Parts, editable: &gtk::Editable) {
+    use std::rc::Rc;
+    let has_placeholder = editable.find_property("placeholder-text").is_some();
+    let sync: Rc<dyn Fn()> = {
+        let title = parts.title.downgrade();
+        let editable = editable.downgrade();
+        Rc::new(move || {
+            let (Some(title), Some(editable)) = (title.upgrade(), editable.upgrade()) else {
+                return;
+            };
+            let focused = editable
+                .upcast_ref::<gtk::Widget>()
+                .state_flags()
+                .contains(gtk::StateFlags::FOCUS_WITHIN);
+            let resting = editable.text().is_empty() && !focused;
+            let shown = !resting || !has_placeholder;
+            if title.is_visible() != shown {
+                title.set_visible(shown);
+            }
+            if has_placeholder {
+                let text = title.text();
+                editable.set_property("placeholder-text", text.as_str());
+            }
+        })
+    };
+    let again = sync.clone();
+    editable.connect_changed(move |_| again());
+    let again = sync.clone();
+    editable.connect_state_flags_changed(move |_, _| again());
+    let again = sync.clone();
+    parts.title.connect_label_notify(move |_| again());
+    // Setting a title makes the label visible; the row decides again.
+    let again = sync.clone();
+    parts.title.connect_visible_notify(move |_| again());
+    sync();
 }
 
 macro_rules! entry_common {

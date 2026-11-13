@@ -280,8 +280,8 @@ impl StyleManager {
     fn refresh(&self) {
         use gtk::subclass::prelude::ObjectSubclassIsExt;
         let imp = self.imp();
-        // GTK 4.20+ maps the deprecated prefer-dark setter onto gtk-interface-color-scheme, whose
-        // notify calls back in here: without this guard that is a loop at 100% CPU on startup.
+        // Applying the sheet can notify the colour scheme again from inside this call (GTK 4.20+
+        // maps the old prefer-dark setter onto it): do not re-enter.
         if imp.refreshing.replace(true) {
             return;
         }
@@ -291,17 +291,9 @@ impl StyleManager {
             ColorScheme::Default => Self::system_dark(),
         };
         let high_contrast = Self::system_high_contrast();
-        // GTK's own theme draws whatever no NDL rule covers; keep it on the same side. The
-        // replacement, gtk-interface-color-scheme, is the system's value, which this must not
-        // overwrite (see the module header).
-        if let Some(settings) = gtk::Settings::default() {
-            #[allow(deprecated)]
-            let current = settings.is_gtk_application_prefer_dark_theme();
-            if current != dark {
-                #[allow(deprecated)]
-                settings.set_gtk_application_prefer_dark_theme(dark);
-            }
-        }
+        // Nothing is written to GtkSettings here: with the empty base theme GTK has no light or
+        // dark variant to follow, and `set_gtk_application_prefer_dark_theme` makes GTK reload
+        // its theme (about 10 ms on every switch) for nothing.
         if let Some(css) = mode_css(mode_name(dark, high_contrast)) {
             imp.mode.borrow().load_from_string(css);
         }
