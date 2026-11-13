@@ -6,7 +6,7 @@ import { ICONS_OUTPUT, OUTPUT, iconsSource, rustSource } from '../scripts/build.
 
 const tokens = loadTokens(SOURCE_DIR);
 const src = rustSource();
-const colours = [...tokens.values()].filter((t) => t.type === 'color' && t.path.startsWith('color.'));
+const colours = [...tokens.values()].filter((t) => t.type === 'color' && /^(color\.|component\.window\.)/.test(t.path));
 
 test('the committed tokens.rs matches the tokens (run `npm run build -w @nodalia/egui`)', () => {
   assert.equal(readFileSync(OUTPUT, 'utf8'), src);

@@ -20,7 +20,9 @@ const shadow = (v) => `Shadow { color: ${rgba(v.color)}, offset_x: ${float(px(v.
 
 const colors = all.filter((t) => t.type === 'color' && t.path.startsWith('color.'));
 const elevations = all.filter((t) => t.type === 'shadow' && t.path.startsWith('elevation.'));
-const colorField = (t) => snake(t.path.slice('color.'.length));
+const paletteColors = [...colors, ...all.filter((t) => t.type === 'color' && t.path.startsWith('component.window.'))];
+const colorField = (t) => snake(t.path.replace(/^(color\.|component\.)/, ''));
+
 const densityNames = [...new Set(all.filter((t) => t.path.startsWith('density.')).map((t) => t.path.split('.')[1]))];
 const densityKeys = [...new Set(all.filter((t) => t.path.startsWith('density.')).map((t) => t.path.split('.')[2]))];
 const group = (prefix) => all.filter((t) => t.path.startsWith(`${prefix}.`));
@@ -93,10 +95,10 @@ export function rustSource() {
     '    }',
     '}',
     '',
-    '/// Every semantic colour and elevation of one mode.',
+    '/// Semantic colours, elevations, and window-control colours of one mode.',
     '#[derive(Clone, Copy, Debug, PartialEq)]',
     'pub struct Palette {',
-    ...colors.map((t) => `    pub ${colorField(t)}: Rgba,`),
+    ...paletteColors.map((t) => `    pub ${colorField(t)}: Rgba,`),
     ...elevations.map((t) => `    pub ${snake(t.path)}: Shadow,`),
     '}',
     '',
@@ -104,7 +106,7 @@ export function rustSource() {
   for (const mode of MODES) {
     lines.push(
       `pub const ${upper(mode)}: Palette = Palette {`,
-      ...colors.map((t) => `    ${colorField(t)}: ${rgba(resolve(tokens, t.path, mode))},`),
+      ...paletteColors.map((t) => `    ${colorField(t)}: ${rgba(resolve(tokens, t.path, mode))},`),
       ...elevations.map((t) => `    ${snake(t.path)}: ${shadow(resolve(tokens, t.path, mode))},`),
       '};',
       '',
