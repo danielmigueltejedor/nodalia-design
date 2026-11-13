@@ -349,8 +349,9 @@ entry:focus-within,
 spinbutton:focus-within,
 passwordentry:focus-within {
   border-color: var(--ndl-color-border-focus);
-  outline: 1px solid var(--ndl-color-border-focus);
-  outline-offset: -2px;
+  /* Only the border changes colour: a second ring (outline or shadow) renders soft on
+     fractional scales and reads as a halo. */
+  outline: none;
   background-color: var(--ndl-color-control-field-bg);
 }
 
