@@ -14,6 +14,8 @@ default = []
 egui = ["dep:egui"]
 # The engineering suite's shared parts (`engineering`), with IBM Plex Sans and Mono embedded (~670 KB).
 engineering = ["egui"]
+# The creator suite's shared parts (`creator`): workspace selector, dialog buttons, Home rail, fields.
+creator = ["egui"]
 
 [dependencies]
 egui = { version = "0.37", default-features = false, optional = true }
