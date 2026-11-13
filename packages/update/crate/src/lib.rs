@@ -3,9 +3,10 @@
 //! One flow for every app, whatever its toolkit: ask GitHub Releases for the latest release,
 //! compare it with the running version, download the package for this machine and check its
 //! SHA-256 against the digest GitHub publishes, then replace the running AppImage (Linux) or
-//! `.app` (macOS) and restart. Installs that something else manages (Flatpak, `.deb`, `.rpm`,
-//! the AUR, a dev build) are not touched: [`install_kind`] says so and the app points to the
-//! release page instead.
+//! `.app` (macOS) and restart, or install the release's MSI (Windows). Installs that something
+//! else manages (Flatpak, `.deb`, `.rpm`, the AUR, a dev build), portable copies and copies in a
+//! folder this user cannot write are not touched: [`install_kind`] says so and the app points to
+//! the release page instead.
 //!
 //! The crate draws nothing. It returns data and typed errors, and the app words them in its own
 //! language and shows them in its own toolkit. Every call blocks: run it off the UI thread.
@@ -16,6 +17,7 @@ mod macos;
 mod notes;
 mod release;
 mod version;
+mod windows;
 
 /// The update windows for egui apps.
 #[cfg(feature = "egui")]
@@ -30,9 +32,10 @@ pub use macos::{parse_codesign_display, same_publisher, CodeIdentity};
 pub use notes::{notes_in, Language};
 pub use release::{
     asset_digest, parse as parse_release, parse_list as parse_release_list, platform_markers,
-    preferred_assets, preferred_assets_for,
+    preferred_assets, preferred_assets_for, systems_for_package, PACKAGES,
 };
 pub use version::{compare as compare_versions, strip as strip_version};
+pub use windows::{helper_script as windows_helper_script, parse_reg_install_dir, same_folder};
 
 /// The app being updated.
 #[derive(Clone, Debug)]
@@ -136,29 +139,102 @@ pub enum InstallKind {
     AppImage(PathBuf),
     /// Running from this `.app` bundle.
     MacBundle(PathBuf),
+    /// Installed from the app's MSI into `dir`, for this user or for the whole machine.
+    WindowsMsi { dir: PathBuf, per_machine: bool },
+    /// A portable copy (the Windows ZIP, with `portable.txt` beside the program) in this folder:
+    /// the person replaces it, from the release page.
+    Portable(PathBuf),
+    /// An AppImage or an app this user cannot replace where it is: a folder they cannot write,
+    /// the disk image itself, or a copy macOS runs from a translocated, read-only place.
+    NotWritable(PathBuf),
     /// Flatpak, a distribution package or a dev build: another tool updates it.
     Managed,
 }
 
 impl InstallKind {
+    /// Whether the update is installed from inside the app.
     pub fn can_apply_in_place(&self) -> bool {
+        matches!(
+            self,
+            InstallKind::AppImage(_) | InstallKind::MacBundle(_) | InstallKind::WindowsMsi { .. }
+        )
+    }
+
+    /// Whether the app looks for releases by itself. Not for an install a package manager owns:
+    /// that tool says when there is something new. A portable or read-only copy has no such tool,
+    /// so it is told, and pointed at the release page.
+    pub fn checks_at_start(&self) -> bool {
         !matches!(self, InstallKind::Managed)
     }
 }
 
-/// Looks at how the running process was started.
+/// Looks at how the running process was started. Worked out once per process: on Windows it asks
+/// the registry, and the windows ask on every frame.
 pub fn install_kind(app: &App) -> InstallKind {
+    static KINDS: std::sync::OnceLock<
+        std::sync::Mutex<std::collections::HashMap<String, InstallKind>>,
+    > = std::sync::OnceLock::new();
+    let kinds = KINDS.get_or_init(Default::default);
+    let key = format!("{}\0{}", app.name, app.bundle);
+    if let Some(kind) = kinds
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .get(&key)
+    {
+        return kind.clone();
+    }
+    let kind = detect_install_kind(app);
+    kinds
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .insert(key, kind.clone());
+    kind
+}
+
+fn detect_install_kind(app: &App) -> InstallKind {
     if let Some(path) = std::env::var_os("APPIMAGE").filter(|p| !p.is_empty()) {
         if runs_from(std::env::var_os("APPDIR"), std::env::current_exe().ok()) {
-            return InstallKind::AppImage(PathBuf::from(path));
+            let path = PathBuf::from(path);
+            return match path.parent() {
+                Some(dir) if writable(dir) => InstallKind::AppImage(path),
+                _ => InstallKind::NotWritable(path),
+            };
         }
     }
     if cfg!(target_os = "macos") {
         if let Some(bundle) = macos::running_bundle(app) {
-            return InstallKind::MacBundle(bundle);
+            let replaceable =
+                !macos::is_translocated(&bundle) && bundle.parent().is_some_and(writable);
+            return if replaceable {
+                InstallKind::MacBundle(bundle)
+            } else {
+                InstallKind::NotWritable(bundle)
+            };
         }
     }
+    #[cfg(windows)]
+    if let Some(kind) = windows::detect() {
+        return kind;
+    }
+    let _ = app;
     InstallKind::Managed
+}
+
+/// Whether this user can create a file in `dir`, tried rather than read from its permissions:
+/// a read-only volume, an ACL or a sandbox all answer the same way.
+pub(crate) fn writable(dir: &std::path::Path) -> bool {
+    let probe = dir.join(format!(".nodalia-update-probe-{}", std::process::id()));
+    match std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&probe)
+    {
+        Ok(_) => {
+            let _ = std::fs::remove_file(&probe);
+            true
+        }
+        Err(_) => false,
+    }
 }
 
 /// Whether this process runs from inside the mounted AppImage `APPDIR` names. `APPIMAGE` alone is
@@ -180,6 +256,10 @@ pub fn check(app: &App) -> Result<Check, Error> {
         app.repo
     );
     let body = download::get(&url, "application/vnd.github+json")?;
+    // Nothing published yet is nothing newer, not an error to show.
+    if release::is_empty_list(&body) {
+        return Ok(Check::UpToDate);
+    }
     let release = release::parse_list(&body, &preferred_assets_for(app.edition))?;
     if compare_versions(&release.version, app.version) != Ordering::Greater {
         return Ok(Check::UpToDate);
@@ -234,5 +314,41 @@ mod tests {
             Some("".into()),
             Some(PathBuf::from("/usr/bin/pluma"))
         ));
+    }
+
+    #[test]
+    fn only_appimages_apps_and_msi_installs_replace_themselves() {
+        let p = || PathBuf::from("/x");
+        assert!(InstallKind::AppImage(p()).can_apply_in_place());
+        assert!(InstallKind::MacBundle(p()).can_apply_in_place());
+        assert!(InstallKind::WindowsMsi {
+            dir: p(),
+            per_machine: true
+        }
+        .can_apply_in_place());
+        for kind in [
+            InstallKind::Portable(p()),
+            InstallKind::NotWritable(p()),
+            InstallKind::Managed,
+        ] {
+            assert!(!kind.can_apply_in_place(), "{kind:?}");
+        }
+        assert!(InstallKind::Portable(p()).checks_at_start());
+        assert!(InstallKind::NotWritable(p()).checks_at_start());
+        assert!(!InstallKind::Managed.checks_at_start());
+    }
+
+    #[test]
+    fn a_folder_is_writable_only_if_a_file_can_be_made_there() {
+        let dir = std::env::temp_dir().join(format!("nodalia-update-w-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        assert!(writable(&dir));
+        assert_eq!(
+            std::fs::read_dir(&dir).unwrap().count(),
+            0,
+            "the probe is removed"
+        );
+        assert!(!writable(&dir.join("missing")));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

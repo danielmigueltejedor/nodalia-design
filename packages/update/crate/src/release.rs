@@ -9,50 +9,86 @@ use crate::{Error, Release, ReleaseAsset};
 /// `.zsync` or `.sha256` beside the package never does. A package for another CPU is never
 /// listed: an AppImage built for x86-64 would replace an aarch64 one and not start.
 pub fn preferred_assets() -> &'static [&'static str] {
-    #[cfg(target_os = "macos")]
-    {
-        #[cfg(target_arch = "aarch64")]
-        {
-            &["macos-arm64.dmg", "macos-universal.dmg", "macos.dmg"]
-        }
-        #[cfg(not(target_arch = "aarch64"))]
-        {
-            &[
-                "macos-x86_64.dmg",
-                "macos-intel.dmg",
-                "macos-universal.dmg",
-                "macos.dmg",
-            ]
-        }
-    }
-    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-    {
+    let system = if cfg!(target_os = "macos") {
+        "macos"
+    } else if cfg!(target_os = "linux") {
+        "linux"
+    } else if cfg!(windows) {
+        "windows"
+    } else {
+        return &[];
+    };
+    let cpu = if cfg!(target_arch = "aarch64") {
+        "aarch64"
+    } else if cfg!(target_arch = "x86_64") {
+        "x86_64"
+    } else {
+        return &[];
+    };
+    PACKAGES
+        .iter()
+        .find(|(s, c, _)| *s == system && *c == cpu)
+        .map_or(&[], |(_, _, names)| names)
+}
+
+/// Every system's package names, best first: `(os, cpu, name endings)`. [`preferred_assets`]
+/// reads this machine's row; an app's tests read them all, to check that what its packaging
+/// scripts publish is what every system's updater looks for.
+pub const PACKAGES: &[(&str, &str, &[&str])] = &[
+    (
+        "macos",
+        "aarch64",
+        &["macos-arm64.dmg", "macos-universal.dmg", "macos.dmg"],
+    ),
+    (
+        "macos",
+        "x86_64",
+        &[
+            "macos-x86_64.dmg",
+            "macos-intel.dmg",
+            "macos-universal.dmg",
+            "macos.dmg",
+        ],
+    ),
+    (
+        "linux",
+        "x86_64",
         &[
             "linux-x86_64.appimage",
             "linux-amd64.appimage",
             "x86_64.appimage",
-        ]
-    }
-    #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
-    {
+        ],
+    ),
+    (
+        "linux",
+        "aarch64",
         &[
             "linux-aarch64.appimage",
             "linux-arm64.appimage",
             "aarch64.appimage",
             "arm64.appimage",
-        ]
-    }
-    #[cfg(all(
-        target_os = "linux",
-        not(any(target_arch = "x86_64", target_arch = "aarch64"))
-    ))]
-    {
-        &[]
-    }
-    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
-    {
-        &[]
-    }
+        ],
+    ),
+    (
+        "windows",
+        "x86_64",
+        &["windows-x64.msi", "windows-amd64.msi", "windows-x86_64.msi"],
+    ),
+    (
+        "windows",
+        "aarch64",
+        &["windows-arm64.msi", "windows-aarch64.msi"],
+    ),
+];
+
+/// The `(os, cpu)` rows of [`PACKAGES`] whose updater would install a package called `name`.
+pub fn systems_for_package(name: &str) -> Vec<(&'static str, &'static str)> {
+    let name = name.to_ascii_lowercase();
+    PACKAGES
+        .iter()
+        .filter(|(_, _, endings)| endings.iter().any(|e| name.ends_with(e)))
+        .map(|(os, cpu, _)| (*os, *cpu))
+        .collect()
 }
 
 /// `sha256:<hex>` as GitHub reports an asset's digest, lower-cased; `None` for anything else.
@@ -94,10 +130,33 @@ pub fn platform_markers() -> &'static [&'static str] {
     {
         &[".appimage", ".deb", ".rpm", ".flatpak", ".pkg.tar.zst"]
     }
-    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    #[cfg(windows)]
+    {
+        &[".msi", "-portable.zip", ".exe"]
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux", windows)))]
     {
         &[]
     }
+}
+
+/// Whether the body of `releases` lists no published release at all (a repository that has not
+/// released yet). Drafts and pre-releases do not count.
+pub(crate) fn is_empty_list(json: &[u8]) -> bool {
+    serde_json::from_slice::<Value>(json)
+        .ok()
+        .and_then(|list| {
+            list.as_array().map(|releases| {
+                !releases.iter().any(|r| {
+                    !r.get("draft").and_then(Value::as_bool).unwrap_or(false)
+                        && !r
+                            .get("prerelease")
+                            .and_then(Value::as_bool)
+                            .unwrap_or(false)
+                })
+            })
+        })
+        .unwrap_or(false)
 }
 
 /// Reads the body of `releases` (newest first) and returns the newest published release that
@@ -362,6 +421,56 @@ mod tests {
         if cfg!(any(target_os = "macos", target_os = "linux")) {
             assert_eq!(release.version, "0.1.1");
         }
+    }
+
+    #[test]
+    fn each_published_package_reaches_the_systems_it_is_for() {
+        assert_eq!(
+            systems_for_package("forja-0.1.1-macos-universal.dmg"),
+            [("macos", "aarch64"), ("macos", "x86_64")]
+        );
+        assert_eq!(
+            systems_for_package("Vortia-0.7.0-linux-x86_64.AppImage"),
+            [("linux", "x86_64")]
+        );
+        assert_eq!(
+            systems_for_package("forja-0.1.1-windows-arm64.msi"),
+            [("windows", "aarch64")]
+        );
+        assert!(systems_for_package("forja-0.1.1-windows-x64-portable.zip").is_empty());
+        assert!(systems_for_package("forja-0.1.1-linux-x86_64.AppImage.zsync").is_empty());
+    }
+
+    #[test]
+    fn a_repository_without_releases_is_an_empty_list() {
+        assert!(is_empty_list(b"[]"));
+        assert!(is_empty_list(br#"[{"tag_name":"v1.0.0","draft":true}]"#));
+        assert!(!is_empty_list(br#"[{"tag_name":"v1.0.0"}]"#));
+        assert!(
+            !is_empty_list(b"{\"message\":\"Not Found\"}"),
+            "an error is not an empty list"
+        );
+    }
+
+    #[test]
+    fn windows_picks_the_msi_not_the_portable_zip_or_symbols() {
+        let json = br#"{"tag_name":"v0.3.2","body":"","html_url":"https://e/r","assets":[
+            {"name":"lienzo-0.3.2-windows-x64-portable.zip","browser_download_url":"https://e/z","size":1},
+            {"name":"lienzo-0.3.2-windows-x64-symbols.zip","browser_download_url":"https://e/s","size":1},
+            {"name":"lienzo-0.3.2-windows-arm64.msi","browser_download_url":"https://e/a","size":1},
+            {"name":"lienzo-0.3.2-windows-x64.msi","browser_download_url":"https://e/m","size":1}]}"#;
+        let release = parse(json, &["windows-x64.msi"]).unwrap();
+        assert_eq!(release.asset.unwrap().name, "lienzo-0.3.2-windows-x64.msi");
+        let arm = parse(json, &["windows-arm64.msi"]).unwrap();
+        assert_eq!(arm.asset.unwrap().name, "lienzo-0.3.2-windows-arm64.msi");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_has_packages_and_markers() {
+        assert!(!preferred_assets().is_empty());
+        assert!(preferred_assets().iter().all(|n| n.ends_with(".msi")));
+        assert!(platform_markers().contains(&".msi"));
     }
 
     #[test]

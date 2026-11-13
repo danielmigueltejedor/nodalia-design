@@ -49,6 +49,14 @@ pub(crate) fn running_bundle(app: &App) -> Option<PathBuf> {
     (bundle.file_name()?.to_str()? == app.bundle).then(|| bundle.to_path_buf())
 }
 
+/// Whether macOS runs this bundle from a translocated copy: a quarantined app opened where it was
+/// downloaded runs from a random read-only path, and replacing that path changes nothing.
+pub(crate) fn is_translocated(bundle: &std::path::Path) -> bool {
+    bundle
+        .components()
+        .any(|part| part.as_os_str() == "AppTranslocation")
+}
+
 /// How `codesign` verifies an app whose seal is checked before an update. Not `--strict`: that
 /// flag also rejects Finder metadata (`com.apple.FinderInfo`) on the files, and every file that
 /// has been on an HFS+ disk image or copied by the Finder carries it, so a perfectly good app
@@ -268,6 +276,16 @@ mod tests {
         "Identifier=dev.danielmiguelt.Vinilo\nSignature size=9000\nTeamIdentifier=ABCDE12345\n";
 
     #[test]
+    fn a_translocated_copy_is_recognised() {
+        assert!(is_translocated(std::path::Path::new(
+            "/private/var/folders/x/T/AppTranslocation/1234/d/Lienzo.app"
+        )));
+        assert!(!is_translocated(std::path::Path::new(
+            "/Applications/Lienzo.app"
+        )));
+    }
+
+    #[test]
     fn reads_adhoc_and_team_signatures() {
         let adhoc = parse_codesign_display(ADHOC);
         assert_eq!(adhoc.identifier, "dev.danielmiguelt.Vinilo");
@@ -402,5 +420,212 @@ mod tests {
             .unwrap_or(false);
         let _ = std::fs::remove_file(path);
         assert!(ok, "bash -n rejected the helper");
+    }
+}
+
+/// The whole macOS update on a real machine: an ad-hoc signed app (as every Nodalia DMG ships),
+/// on an HFS+ disk image whose files carry Finder metadata, checked the way the app checks it and
+/// then installed by the helper itself, signature check included. Runs on the macOS CI runner.
+#[cfg(all(test, target_os = "macos"))]
+mod end_to_end {
+    use std::fs;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
+
+    fn run(program: &str, args: &[&str]) {
+        let status = Command::new(program).args(args).status().unwrap();
+        assert!(status.success(), "{program} {args:?} failed");
+    }
+
+    /// `Probe.app` whose program is a copy of `sleep`, so it shows in `ps` under its own path,
+    /// with `version.txt` saying which build it is. Signed ad hoc, then given Finder metadata the
+    /// way a file copied off a disk image has it.
+    fn make_app(at: &Path, version: &str) -> PathBuf {
+        let app = at.join("Probe.app");
+        let contents = app.join("Contents");
+        fs::create_dir_all(contents.join("MacOS")).unwrap();
+        fs::create_dir_all(contents.join("Resources")).unwrap();
+        fs::copy("/bin/sleep", contents.join("MacOS/probe")).unwrap();
+        fs::write(contents.join("Resources/version.txt"), version).unwrap();
+        fs::write(
+            contents.join("Info.plist"),
+            format!(
+                r#"<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>dev.nodalia.update-probe</string>
+<key>CFBundleExecutable</key><string>probe</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>{version}</string>
+</dict></plist>"#
+            ),
+        )
+        .unwrap();
+        run(
+            "/usr/bin/codesign",
+            &["--force", "--deep", "--sign", "-", app.to_str().unwrap()],
+        );
+        let finder_info = "0000000000000000040000000000000000000000000000000000000000000000";
+        run(
+            "/usr/bin/xattr",
+            &[
+                "-wx",
+                "com.apple.FinderInfo",
+                finder_info,
+                contents.join("Info.plist").to_str().unwrap(),
+            ],
+        );
+        app
+    }
+
+    fn make_dmg(dir: &Path, version: &str) -> PathBuf {
+        let stage = dir.join(format!("stage-{version}"));
+        fs::create_dir_all(&stage).unwrap();
+        make_app(&stage, version);
+        let dmg = dir.join(format!("probe-{version}-macos-arm64.dmg"));
+        run(
+            "/usr/bin/hdiutil",
+            &[
+                "create",
+                "-quiet",
+                "-fs",
+                "HFS+",
+                "-volname",
+                "Probe",
+                "-srcfolder",
+                stage.to_str().unwrap(),
+                "-format",
+                "UDZO",
+                dmg.to_str().unwrap(),
+            ],
+        );
+        dmg
+    }
+
+    fn sha256(path: &Path) -> String {
+        use sha2::{Digest, Sha256};
+        let bytes = fs::read(path).unwrap();
+        Sha256::digest(&bytes)
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect()
+    }
+
+    fn scratch(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("nodalia-e2e-{name}-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        dir.canonicalize().unwrap()
+    }
+
+    const APP: crate::App = crate::App {
+        name: "Probe",
+        repo: "o/r",
+        bundle: "Probe.app",
+        version: "1.0.0",
+        edition: None,
+    };
+
+    #[test]
+    fn an_adhoc_app_from_a_disk_image_passes_the_seal_check() {
+        let dir = scratch("seal");
+        let installed = make_app(&dir.join("Applications"), "1");
+        let dmg = make_dmg(&dir, "2");
+        crate::apply::verify_macos_package(&APP, &installed, &dmg, &dir.join("mount"))
+            .unwrap_or_else(|e| panic!("the app's pre-install check refused it: {e}"));
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_helper_installs_the_new_app_and_starts_it() {
+        let dir = scratch("helper");
+        let installed = make_app(&dir.join("Applications"), "1");
+        let dmg = make_dmg(&dir, "2");
+        let script = dir.join("helper.sh");
+        fs::write(&script, super::helper_script("Probe.app", "Probe")).unwrap();
+        // A stand-in for `open` that starts the app's program in the background.
+        let open = dir.join("open.sh");
+        fs::write(
+            &open,
+            "#!/bin/bash\n\"$1/Contents/MacOS/probe\" 20 >/dev/null 2>&1 &\nexit 0\n",
+        )
+        .unwrap();
+        run("/bin/chmod", &["+x", open.to_str().unwrap()]);
+        // The parent has already exited, as the app has once it hands over.
+        let mut parent = Command::new("/usr/bin/true").spawn().unwrap();
+        let pid = parent.id().to_string();
+        parent.wait().unwrap();
+        let (log, result) = (dir.join("update.log"), dir.join("result.txt"));
+        let status = Command::new("/bin/bash")
+            .arg(&script)
+            .arg(&dmg)
+            .arg(dir.join("dmg-mount"))
+            .arg(&installed)
+            .arg(&pid)
+            .arg(&log)
+            .arg(&result)
+            .arg(sha256(&dmg))
+            .env("NODALIA_UPDATE_OPEN", &open)
+            .env("NODALIA_UPDATE_WAIT_STEPS", "4")
+            .env("NODALIA_UPDATE_GRACE_STEPS", "2")
+            .status()
+            .unwrap();
+        let log_text = fs::read_to_string(&log).unwrap_or_default();
+        let _ = Command::new("/usr/bin/pkill")
+            .args([
+                "-f",
+                installed.join("Contents/MacOS/probe").to_str().unwrap(),
+            ])
+            .status();
+        assert!(status.success(), "the helper failed:\n{log_text}");
+        assert_eq!(
+            fs::read_to_string(&result).unwrap().trim(),
+            "ok",
+            "{log_text}"
+        );
+        assert_eq!(
+            fs::read_to_string(installed.join("Contents/Resources/version.txt")).unwrap(),
+            "2",
+            "the new version is installed"
+        );
+        assert!(
+            !dir.join("Applications/Probe.app.nodalia-backup").exists(),
+            "the backup is removed once the new app runs"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_helper_refuses_a_disk_image_that_changed_after_the_download() {
+        let dir = scratch("digest");
+        let installed = make_app(&dir.join("Applications"), "1");
+        let dmg = make_dmg(&dir, "2");
+        let script = dir.join("helper.sh");
+        fs::write(&script, super::helper_script("Probe.app", "Probe")).unwrap();
+        let mut parent = Command::new("/usr/bin/true").spawn().unwrap();
+        let pid = parent.id().to_string();
+        parent.wait().unwrap();
+        let result = dir.join("result.txt");
+        let status = Command::new("/bin/bash")
+            .arg(&script)
+            .arg(&dmg)
+            .arg(dir.join("dmg-mount"))
+            .arg(&installed)
+            .arg(&pid)
+            .arg(dir.join("update.log"))
+            .arg(&result)
+            .arg("0".repeat(64))
+            .env("NODALIA_UPDATE_OPEN", "/usr/bin/true")
+            .env("NODALIA_UPDATE_WAIT_STEPS", "4")
+            .status()
+            .unwrap();
+        assert!(!status.success());
+        assert_eq!(fs::read_to_string(&result).unwrap().trim(), "contents");
+        assert_eq!(
+            fs::read_to_string(installed.join("Contents/Resources/version.txt")).unwrap(),
+            "1",
+            "nothing was replaced"
+        );
+        let _ = fs::remove_dir_all(&dir);
     }
 }
