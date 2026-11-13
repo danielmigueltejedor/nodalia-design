@@ -1069,6 +1069,9 @@ ndl-dialog .ndl-alert-text .title-3 {
 
 .ndl-row.ndl-entry-row .title {
   color: var(--ndl-color-text-secondary);
+  /* The group's caption margin is for group titles: here it would push the title off the
+   * text's left edge. */
+  margin: 0;
 }
 
 .ndl-row.ndl-button-row .title {
