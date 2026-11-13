@@ -1680,4 +1680,620 @@ export const ICONS = {
     '<circle cx="14" cy="14" r="4.5"/>',
     '<path d="M17.5 17.5L21 21"/>',
   ] },
+  // --- vector illustration (drawn for Pluma, shared by every app) ---
+  "chevrons-left": { group: "general", body: [
+    '<path d="M11.5 6l-6 6 6 6"/>',
+    '<path d="M18.5 6l-6 6 6 6"/>',
+  ] },
+  "chevrons-right": { group: "general", body: [
+    '<path d="M12.5 6l6 6-6 6"/>',
+    '<path d="M5.5 6l6 6-6 6"/>',
+  ] },
+  "arrows-horizontal": { group: "general", body: [
+    '<path d="M4 12h16"/>',
+    '<path d="M7.5 8.5 4 12l3.5 3.5M16.5 8.5 20 12l-3.5 3.5"/>',
+  ] },
+  "arrows-vertical": { group: "general", body: [
+    '<path d="M12 4v16"/>',
+    '<path d="M8.5 7.5 12 4l3.5 3.5M8.5 16.5 12 20l3.5-3.5"/>',
+  ] },
+  "reverse": { group: "general", body: [
+    '<path d="M4 8.5h15"/>',
+    '<path d="M16 5.5l3 3-3 3"/>',
+    '<path d="M20 15.5H5"/>',
+    '<path d="M8 12.5l-3 3 3 3"/>',
+  ] },
+  "rotate-ccw": { group: "general", body: [
+    '<path d="M4.5 12A7.5 7.5 0 1 0 12 4.5H8"/>',
+    '<path d="M10.5 2 8 4.5 10.5 7"/>',
+  ] },
+  "keyboard": { group: "general", body: [
+    '<rect x="3" y="6" width="18" height="12" rx="2"/>',
+    '<path d="M7 10h1M11.5 10h1M16 10h1M8 14h8"/>',
+  ] },
+  "link-off": { group: "general", body: [
+    '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/>',
+    '<path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    '<path d="M4 4l16 16"/>',
+  ] },
+  "pencil": { group: "design", body: [
+    '<path d="M15.5 4.6a2.12 2.12 0 0 1 3 3L8 18l-4 1.5L5.5 15.5z"/>',
+    '<path d="M13.5 6.5l3 3"/>',
+  ] },
+  "library": { group: "general", body: [
+    '<path d="M5 4.5v15M9 4.5v15"/>',
+    '<path d="M13.2 5.3l3.4-.9 3.6 13.4-3.4.9z"/>',
+  ] },
+  "navigator": { group: "view", fill: [1], body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<rect x="9" y="9" width="7" height="6" rx="0.5"/>',
+  ] },
+  "resize": { group: "general", body: [
+    '<path d="M6 18 18 6"/>',
+    '<path d="M12.5 6H18v5.5M6 12.5V18h5.5"/>',
+  ] },
+  "branch": { group: "general", body: [
+    '<circle cx="7" cy="5.5" r="2"/>',
+    '<circle cx="7" cy="18.5" r="2"/>',
+    '<circle cx="17" cy="7.5" r="2"/>',
+    '<path d="M7 7.5v9"/>',
+    '<path d="M17 9.5c0 3.5-3 4.5-6 4.5-2 0-4 .5-4 2.5"/>',
+  ] },
+  "triangle": { group: "design", body: [
+    '<path d="M12 4.5 20.5 19h-17z"/>',
+  ] },
+  "spiral": { group: "design", body: [
+    '<path d="M13 14.5a1.75 1.75 0 0 1 3.5 0 3.5 3.5 0 0 1-3.5 3.5 5.25 5.25 0 0 1-5.25-5.25 7 7 0 0 1 7-7"/>',
+  ] },
+  "color-wheel": { group: "design", body: [
+    '<circle cx="12" cy="12" r="8.5"/>',
+    '<path d="M12 12V3.5M12 12l7.36 4.25M12 12l-7.36 4.25"/>',
+    '<path d="M12 12V3.5a8.5 8.5 0 0 1 7.36 12.75z" fill="currentColor" fill-opacity="0.18" stroke="none"/>',
+  ] },
+  "color-guide": { group: "design", body: [
+    '<circle cx="12" cy="12" r="8.5"/>',
+    '<path d="M12 5.5 17.63 15.25H6.37z"/>',
+  ] },
+  "swatches": { group: "design", fill: [0, 3], body: [
+    '<rect x="4" y="4" width="6" height="6" rx="1.25"/>',
+    '<rect x="14" y="4" width="6" height="6" rx="1.25"/>',
+    '<rect x="4" y="14" width="6" height="6" rx="1.25"/>',
+    '<rect x="14" y="14" width="6" height="6" rx="1.25"/>',
+  ] },
+  "graphic-styles": { group: "design", fill: [0, 3], body: [
+    '<rect x="4" y="4" width="6" height="6" rx="1.25"/>',
+    '<circle cx="17" cy="7" r="3"/>',
+    '<circle cx="7" cy="17" r="3"/>',
+    '<rect x="14" y="14" width="6" height="6" rx="1.25"/>',
+  ] },
+  "glyphs": { group: "text", body: [
+    '<rect x="3.5" y="3.5" width="17" height="17" rx="2"/>',
+    '<path d="M8 16.5l4-9 4 9M9.5 13.5h5"/>',
+  ] },
+  "effects": { group: "design", body: [
+    '<path d="M11.5 4.5H10A2.5 2.5 0 0 0 7.5 7v12.5"/>',
+    '<path d="M5 10.5h5.5"/>',
+    '<path d="M13.5 12l5.5 7.5M19 12l-5.5 7.5"/>',
+  ] },
+  "actions": { group: "design", fill: [1], body: [
+    '<path d="M4 6h10M4 11h10M4 16h6"/>',
+    '<path d="M14.5 13.5v6.5l5.5-3.25z"/>',
+  ] },
+  "appearance": { group: "design", fill: [0], body: [
+    '<rect x="4" y="4.5" width="5" height="5" rx="1"/>',
+    '<path d="M12.5 7h7.5"/>',
+    '<rect x="4" y="14.5" width="5" height="5" rx="1"/>',
+    '<path d="M12.5 17h7.5"/>',
+  ] },
+  "stroke-weight": { group: "design", body: [
+    '<path d="M4 5h16"/>',
+    '<rect x="3" y="9" width="18" height="3.5" rx="1" fill="currentColor" stroke="none"/>',
+    '<rect x="3" y="15" width="18" height="5.5" rx="1.25" fill="currentColor" stroke="none"/>',
+  ] },
+  "opacity": { group: "design", fill: [0], body: [
+    '<circle cx="9" cy="12" r="5.5"/>',
+    '<circle cx="15" cy="12" r="5.5" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
+  "none": { group: "design", body: [
+    '<circle cx="12" cy="12" r="8.5"/>',
+    '<path d="M6 18 18 6"/>',
+  ] },
+  "clip-mask": { group: "design", fill: [1], body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    '<circle cx="12" cy="12" r="4.5"/>',
+  ] },
+  "guides": { group: "view", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    '<path d="M2.5 9.5h19M14.5 2.5v19"/>',
+  ] },
+  "screen-mode": { group: "view", fill: [1], body: [
+    '<rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/>',
+    '<rect x="7" y="7.5" width="10" height="5.5" rx="0.5"/>',
+    '<path d="M9 20h6M12 16.5V20"/>',
+  ] },
+  "rotate-view": { group: "view", body: [
+    '<rect x="9" y="9" width="6" height="6" rx="1"/>',
+    '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/>',
+    '<path d="M20 3.5v4h-4"/>',
+  ] },
+  "mountain": { group: "view", fill: [0], body: [
+    '<path d="M3 18.5l6.5-9 4 5.5 2.5-3 5 6.5z"/>',
+  ] },
+  "mountain-small": { group: "view", fill: [0], body: [
+    '<path d="M7 16.5l3.5-4.75 2 2.75 1.5-1.5 3 3.5z"/>',
+  ] },
+  "new-item": { group: "general", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="2"/>',
+    '<path d="M12 8.5v7M8.5 12h7"/>',
+  ] },
+  "fill-add": { group: "design", fill: [1], body: [
+    '<rect x="4" y="4" width="16" height="16" rx="2"/>',
+    '<rect x="8.5" y="8.5" width="7" height="7" rx="1"/>',
+  ] },
+  "stroke-add": { group: "design", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="2"/>',
+    '<rect x="8.5" y="8.5" width="7" height="7" rx="1"/>',
+  ] },
+  "swap": { group: "design", body: [
+    '<path d="M7.5 4.5H14a5 5 0 0 1 5 5v6"/>',
+    '<path d="M10 2 7.5 4.5 10 7M16.5 13l2.5 2.5 2.5-2.5"/>',
+  ] },
+  "symbol": { group: "design", fill: [0, 1, 2], body: [
+    '<circle cx="12" cy="7.5" r="3"/>',
+    '<circle cx="7.5" cy="13.5" r="3"/>',
+    '<circle cx="16.5" cy="13.5" r="3"/>',
+    '<path d="M12 12v8.5M9.5 20.5h5"/>',
+  ] },
+  "brush-remove": { group: "design", body: [
+    '<path d="M19.5 4.5a2 2 0 0 0-2.9 0L9 12.5l2.5 2.5 8-7.6a2 2 0 0 0 0-2.9z"/>',
+    '<path d="M9 12.5c-2.5 0-3.5 1.5-3.5 3.5 0 1.5-1 2.5-2 3 1 1 2.5 1.5 4 1.5 2.5 0 4-1.5 4-4z"/>',
+    '<path d="M3.5 3.5l17 17"/>',
+  ] },
+  // tools
+  "group-select": { group: "design", body: [
+    '<path d="M4.5 3.5l4.6 13 2-5.3 5.3-2z"/>',
+    '<path d="M17.5 14.5v6M14.5 17.5h6"/>',
+  ] },
+  "live-select": { group: "design", fill: [1], body: [
+    '<path d="M4.5 3.5l4.6 13 2-5.3 5.3-2z"/>',
+    '<rect x="14" y="14" width="6.5" height="6.5" rx="1"/>',
+  ] },
+  "anchor-point": { group: "design", fill: [1], body: [
+    '<path d="M5 19.5 12 6l7 13.5"/>',
+    '<rect x="10.25" y="4.25" width="3.5" height="3.5" rx="0.5"/>',
+  ] },
+  "anchor-smooth": { group: "design", fill: [2, 3, 4], body: [
+    '<path d="M3.5 19.5C5 13 8.5 10 12 10s7 3 8.5 9.5"/>',
+    '<path d="M6 10h12"/>',
+    '<rect x="10.25" y="8.25" width="3.5" height="3.5" rx="0.5"/>',
+    '<circle cx="5" cy="10" r="1.5"/>',
+    '<circle cx="19" cy="10" r="1.5"/>',
+  ] },
+  "pen-add": { group: "design", body: [
+    '<path d="M10 3.5l4.5 8.5-2.25 5.5h-4.5L5.5 12z"/>',
+    '<path d="M10 3.5v8"/>',
+    '<circle cx="10" cy="12.75" r="1.25"/>',
+    '<path d="M7 20.5h6"/>',
+    '<path d="M18.5 13.5v7M15 17h7"/>',
+  ] },
+  "pen-remove": { group: "design", body: [
+    '<path d="M10 3.5l4.5 8.5-2.25 5.5h-4.5L5.5 12z"/>',
+    '<path d="M10 3.5v8"/>',
+    '<circle cx="10" cy="12.75" r="1.25"/>',
+    '<path d="M7 20.5h6"/>',
+    '<path d="M15 17h7"/>',
+  ] },
+  "curvature": { group: "design", fill: [1, 2, 3], body: [
+    '<path d="M4.5 18C6 10.5 9.5 7.5 12 10s6 3 7.5-4"/>',
+    '<circle cx="4.5" cy="18" r="1.75"/>',
+    '<circle cx="12" cy="10" r="1.75"/>',
+    '<circle cx="19.5" cy="6" r="1.75"/>',
+  ] },
+  "type-path": { group: "text", body: [
+    '<path d="M7 4.5h9M11.5 4.5v8"/>',
+    '<path d="M3.5 18.5c3-3 5.5-3 8.5 0s5.5 3 8.5 0"/>',
+  ] },
+  "type-vertical": { group: "text", body: [
+    '<path d="M10 5h10M15 5v14"/>',
+    '<path d="M5 5v14"/>',
+    '<path d="M3 16.5 5 19l2-2.5"/>',
+  ] },
+  "type-vertical-area": { group: "text", body: [
+    '<rect x="8.5" y="3.5" width="12" height="17" rx="1.5"/>',
+    '<path d="M11.5 8h6M14.5 8v8.5"/>',
+    '<path d="M4.5 4v15"/>',
+    '<path d="M2.75 17 4.5 19.25 6.25 17"/>',
+  ] },
+  "type-vertical-path": { group: "text", body: [
+    '<path d="M10 4h9M14.5 4v8"/>',
+    '<path d="M5 4v8.5"/>',
+    '<path d="M3.25 10.5 5 12.75l1.75-2.25"/>',
+    '<path d="M3.5 18.5c3-3 5.5-3 8.5 0s5.5 3 8.5 0"/>',
+  ] },
+  "touch-type": { group: "text", fill: [1, 2, 3, 4], body: [
+    '<path d="M8 7.5h8M12 7.5v9.5"/>',
+    '<circle cx="4.5" cy="4.5" r="1.6"/>',
+    '<circle cx="19.5" cy="4.5" r="1.6"/>',
+    '<circle cx="4.5" cy="19.5" r="1.6"/>',
+    '<circle cx="19.5" cy="19.5" r="1.6"/>',
+  ] },
+  "shape-rectangle": { group: "design", body: [
+    '<rect x="4" y="5.5" width="16" height="13" rx="1"/>',
+  ] },
+  "shape-rounded-rectangle": { group: "design", body: [
+    '<rect x="4" y="5.5" width="16" height="13" rx="4"/>',
+  ] },
+  "shape-ellipse": { group: "design", body: [
+    '<path d="M3.5 12a8.5 6.5 0 1 0 17 0 8.5 6.5 0 1 0-17 0z"/>',
+  ] },
+  "flare": { group: "design", fill: [0], body: [
+    '<circle cx="12" cy="12" r="3"/>',
+    '<path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/>',
+  ] },
+  "polar-grid": { group: "design", body: [
+    '<circle cx="12" cy="12" r="8.5"/>',
+    '<circle cx="12" cy="12" r="4.25"/>',
+    '<path d="M12 3.5v17M3.5 12h17"/>',
+  ] },
+  "blob-brush": { group: "design", fill: [1], body: [
+    '<path d="M19.5 4.5a2 2 0 0 0-2.9 0L10.5 10.6l2.9 2.9 6.1-6.1a2 2 0 0 0 0-2.9z"/>',
+    '<path d="M4 16.25c0-2 1.5-3.25 3.75-3.25S12 14.5 12 16.75 10 20.5 7.5 20.5 4 18.75 4 16.25z"/>',
+  ] },
+  "smooth-path": { group: "design", body: [
+    '<path d="M3.5 9 5.5 6.5 7.5 9 9.5 6.5 11.5 9 13.5 6.5 15.5 9 17.5 6.5 19.5 9"/>',
+    '<path d="M3.5 17c3-4 6-4 8.5-1s5.5 3 8.5-1"/>',
+  ] },
+  "path-eraser": { group: "design", fill: [1], body: [
+    '<path d="M3.5 18.5C6 11 9.5 8 13.5 6.5"/>',
+    '<path d="M12 16.5l5-5 3.5 3.5-5 5z"/>',
+  ] },
+  "knife": { group: "design", body: [
+    '<path d="M4 20 18.5 5.5a2.12 2.12 0 0 1 0 3L9 18z"/>',
+    '<path d="M4 20l5-2"/>',
+  ] },
+  "cut-line": { group: "design", body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<path d="M2.5 20 21.5 4"/>',
+  ] },
+  "cut-mirror": { group: "design", body: [
+    '<rect x="3.5" y="5" width="17" height="14" rx="1.5"/>',
+    '<path d="M12 2.5v19" stroke-dasharray="2 3"/>',
+  ] },
+  "cut-rect": { group: "design", body: [
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/>',
+    '<rect x="8" y="8.5" width="8" height="7" rx="0.5" stroke-dasharray="2 2.5"/>',
+  ] },
+  "shear": { group: "design", body: [
+    '<path d="M8.5 5.5h12L15.5 18.5h-12z"/>',
+  ] },
+  "reshape": { group: "design", fill: [1], body: [
+    '<path d="M4 19C6 11.5 10 8 16 7"/>',
+    '<rect x="15" y="5.25" width="3.5" height="3.5" rx="0.5"/>',
+    '<path d="M14.5 13.5l5 5M20 14v5h-5"/>',
+  ] },
+  "width": { group: "design", fill: [2, 3], body: [
+    '<path d="M3.5 12c4-5.5 13-5.5 17 0-4 5.5-13 5.5-17 0z"/>',
+    '<path d="M12 6v12"/>',
+    '<circle cx="12" cy="6" r="1.5"/>',
+    '<circle cx="12" cy="18" r="1.5"/>',
+  ] },
+  "warp": { group: "design", body: [
+    '<path d="M3.5 7.5c2-2 4.5-2 6.5 0s4.5 2 6.5 0 2.5-1.5 4-1.5"/>',
+    '<path d="M3.5 12.5c2-2 4.5-2 6.5 0s4.5 2 6.5 0 2.5-1.5 4-1.5"/>',
+    '<path d="M3.5 17.5c2-2 4.5-2 6.5 0s4.5 2 6.5 0 2.5-1.5 4-1.5"/>',
+  ] },
+  "twirl": { group: "design", body: [
+    '<path d="M13 14.5a1.75 1.75 0 0 1 3.5 0 3.5 3.5 0 0 1-3.5 3.5 5.25 5.25 0 0 1-5.25-5.25 7 7 0 0 1 7-7"/>',
+    '<path d="M12.25 3.25l2.5 2.5-2.5 2.5"/>',
+  ] },
+  "pucker": { group: "design", body: [
+    '<path d="M12 3.5c0 5 3.5 8.5 8.5 8.5-5 0-8.5 3.5-8.5 8.5 0-5-3.5-8.5-8.5-8.5 5 0 8.5-3.5 8.5-8.5z"/>',
+  ] },
+  "bloat": { group: "design", body: [
+    '<path d="M12 5a4.75 4.75 0 0 1 7 7 4.75 4.75 0 0 1-7 7 4.75 4.75 0 0 1-7-7 4.75 4.75 0 0 1 7-7z"/>',
+  ] },
+  "scallop": { group: "design", body: [
+    '<path d="M12 5a3.5 3.5 0 0 0 4.95 2.05A3.5 3.5 0 0 0 19 12a3.5 3.5 0 0 0-2.05 4.95A3.5 3.5 0 0 0 12 19a3.5 3.5 0 0 0-4.95-2.05A3.5 3.5 0 0 0 5 12a3.5 3.5 0 0 0 2.05-4.95A3.5 3.5 0 0 0 12 5z"/>',
+  ] },
+  "crystallize": { group: "design", body: [
+    '<path d="M12 3.25l2.01 3.9 4.18-1.34-1.34 4.18 3.9 2.01-3.9 2.01 1.34 4.18-4.18-1.34L12 20.75l-2.01-3.9-4.18 1.34 1.34-4.18L3.25 12l3.9-2.01-1.34-4.18 4.18 1.34z"/>',
+  ] },
+  "wrinkle": { group: "design", body: [
+    '<path d="M3.5 9l2-2.5 2 2.5 2-2.5 2 2.5 2-2.5 2 2.5 2-2.5 2 2.5"/>',
+    '<path d="M3.5 17l2-2.5 2 2.5 2-2.5 2 2.5 2-2.5 2 2.5 2-2.5 2 2.5"/>',
+  ] },
+  "puppet-warp": { group: "design", fill: [0], body: [
+    '<circle cx="12" cy="5.5" r="2"/>',
+    '<path d="M12 8.5v6M6 10.5h12M12 14.5l-4 6M12 14.5l4 6"/>',
+  ] },
+  "shape-builder": { group: "design", body: [
+    '<circle cx="9" cy="9.5" r="5.5"/>',
+    '<rect x="9" y="9.5" width="10" height="10" rx="1"/>',
+    '<path d="M18 2.75v5M15.5 5.25h5"/>',
+  ] },
+  "perspective": { group: "design", body: [
+    '<path d="M3.5 19.5 9 4.5h6l5.5 15z"/>',
+    '<path d="M12 4.5v15M6.25 12h11.5"/>',
+  ] },
+  "mesh-gradient": { group: "design", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    '<path d="M4 9.5c5-2 11 2 16 0M4 14.5c5-2 11 2 16 0"/>',
+    '<path d="M9.5 4c-2 5 2 11 0 16M14.5 4c-2 5 2 11 0 16"/>',
+  ] },
+  "gradient-radial": { group: "design", fill: [2], body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    '<circle cx="12" cy="12" r="4.5" fill="currentColor" fill-opacity="0.18"/>',
+    '<circle cx="12" cy="12" r="1.5"/>',
+  ] },
+  "gradient-freeform": { group: "design", fill: [1, 2, 3], body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    '<circle cx="8.5" cy="8.5" r="1.75"/>',
+    '<circle cx="15.5" cy="10" r="1.75"/>',
+    '<circle cx="10.5" cy="15.5" r="1.75"/>',
+  ] },
+  "gradient-stroke-within": { group: "design", body: [
+    '<path d="M4 20.5V9.5A5.5 5.5 0 0 1 9.5 4h11v5.5h-10a.5.5 0 0 0-.5.5v10.5z" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
+  "gradient-stroke-along": { group: "design", body: [
+    '<path d="M4 20.5V9.5A5.5 5.5 0 0 1 9.5 4h11v5.5h-10a.5.5 0 0 0-.5.5v10.5z"/>',
+    '<path d="M4 20.5V14h6v6.5z" fill="currentColor"/>',
+  ] },
+  "gradient-stroke-across": { group: "design", body: [
+    '<path d="M4 20.5V9.5A5.5 5.5 0 0 1 9.5 4h11v5.5h-10a.5.5 0 0 0-.5.5v10.5z"/>',
+    '<path d="M4 20.5V9.5A5.5 5.5 0 0 1 9.5 4h11v2.75h-11A2.75 2.75 0 0 0 6.75 9.5v11z" fill="currentColor"/>',
+  ] },
+  "blend": { group: "design", fill: [0], body: [
+    '<circle cx="6" cy="12" r="2.5"/>',
+    '<circle cx="11" cy="12" r="3.5" stroke-dasharray="2 2.5"/>',
+    '<circle cx="16.5" cy="12" r="4.5"/>',
+  ] },
+  "objects-on-path": { group: "design", fill: [1, 2, 3], body: [
+    '<path d="M3.5 18c4-9.5 13-9.5 17 0"/>',
+    '<rect x="2.5" y="16" width="4" height="4" rx="0.75"/>',
+    '<rect x="10" y="8.75" width="4" height="4" rx="0.75"/>',
+    '<rect x="17.5" y="16" width="4" height="4" rx="0.75"/>',
+  ] },
+  "symbol-sprayer": { group: "design", fill: [3, 4, 5], body: [
+    '<rect x="10" y="9.5" width="8" height="11" rx="1.5"/>',
+    '<path d="M11.75 9.5V7h4.5v2.5"/>',
+    '<path d="M14 7V4.5"/>',
+    '<circle cx="5.5" cy="5" r="1"/>',
+    '<circle cx="4.5" cy="9" r="1"/>',
+    '<circle cx="7.5" cy="7.25" r="1"/>',
+  ] },
+  "artboard": { group: "design", body: [
+    '<path d="M7 3v18M17 3v18M3 7h18M3 17h18"/>',
+  ] },
+  "artboards": { group: "design", body: [
+    '<rect x="3.5" y="4" width="8" height="10" rx="1"/>',
+    '<rect x="13.5" y="8" width="7" height="12" rx="1"/>',
+  ] },
+  "rearrange": { group: "design", fill: [0, 1], body: [
+    '<rect x="4" y="4" width="6" height="6" rx="1"/>',
+    '<rect x="14" y="14" width="6" height="6" rx="1"/>',
+    '<path d="M13.5 7h3.5a2.5 2.5 0 0 1 2.5 2.5v1M10.5 17H7a2.5 2.5 0 0 1-2.5-2.5v-1"/>',
+    '<path d="M17.5 8.75l2 2 2-2M6.5 15.25l-2-2-2 2"/>',
+  ] },
+  "web-slice": { group: "design", body: [
+    '<path d="M3.5 20.5 15 9l3 3L8 20.5z"/>',
+    '<path d="M15 9l3.5-3.5a2.12 2.12 0 0 1 3 3L18 12"/>',
+  ] },
+  "contour": { group: "design", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="4.5"/>',
+    '<rect x="8.5" y="8.5" width="7" height="7" rx="1.5"/>',
+  ] },
+  // panels
+  "align-objects-right": { group: "design", body: [
+    '<path d="M20 3.5v17"/>',
+    '<rect x="7" y="6" width="10" height="4.5" rx="1"/>',
+    '<rect x="11" y="13.5" width="6" height="4.5" rx="1"/>',
+  ] },
+  "align-objects-top": { group: "design", body: [
+    '<path d="M3.5 4h17"/>',
+    '<rect x="6" y="7" width="4.5" height="10" rx="1"/>',
+    '<rect x="13.5" y="7" width="4.5" height="6" rx="1"/>',
+  ] },
+  "align-objects-middle": { group: "design", body: [
+    '<path d="M3.5 12h17"/>',
+    '<rect x="6" y="6" width="4.5" height="12" rx="1"/>',
+    '<rect x="13.5" y="8.5" width="4.5" height="7" rx="1"/>',
+  ] },
+  "align-objects-bottom": { group: "design", body: [
+    '<path d="M3.5 20h17"/>',
+    '<rect x="6" y="7" width="4.5" height="10" rx="1"/>',
+    '<rect x="13.5" y="11" width="4.5" height="6" rx="1"/>',
+  ] },
+  "align-objects-both": { group: "design", body: [
+    '<path d="M12 3v3.5M12 17.5V21M3 12h3.5M17.5 12H21"/>',
+    '<rect x="7" y="7" width="10" height="10" rx="1.5"/>',
+  ] },
+  "distribute-left": { group: "design", body: [
+    '<path d="M4 4v16M12.5 4v16"/>',
+    '<rect x="6.5" y="7" width="3.5" height="10" rx="1"/>',
+    '<rect x="15" y="9" width="5" height="6" rx="1"/>',
+  ] },
+  "distribute-hcenter": { group: "design", body: [
+    '<path d="M7 3.5V7M7 17v3.5M16.5 3.5V9M16.5 15v5.5"/>',
+    '<rect x="4.75" y="7" width="4.5" height="10" rx="1"/>',
+    '<rect x="13.5" y="9" width="6" height="6" rx="1"/>',
+  ] },
+  "distribute-right": { group: "design", body: [
+    '<path d="M11.5 4v16M20 4v16"/>',
+    '<rect x="4" y="9" width="5" height="6" rx="1"/>',
+    '<rect x="14" y="7" width="3.5" height="10" rx="1"/>',
+  ] },
+  "distribute-top": { group: "design", body: [
+    '<path d="M4 4h16M4 12.5h16"/>',
+    '<rect x="7" y="6.5" width="10" height="3.5" rx="1"/>',
+    '<rect x="9" y="15" width="6" height="5" rx="1"/>',
+  ] },
+  "distribute-vcenter": { group: "design", body: [
+    '<path d="M3.5 7H7M17 7h3.5M3.5 16.5H9M15 16.5h5.5"/>',
+    '<rect x="7" y="4.75" width="10" height="4.5" rx="1"/>',
+    '<rect x="9" y="13.5" width="6" height="6" rx="1"/>',
+  ] },
+  "distribute-bottom": { group: "design", body: [
+    '<path d="M4 11.5h16M4 20h16"/>',
+    '<rect x="9" y="4" width="6" height="5" rx="1"/>',
+    '<rect x="7" y="14" width="10" height="3.5" rx="1"/>',
+  ] },
+  "distribute-vertical": { group: "design", body: [
+    '<path d="M3.5 4h17M3.5 20h17"/>',
+    '<rect x="7" y="9.5" width="10" height="5" rx="1"/>',
+  ] },
+  "align-to-selection": { group: "design", fill: [1], body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1" stroke-dasharray="2 3"/>',
+    '<rect x="7.5" y="7.5" width="4" height="9" rx="1"/>',
+    '<rect x="13" y="11" width="3.5" height="5.5" rx="1"/>',
+  ] },
+  "align-to-key": { group: "design", fill: [0], body: [
+    '<rect x="4" y="6" width="7" height="12" rx="1"/>',
+    '<rect x="14" y="9" width="6" height="6" rx="1"/>',
+  ] },
+  "align-to-artboard": { group: "design", fill: [1], body: [
+    '<path d="M7 3v4H3M17 3v4h4M7 21v-4H3M17 21v-4h4"/>',
+    '<rect x="9.5" y="9.5" width="5" height="5" rx="1"/>',
+  ] },
+  "justify-left": { group: "text", body: [
+    '<path d="M4 5h16M4 9.75h16M4 14.5h16M4 19.25h9"/>',
+  ] },
+  "justify-center": { group: "text", body: [
+    '<path d="M4 5h16M4 9.75h16M4 14.5h16M7.5 19.25h9"/>',
+  ] },
+  "justify-right": { group: "text", body: [
+    '<path d="M4 5h16M4 9.75h16M4 14.5h16M11 19.25h9"/>',
+  ] },
+  "text-ltr": { group: "text", body: [
+    '<path d="M15.5 3.5H10a3.25 3.25 0 0 0 0 6.5h2"/>',
+    '<path d="M12 3.5v10M15 3.5v10"/>',
+    '<path d="M4 18.5h16M17 16l3 2.5-3 2.5"/>',
+  ] },
+  "text-rtl": { group: "text", body: [
+    '<path d="M15.5 3.5H10a3.25 3.25 0 0 0 0 6.5h2"/>',
+    '<path d="M12 3.5v10M15 3.5v10"/>',
+    '<path d="M20 18.5H4M7 16l-3 2.5 3 2.5"/>',
+  ] },
+  "cap-butt": { group: "design", body: [
+    '<path d="M3.5 8.5h10v7h-10" fill="currentColor" fill-opacity="0.18"/>',
+    '<path d="M13.5 4v16" stroke-dasharray="2 3"/>',
+  ] },
+  "cap-round": { group: "design", body: [
+    '<path d="M3.5 8.5h10a3.5 3.5 0 0 1 0 7h-10" fill="currentColor" fill-opacity="0.18"/>',
+    '<path d="M13.5 4v16" stroke-dasharray="2 3"/>',
+  ] },
+  "cap-square": { group: "design", body: [
+    '<path d="M3.5 8.5H17v7H3.5" fill="currentColor" fill-opacity="0.18"/>',
+    '<path d="M13.5 4v16" stroke-dasharray="2 3"/>',
+  ] },
+  "join-miter": { group: "design", body: [
+    '<path d="M4 20.5V3.5h16.5v6H10v11z" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
+  "join-round": { group: "design", body: [
+    '<path d="M4 20.5V9.5a6 6 0 0 1 6-6h10.5v6H10v11z" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
+  "join-bevel": { group: "design", body: [
+    '<path d="M4 20.5V8l4.5-4.5h12v6H10v11z" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
+  "stroke-center": { group: "design", body: [
+    '<path d="M4.5 4.5h15v15h-15zM9.5 9.5v5h5v-5z" fill="currentColor" fill-opacity="0.18" fill-rule="evenodd" stroke="none"/>',
+    '<rect x="7" y="7" width="10" height="10"/>',
+  ] },
+  "stroke-inside": { group: "design", body: [
+    '<path d="M4.5 4.5h15v15h-15zM9.5 9.5v5h5v-5z" fill="currentColor" fill-opacity="0.18" fill-rule="evenodd" stroke="none"/>',
+    '<rect x="4.5" y="4.5" width="15" height="15"/>',
+  ] },
+  "stroke-outside": { group: "design", body: [
+    '<path d="M4.5 4.5h15v15h-15zM9.5 9.5v5h5v-5z" fill="currentColor" fill-opacity="0.18" fill-rule="evenodd" stroke="none"/>',
+    '<rect x="9.5" y="9.5" width="5" height="5"/>',
+  ] },
+  "arrowhead-tip": { group: "design", fill: [1], body: [
+    '<path d="M3.5 12h7"/>',
+    '<path d="M10.5 7.5l6 4.5-6 4.5z"/>',
+    '<path d="M16.5 4v16" stroke-dasharray="2 3"/>',
+  ] },
+  "arrowhead-extend": { group: "design", fill: [1], body: [
+    '<path d="M3.5 12h11"/>',
+    '<path d="M14.5 7.5l6 4.5-6 4.5z"/>',
+    '<path d="M14.5 4v16" stroke-dasharray="2 3"/>',
+  ] },
+  "dash-exact": { group: "design", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1" stroke-dasharray="3 3"/>',
+  ] },
+  "dash-align": { group: "design", body: [
+    '<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>',
+    '<path d="M11 4h2M20 11v2M11 20h2M4 11v2"/>',
+  ] },
+  "draw-normal": { group: "design", fill: [1], body: [
+    '<rect x="4" y="4" width="11" height="11" rx="1"/>',
+    '<circle cx="15.5" cy="15.5" r="4.5"/>',
+  ] },
+  "draw-behind": { group: "design", fill: [1], body: [
+    '<circle cx="15.5" cy="15.5" r="4.5"/>',
+    '<rect x="4" y="4" width="11" height="11" rx="1"/>',
+  ] },
+  "draw-inside": { group: "design", fill: [1], body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1" stroke-dasharray="2 3"/>',
+    '<circle cx="12" cy="12" r="4.5"/>',
+  ] },
+  "fill-rule-evenodd": { group: "design", body: [
+    '<path d="M4 4h11v11H4zM9 9h11v11H9z" fill="currentColor" fill-opacity="0.18" fill-rule="evenodd"/>',
+  ] },
+  "fill-rule-nonzero": { group: "design", body: [
+    '<path d="M4 4h11v11H4zM9 9h11v11H9z" fill="currentColor" fill-opacity="0.18" fill-rule="nonzero"/>',
+    '<path d="M9 9h6v6H9z" fill="currentColor" fill-opacity="0.18" stroke="none"/>',
+  ] },
+  "center-show": { group: "design", fill: [1], body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    '<circle cx="12" cy="12" r="2"/>',
+  ] },
+  "center-hide": { group: "design", body: [
+    '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    '<path d="M10 10l4 4M14 10l-4 4"/>',
+  ] },
+  // Pathfinder: square A at the top left, square B in front at the bottom right
+  "pathfinder": { group: "design", body: [
+    '<rect x="4" y="4" width="10" height="10" rx="1"/>',
+    '<rect x="10" y="10" width="10" height="10" rx="1" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
+  "pathfinder-unite": { group: "design", body: [
+    '<path d="M4 5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v5h5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-5H5a1 1 0 0 1-1-1z" fill="currentColor"/>',
+  ] },
+  "pathfinder-minus-front": { group: "design", body: [
+    '<path d="M4 5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v5h-4v4H5a1 1 0 0 1-1-1z" fill="currentColor"/>',
+    '<path d="M14 10h5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-5" stroke-dasharray="2 3"/>',
+  ] },
+  "pathfinder-minus-back": { group: "design", body: [
+    '<path d="M14 10h5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-5h4z" fill="currentColor"/>',
+    '<path d="M10 14H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v5" stroke-dasharray="2 3"/>',
+  ] },
+  "pathfinder-intersect": { group: "design", body: [
+    '<rect x="4" y="4" width="10" height="10" rx="1" stroke-dasharray="2 3"/>',
+    '<rect x="10" y="10" width="10" height="10" rx="1" stroke-dasharray="2 3"/>',
+    '<rect x="10" y="10" width="4" height="4" fill="currentColor"/>',
+  ] },
+  "pathfinder-exclude": { group: "design", body: [
+    '<path d="M5 4h8a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM11 10h8a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z" fill="currentColor" fill-rule="evenodd"/>',
+  ] },
+  "pathfinder-divide": { group: "design", body: [
+    '<rect x="4" y="4" width="10" height="10" rx="1"/>',
+    '<rect x="10" y="10" width="10" height="10" rx="1"/>',
+    '<rect x="10" y="10" width="4" height="4" fill="currentColor" fill-opacity="0.18"/>',
+  ] },
+  "pathfinder-trim": { group: "design", body: [
+    '<rect x="4" y="4" width="10" height="10" rx="1" fill="currentColor"/>',
+    '<path d="M14 10h5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-5"/>',
+  ] },
+  "pathfinder-merge": { group: "design", body: [
+    '<path d="M14 10h5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-5h4z" fill="currentColor" fill-opacity="0.18"/>',
+    '<rect x="4" y="4" width="10" height="10" rx="1" fill="currentColor"/>',
+  ] },
+  "pathfinder-crop": { group: "design", body: [
+    '<rect x="4" y="4" width="10" height="10" rx="1"/>',
+    '<rect x="10" y="10" width="10" height="10" rx="1" stroke-dasharray="2 3"/>',
+    '<rect x="10" y="10" width="4" height="4" fill="currentColor"/>',
+  ] },
+  "pathfinder-outline": { group: "design", body: [
+    '<rect x="4" y="4" width="10" height="10" rx="1"/>',
+    '<rect x="10" y="10" width="10" height="10" rx="1"/>',
+  ] },
 };
