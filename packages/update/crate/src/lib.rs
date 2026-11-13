@@ -32,7 +32,7 @@ pub use macos::{parse_codesign_display, same_publisher, CodeIdentity};
 pub use notes::{notes_in, Language};
 pub use release::{
     asset_digest, parse as parse_release, parse_list as parse_release_list, platform_markers,
-    preferred_assets, preferred_assets_for,
+    preferred_assets, preferred_assets_for, systems_for_package, PACKAGES,
 };
 pub use version::{compare as compare_versions, strip as strip_version};
 pub use windows::{helper_script as windows_helper_script, parse_reg_install_dir, same_folder};
