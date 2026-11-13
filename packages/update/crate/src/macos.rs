@@ -49,17 +49,36 @@ pub(crate) fn running_bundle(app: &App) -> Option<PathBuf> {
     (bundle.file_name()?.to_str()? == app.bundle).then(|| bundle.to_path_buf())
 }
 
+/// How `codesign` verifies an app whose seal is checked before an update. Not `--strict`: that
+/// flag also rejects Finder metadata (`com.apple.FinderInfo`) on the files, and every file that
+/// has been on an HFS+ disk image or copied by the Finder carries it, so a perfectly good app
+/// failed ("resource fork, Finder information, or similar detritus not allowed"). Without it
+/// `codesign` still checks the signature, that every sealed file is unchanged, and nested code.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+pub(crate) const VERIFY_ARGS: [&str; 3] = ["--verify", "--deep", "--verbose=2"];
+
 /// Reads the signature of an `.app` with `codesign`, after verifying it.
 #[cfg(target_os = "macos")]
 pub(crate) fn read_identity(bundle: &std::path::Path) -> Result<CodeIdentity, String> {
     use std::process::Command;
     let verify = Command::new("/usr/bin/codesign")
-        .args(["--verify", "--deep", "--strict"])
+        .args(VERIFY_ARGS)
         .arg(bundle)
-        .status()
+        .output()
         .map_err(|e| e.to_string())?;
-    if !verify.success() {
-        return Err("The downloaded macOS app has an invalid code signature.".into());
+    if !verify.status.success() {
+        // codesign says which file and why; keep it, so the message points at the cause.
+        let why = String::from_utf8_lossy(&verify.stderr);
+        let why = why
+            .lines()
+            .rev()
+            .find(|l| !l.trim().is_empty())
+            .unwrap_or("")
+            .trim();
+        return Err(format!(
+            "The macOS app at {} has an invalid code signature ({why}).",
+            bundle.display()
+        ));
     }
     let shown = Command::new("/usr/bin/codesign")
         .args(["-dv", "--verbose=4"])
@@ -188,7 +207,9 @@ STAGE=
 # The copy that is about to be installed is the one that is checked, so nothing that changed the
 # disk image after the app looked at it can get through: valid signature, same publisher.
 if [ -z "$NODALIA_UPDATE_SKIP_SIGNATURE" ]; then
-  /usr/bin/codesign --verify --deep --strict "$NEW" || fail signature
+  # Not the strict mode: it refuses the Finder metadata every file from a disk image carries, which
+  # `ditto` keeps even with --noextattr, and which is not part of the signature.
+  /usr/bin/codesign --verify --deep "$NEW" || fail signature
   NEW_ID=$(identity "$NEW")
   OLD_ID=$(identity "$BUNDLE")
   if [ -z "$NEW_ID" ] || [ "$NEW_ID" != "$OLD_ID" ]; then
@@ -278,6 +299,14 @@ mod tests {
         ));
     }
 
+    /// A disk image's files all carry `com.apple.FinderInfo`, which `--strict` refuses: the
+    /// seal is checked without it (see `VERIFY_ARGS`), for the downloaded app, the installed one and the helper's copy alike.
+    #[test]
+    fn the_seal_check_is_not_strict() {
+        assert!(!VERIFY_ARGS.contains(&"--strict"));
+        assert!(VERIFY_ARGS.contains(&"--deep") && VERIFY_ARGS.contains(&"--verify"));
+    }
+
     #[cfg(unix)]
     #[test]
     fn the_helper_names_the_bundle_and_is_valid_bash() {
@@ -292,6 +321,10 @@ mod tests {
         );
         assert!(script.contains("/*/\"Vinilo Native.app\") ;;"));
         assert!(script.contains("SOURCE=\"$MOUNT/Vinilo Native.app\""));
+        assert!(
+            !script.contains("--strict"),
+            "the helper's seal check must not be strict: a disk image's Finder metadata fails it"
+        );
         let hash = script
             .find("shasum -a 256")
             .expect("the helper hashes the image it is about to mount");
