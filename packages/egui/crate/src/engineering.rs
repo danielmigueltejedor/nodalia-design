@@ -507,7 +507,8 @@ pub struct TitleOutput {
     pub action: Option<TitleAction>,
     /// Where the app draws its window controls.
     pub controls: Rect,
-    /// The empty part of the bar: drag the window with it, double-click to maximize.
+    /// The empty part of the bar (what `background` returned): drag the window with it,
+    /// double-click to maximize.
     pub drag: Response,
 }
 
@@ -602,14 +603,29 @@ fn document_tab(
 /// (save, undo, redo), document tabs with a new-document button, then from the right the
 /// window controls' space, the menu and the command search.
 pub fn title_bar(ui: &mut Ui, look: &Look, bar: &TitleBar) -> TitleOutput {
+    title_bar_with(ui, look, bar, |ui, rect| {
+        ui.interact(
+            rect,
+            ui.scope_id().with("ndl_eng_title_drag"),
+            Sense::click_and_drag(),
+        )
+    })
+}
+
+/// [`title_bar`] with the app's own handling of the empty area: `background` is called with
+/// the bar's rect before any control is laid out, so the controls win the pointer over it.
+/// Use it to plug in a platform's window-move logic (native drag on macOS, double-click
+/// actions) instead of a plain drag response.
+pub fn title_bar_with(
+    ui: &mut Ui,
+    look: &Look,
+    bar: &TitleBar,
+    background: impl FnOnce(&mut Ui, Rect) -> Response,
+) -> TitleOutput {
     let p = &look.palette;
     let full = ui.available_rect_before_wrap();
     let rect = Rect::from_min_size(full.min, vec2(full.width(), layout::TITLE_BAR));
-    let drag = ui.interact(
-        rect,
-        ui.scope_id().with("ndl_eng_title_drag"),
-        Sense::click_and_drag(),
-    );
+    let drag = background(ui, rect);
     let mut action = None;
     let controls = Rect::from_min_max(
         pos2(rect.right() - bar.controls_width, rect.top()),
