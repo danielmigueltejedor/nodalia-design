@@ -45,20 +45,20 @@ export default {
     const s = sc({ cy: 32 });
     const z = (y) => -0.45 * y;
     plane(s, [[-15, -15, z(-15)], [15, -15, z(-15)], [15, 15, z(15)], [-15, 15, z(15)]]);
-    s.line([[-17, -15, z(-15)], [17, -15, z(-15)]], { role: "ink", width: 3.4 });
-    return s.line([[-17, 15, z(15)], [17, 15, z(15)]], { role: "ink", width: 3.4 });
+    s.line([[-17, -15, z(-15)], [17, -15, z(-15)]], { role: "line", width: 3.4 });
+    return s.line([[-17, 15, z(15)], [17, 15, z(15)]], { role: "line", width: 3.4 });
   },
   "plane_axis_point": () => {
     const s = sc({ cy: 34 });
     plane(s, [[0, -14, -12], [0, 14, -12], [0, 14, 12], [0, -14, 12]]);
-    s.line([[0, -18, -12], [0, 18, -12]], { role: "ink", width: 3 });
+    s.line([[0, -18, -12], [0, 18, -12]], { role: "line", width: 3 });
     return s.dot([0, 4, 8], { r: 3 });
   },
   "plane_along_path": () => {
     const s = sc({ cy: 34 });
     const path = [];
     for (let i = 0; i <= 30; i++) { const t = i / 30; path.push([-16 + 32 * t, 10 - 20 * t * t, -6]); }
-    s.line(path, { role: "ink", width: 2.6, layer: "under" });
+    s.line(path, { role: "line", width: 2.6, layer: "under" });
     return plane(s, [[0, 10, -16], [0, 0, -16], [0, 0, 6], [0, 10, 6]].map(([x, y, z]) => [x + 2, y - 4, z + 6]));
   },
   "axis": () => {
@@ -97,10 +97,10 @@ export default {
   "point_edge_plane": () => {
     const s = sc({ cy: 34 });
     plane(s, [[0, -14, -12], [0, 14, -12], [0, 14, 12], [0, -14, 12]], { kind: "face" });
-    s.line([[-16, 4, 2], [16, 4, 2]], { role: "ink", width: 3 });
+    s.line([[-16, 4, 2], [16, 4, 2]], { role: "line", width: 3 });
     return s.dot([0, 4, 2], { r: 4 });
   },
-  "point_two_edges": () => sc({ cy: 34 }).line([[-16, 0, 0], [16, 0, 0]], { role: "ink", width: 3 }).line([[0, -16, 0], [0, 16, 0]], { role: "ink", width: 3 }).dot([0, 0, 0], { r: 4 }),
+  "point_two_edges": () => sc({ cy: 34 }).line([[-16, 0, 0], [16, 0, 0]], { role: "line", width: 3 }).line([[0, -16, 0], [0, 16, 0]], { role: "line", width: 3 }).dot([0, 0, 0], { r: 4 }),
   "point_three_planes": () => {
     const s = sc({ cy: 34 });
     plane(s, hplane(0, 13), { kind: "face" });
@@ -112,7 +112,7 @@ export default {
     const s = sc({ cy: 34 });
     const path = [];
     for (let i = 0; i <= 30; i++) { const t = i / 30; path.push([-16 + 32 * t, 12 - 24 * t, 10 * Math.sin(t * Math.PI) - 4]); }
-    s.line(path, { role: "ink", width: 2.6 });
+    s.line(path, { role: "line", width: 2.6 });
     return s.dot(path[18], { r: 4 });
   },
 };

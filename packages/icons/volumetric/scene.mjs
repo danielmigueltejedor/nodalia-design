@@ -9,6 +9,9 @@
 
 export const ROLES = {
   ink: "#26303d",
+  // Line art that sits on the interface background rather than on a face; an app may draw it
+  // in its text colour.
+  line: "#28323f",
   "face-1": "#eceef2",
   "face-2": "#c3c7d1",
   "face-3": "#9499a8",
@@ -19,9 +22,11 @@ export const ROLES = {
   paper: "#ffffff",
 };
 
-// Display values for a dark interface. Outlines stay dark: the shaded faces carry the contrast.
+// Display values for a dark interface. Outlines stay dark: the shaded faces carry the contrast;
+// only line art drawn on the background turns light.
 export const ROLES_DARK = {
   ink: "#12141a",
+  line: "#dfe2ea",
   "face-1": "#b0b5c3",
   "face-2": "#868c9f",
   "face-3": "#61677a",

@@ -39,7 +39,7 @@ export default {
   },
   "drive": () => {
     const s = sc({ cy: 36 }).cylinder([0, 0, -12], 12, 8, { kind: A });
-    s.line([[0, 0, -4], [0, 0, 8]], { role: "ink", width: 3 });
+    s.line([[0, 0, -4], [0, 0, 8]], { role: "line", width: 3 });
     return s.arcArrow([0, 0, 6], 12, 160, 400);
   },
   "rest": () => {
@@ -102,7 +102,7 @@ export default {
   "inspect": () => {
     const s = sc({ cy: 34 }).box([-14, -14, -10], [14, 14, 4]);
     s.path("M34 30A9 9 0 1 0 52 30A9 9 0 1 0 34 30Z", { fill: "accent-1", stroke: "ink", width: 2.6 });
-    return s.path("M49.5 37.5L57 45", { fill: "none", stroke: "ink", width: 4.4 });
+    return s.path("M49.5 37.5L57 45", { fill: "none", stroke: "line", width: 4.4 });
   },
   "compare": () => {
     const s = sc({ cy: 34 });

@@ -11,7 +11,7 @@ export default {
   "surface": () => sc({ cy: 34 }).sheet(wave, { kind: A, n: 14 }),
   "patch": () => {
     const s = sc({ cy: 34 });
-    s.line([[-14, -14, 0], [14, -14, 0], [14, 14, 0], [-14, 14, 0]], { role: "ink", width: 2.6, closed: true, layer: "under" });
+    s.line([[-14, -14, 0], [14, -14, 0], [14, 14, 0], [-14, 14, 0]], { role: "line", width: 2.6, closed: true, layer: "under" });
     return s.sheet(dome, { kind: A, x0: -14, x1: 14, y0: -14, y1: 14, n: 12, edge: "ink" });
   },
   "ruled": () => {
@@ -26,7 +26,7 @@ export default {
     for (let i = 0; i <= 12; i++) rim.push([14, -14 + (28 * i) / 12, saddle(14, -14 + (28 * i) / 12)]);
     for (let i = 0; i <= 12; i++) rim.push([14 - (28 * i) / 12, 14, saddle(14 - (28 * i) / 12, 14)]);
     for (let i = 0; i <= 12; i++) rim.push([-14, 14 - (28 * i) / 12, saddle(-14, 14 - (28 * i) / 12)]);
-    return s.line(rim, { role: "ink", width: 3.4, closed: true });
+    return s.line(rim, { role: "line", width: 3.4, closed: true });
   },
   "boundary_fill": () => {
     const s = sc({ cy: 36 });
@@ -95,7 +95,7 @@ export default {
     const pts = Array.from({ length: 17 }, (_, i) => { const x = -16 + 2 * i; return [x, -x * 0.2, f(x)]; });
     pts.forEach(([x, y, z], i) => { if (i % 2 === 0) s.line([[x, y, z], [x, y, z + 3 + 6 * Math.abs(Math.sin((x / 16) * Math.PI))]], { role: "accent-2", width: 1.6, layer: "under" }); });
     s.line(pts.map(([x, y, z], i) => [x, y, z + 3 + 6 * Math.abs(Math.sin((x / 16) * Math.PI))]), { role: "accent-3", width: 1.8, layer: "under" });
-    return s.line(pts, { role: "ink", width: 3 });
+    return s.line(pts, { role: "line", width: 3 });
   },
   "curvature_map": () => sc({ cy: 34 }).sheet(saddle, { n: 12, paint: (x) => (Math.abs(x) > 10 ? "accent-3" : Math.abs(x) > 5 ? "accent-2" : "accent-1") }),
   "zebra": () => sc({ cy: 34 }).sheet(wave, { n: 16, paint: (x) => (Math.floor((x + 40) / 4.67) % 2 ? "ink" : "face-1") }),
