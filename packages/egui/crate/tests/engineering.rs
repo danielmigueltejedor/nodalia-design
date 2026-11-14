@@ -359,3 +359,56 @@ fn home_items_report_their_responses() {
     assert_eq!(recent.len(), 1);
     assert!((recent[0].1.height() - eng::RECENT_ROW).abs() < 0.01);
 }
+
+#[test]
+fn a_long_card_name_wraps_and_a_long_detail_ends_inside_the_card() {
+    use eng::StartCard;
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Light.palette_with(Accent::Torno));
+    let cards = [StartCard {
+        icon: "cube",
+        name: "Nouvelle conception en pouces",
+        detail: "Pouces · ouvre l’espace Conception",
+    }];
+    let mut card = egui::Rect::NOTHING;
+    let mut out = ctx.run_ui(Default::default(), |ui| {
+        eng::start_cards_with(ui, &look, &cards, |_, r| card = r.rect);
+    });
+    out.textures_delta.clear();
+    let texts: Vec<_> = out
+        .shapes
+        .iter()
+        .filter_map(|s| match &s.shape {
+            egui::Shape::Text(t) => Some((
+                t.galley.job.text.clone(),
+                egui::Rect::from_min_size(t.pos, t.galley.size()),
+                t.galley.rows.len(),
+            )),
+            _ => None,
+        })
+        .collect();
+    let name = texts
+        .iter()
+        .find(|(t, ..)| t == cards[0].name)
+        .expect("the name is painted");
+    let detail = texts
+        .iter()
+        .find(|(t, ..)| t == cards[0].detail)
+        .expect("the detail is painted");
+    for (text, rect, _) in [name, detail] {
+        assert!(
+            card.shrink(10.0).contains_rect(*rect),
+            "{text:?} at {rect:?} leaves {card:?}"
+        );
+    }
+    assert_eq!(name.2, 2, "the name takes a second line");
+    assert!(
+        name.1.bottom() <= detail.1.top(),
+        "the name sits above the detail"
+    );
+    assert!(
+        name.1.top() >= card.top() + 54.0,
+        "the name clears the icon badge"
+    );
+}

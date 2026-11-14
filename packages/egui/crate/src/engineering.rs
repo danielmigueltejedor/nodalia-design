@@ -971,19 +971,28 @@ pub fn start_cards_with(
                     },
                 );
             }
-            let text = painter.with_clip_rect(rect.shrink(10.0).intersect(painter.clip_rect()));
-            text.text(
-                pos2(rect.left() + 14.0, rect.bottom() - 40.0),
-                Align2::LEFT_CENTER,
-                card.name,
-                label(),
-                color(p.text_primary),
-            );
-            text.text(
-                pos2(rect.left() + 14.0, rect.bottom() - 21.0),
-                Align2::LEFT_CENTER,
+            // The name wraps to a second line and the detail ends in "…", so a long translation
+            // stays inside its card; the full name is still the card's accessible label.
+            let width = rect.width() - 28.0;
+            let detail = fitted(
+                ui,
                 card.detail,
                 caption(),
+                color(p.text_secondary),
+                width,
+                1,
+            );
+            let name = fitted(ui, card.name, label(), color(p.text_primary), width, 2);
+            let detail_top = rect.bottom() - 17.0 - detail.size().y / 2.0;
+            let name_top = detail_top - 3.0 - name.size().y;
+            painter.galley(
+                pos2(rect.left() + 14.0, name_top),
+                name,
+                color(p.text_primary),
+            );
+            painter.galley(
+                pos2(rect.left() + 14.0, detail_top),
+                detail,
                 color(p.text_secondary),
             );
             on_item(i, &resp);
@@ -993,6 +1002,23 @@ pub fn start_cards_with(
         }
     });
     picked
+}
+
+/// `text` laid out within `width` in at most `rows` lines, the last one ending in "…" when it
+/// does not fit.
+fn fitted(
+    ui: &Ui,
+    text: &str,
+    font: FontId,
+    ink: egui::Color32,
+    width: f32,
+    rows: usize,
+) -> Arc<egui::Galley> {
+    let mut job = egui::text::LayoutJob::simple(text.to_owned(), font, ink, width);
+    job.wrap.max_rows = rows;
+    job.wrap.break_anywhere = false;
+    job.wrap.overflow_character = Some('…');
+    ui.fonts_mut(|f| f.layout_job(job))
 }
 
 /// A recent document on Home: its name, its folder, when it was last changed (already in words)
