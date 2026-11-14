@@ -478,7 +478,11 @@ pub struct TitleLabels<'a> {
 /// (`window_controls::show` on Linux, native elsewhere) in the space `controls_width` reserves.
 #[derive(Clone, Debug, PartialEq)]
 pub struct TitleBar<'a> {
+    /// The app's name: shown when there is no `icon`, and the icon's accessible label.
     pub app: &'a str,
+    /// The app's own icon, drawn at the bar's start in place of the name. Every app of the
+    /// suite passes its icon so the three bars start the same way.
+    pub icon: Option<egui::TextureId>,
     pub documents: &'a [Document<'a>],
     pub active: Option<usize>,
     pub labels: TitleLabels<'a>,
@@ -548,6 +552,9 @@ fn text_button(ui: &mut Ui, look: &Look, text: &str) -> Response {
     );
     resp
 }
+
+/// The app icon's side in the [`title_bar`].
+const APP_ICON: f32 = 24.0;
 
 /// The widest a document tab gets; a longer name ends in "…".
 const TAB_MAX: f32 = 240.0;
@@ -637,11 +644,22 @@ pub fn title_bar_with(
     let ui = &mut child;
     ui.spacing_mut().item_spacing.x = 2.0;
     ui.add_space(bar.leading_width);
-    ui.label(
-        RichText::new(bar.app)
-            .font(panel_title())
-            .color(color(p.text_primary)),
-    );
+    if let Some(texture) = bar.icon {
+        let (r, resp) = ui.allocate_exact_size(vec2(APP_ICON, APP_ICON), Sense::hover());
+        resp.widget_info(|| WidgetInfo::labeled(Role::Image, true, bar.app));
+        ui.painter().image(
+            texture,
+            r,
+            Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)),
+            egui::Color32::WHITE,
+        );
+    } else {
+        ui.label(
+            RichText::new(bar.app)
+                .font(panel_title())
+                .color(color(p.text_primary)),
+        );
+    }
     ui.add_space(10.0);
     let l = &bar.labels;
     if icon_button(ui, look, "home", l.home, 30.0).clicked() {

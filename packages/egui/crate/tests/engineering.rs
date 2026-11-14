@@ -127,6 +127,7 @@ fn the_shell_parts_draw() {
     ];
     let bar = TitleBar {
         app: "Forja",
+        icon: None,
         documents: &docs,
         active: Some(0),
         labels: TitleLabels {
@@ -178,4 +179,57 @@ fn the_shell_parts_draw() {
     }
     assert!((controls.width() - nodalia_theme::window_controls::WIDTH).abs() < 0.01);
     assert!((controls.height() - eng::layout::TITLE_BAR).abs() < 0.01);
+}
+
+#[test]
+fn the_title_bar_starts_with_the_app_icon_when_there_is_one() {
+    use eng::{TitleBar, TitleLabels};
+    fn walk(shape: &egui::Shape, texts: &mut Vec<String>, images: &mut Vec<egui::TextureId>) {
+        match shape {
+            egui::Shape::Text(t) => texts.push(t.galley.text().to_owned()),
+            egui::Shape::Mesh(m) => images.push(m.texture_id),
+            egui::Shape::Vec(v) => v.iter().for_each(|s| walk(s, texts, images)),
+            _ => {}
+        }
+    }
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Dark.palette_with(Accent::Forja));
+    let icon = egui::TextureId::User(7);
+    let bar = TitleBar {
+        app: "Forja",
+        icon: Some(icon),
+        documents: &[],
+        active: None,
+        labels: TitleLabels {
+            home: "Home",
+            file: "File",
+            save: "Save",
+            undo: "Undo",
+            redo: "Redo",
+            new_document: "New",
+            close_document: "Close",
+            search: "Search commands",
+            menu: "Menu",
+        },
+        controls_width: 0.0,
+        leading_width: 0.0,
+    };
+    let (mut texts, mut images) = (Vec::new(), Vec::new());
+    for _ in 0..2 {
+        let mut out = ctx.run_ui(Default::default(), |ui| {
+            eng::title_bar(ui, &look, &bar);
+        });
+        out.textures_delta.clear();
+        texts.clear();
+        images.clear();
+        for s in &out.shapes {
+            walk(&s.shape, &mut texts, &mut images);
+        }
+    }
+    assert!(images.contains(&icon), "the icon is painted");
+    assert!(
+        !texts.iter().any(|t| t == "Forja"),
+        "the name gives way to the icon"
+    );
 }

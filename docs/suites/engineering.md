@@ -55,7 +55,7 @@ nodalia_theme::engineering::apply_text_styles(ctx);
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│ ◆ App  ⌂  Archivo  💾 ↶ ↷ │ Doc 1 × │ Doc 2 × │ +     🔍 Buscar comandos  ≡  ● ● ● │  barra de título 40
+│ ◆      ⌂  Archivo  💾 ↶ ↷ │ Doc 1 × │ Doc 2 × │ +     🔍 Buscar comandos  ≡  ● ● ● │  barra de título 40
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Espacio ▾ │ Modelo  Superficie  Inspeccionar  Vista …                        │  pestañas 28
 │           │ [⬚][⬚][⬚] │ [⬚][⬚] │ [⬚][⬚][⬚][⬚] │ …                         │  ribbon 92
@@ -74,7 +74,8 @@ Medidas en `engineering::layout`. Separación entre islas y con el borde: 8. Rad
 
 ### Barra de título
 
-De izquierda a derecha: la marca y el nombre de la app; **Inicio** (casa); **Archivo** (menú de
+De izquierda a derecha: el **icono de la app** (24, en lugar del nombre, que queda como
+etiqueta accesible; `TitleBar::icon`); **Inicio** (casa); **Archivo** (menú de
 documento: nuevo, abrir, guardar, exportar, imprimir); acceso rápido (guardar, deshacer, rehacer);
 las **pestañas de documento**; a la derecha la **búsqueda de comandos** (mismo atajo en las tres:
 `Ctrl+K` / `⌘K`), el **menú hamburguesa** (Preferencias, Atajos de teclado, Acerca de) y los
