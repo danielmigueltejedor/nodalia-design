@@ -8,7 +8,7 @@
 - `0.x.0` (cuando haya beta/estable en `0.x`): un cambio de la `x` puede romper; el `CHANGELOG` lo dice.
 - `1.0.0`: se congela la API pública descrita abajo.
 
-No existe publicación estable automática. Una etiqueta `vX.Y.Z-algo` crea un **borrador** de release marcado como pre-release; publicarlo es una decisión manual.
+Publicar es fusionar: un PR que sube la versión de todos los paquetes y añade sus notas en `docs/release-notes/vX.Y.Z.md` crea la etiqueta, verifica, adjunta los paquetes y publica la release al fusionarse (`release-auto.yml`, [cómo](release-notes/README.md)). Una versión con sufijo (`-alpha.N`) sale como pre-release. Nadie empuja etiquetas a mano.
 
 ## Qué es API pública
 

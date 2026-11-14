@@ -1,48 +1,111 @@
-name: Release (draft)
+name: Release packages
 
-# Pushing a tag vX.Y.Z[-pre.N] runs the full verification and prepares a DRAFT release with the packages as assets.
-# Nothing is published automatically: a maintainer reviews the draft, then publishes it by hand.
+# Runs the full verification and builds the release files: the npm packages of tokens, icons,
+# gtk, qml, qtwidgets and web, and the catalog site, with SHA256SUMS. Then it attaches them to
+# the GitHub release draft.
+#
+# "Release from main" (release-auto.yml) runs this with the tag when a version and its notes
+# land on main, and publishes the release once the files are attached. Run it by hand with
+# tag=vX.Y.Z to rebuild a release's files; without a tag it only uploads a workflow artifact.
 on:
-  push:
-    tags: ['v*']
+  # A change to this workflow builds the files (artifact only, no release).
+  pull_request:
+    paths:
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the files to, e.g. v0.1.0 (empty: artifact only)"
+        required: false
+        default: ""
+  workflow_call:
+    inputs:
+      tag:
+        description: "Release tag to attach the files to"
+        type: string
+        required: true
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: release-packages-${{ inputs.tag || github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - name: The tag must match the package versions
+      - name: Every package carries the release version
+        id: ver
+        env:
+          TAG: ${{ inputs.tag }}
         run: |
-          v="${GITHUB_REF_NAME#v}"
+          v="$(node -p "require('./package.json').version")"
+          # A tag must describe the code it is built from.
+          if [ -n "$TAG" ] && [ "${TAG#v}" != "$v" ]; then
+            echo "Tag $TAG does not match package.json's version $v"; exit 1
+          fi
           for p in tokens icons gtk qml qtwidgets web; do
-            [ "$(node -p "require('./packages/$p/package.json').version")" = "$v" ] || { echo "packages/$p version does not match $GITHUB_REF_NAME"; exit 1; }
+            [ "$(node -p "require('./packages/$p/package.json').version")" = "$v" ] || { echo "packages/$p version is not $v"; exit 1; }
           done
-      - name: The Rust crate carries the same version
-        run: grep -qx "version = \"${GITHUB_REF_NAME#v}\"" packages/egui/crate/Cargo.toml
+          grep -qx "version = \"$v\"" packages/egui/crate/Cargo.toml || { echo "packages/egui/crate is not $v"; exit 1; }
+          echo "version=$v" >> "$GITHUB_OUTPUT"
       - run: npm run validate
       - run: npm test
       - run: npm run check:repro
       - run: npx playwright-core install --with-deps chromium
       - run: npm run test:browser
       - name: Pack
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
           mkdir -p release
           for p in tokens icons gtk qml qtwidgets web; do npm pack -w "@nodalia/$p" --pack-destination release; done
-          tar -czf "release/nodalia-design-catalog-${GITHUB_REF_NAME}.tar.gz" -C apps/catalog/dist .
-          (cd release && sha256sum * > SHA256SUMS)
-      - name: Create draft release
+          tar -czf "release/nodalia-design-$VERSION-catalog.tar.gz" -C apps/catalog/dist .
+          (cd release && sha256sum -- * > SHA256SUMS && cat SHA256SUMS)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nodalia-design-release
+          path: release/
+          if-no-files-found: error
+
+  attach:
+    needs: build
+    if: inputs.tag != ''
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: nodalia-design-release
+          path: release
+      - name: Attach to the release draft
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
-          flags="--draft --generate-notes"
-          case "$GITHUB_REF_NAME" in *-*) flags="$flags --prerelease";; esac
-          gh release create "$GITHUB_REF_NAME" $flags release/*
+          (cd release && sha256sum -c SHA256SUMS)
+          tagged="$(gh api "repos/$REPO/commits/$TAG" --jq .sha)"
+          if [ "$tagged" != "$SHA" ]; then
+            echo "Tag $TAG points at $tagged, not at $SHA (the commit built here)" >&2; exit 1
+          fi
+          # Only a draft takes files: --clobber on a published release would swap what people downloaded.
+          if [ "$(gh release view "$TAG" --repo "$REPO" --json isDraft --jq .isDraft)" != "true" ]; then
+            echo "Release $TAG is not a draft; not touching its files" >&2; exit 1
+          fi
+          gh release upload "$TAG" release/* --repo "$REPO" --clobber
