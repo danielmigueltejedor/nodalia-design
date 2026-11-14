@@ -55,7 +55,7 @@ nodalia_theme::engineering::apply_text_styles(ctx);
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│ ◆ App  ⌂  Archivo  💾 ↶ ↷ │ Doc 1 × │ Doc 2 × │ +     🔍 Buscar comandos  ≡  ● ● ● │  barra de título 40
+│ ◆      ⌂  Archivo  💾 ↶ ↷ │ Doc 1 × │ Doc 2 × │ +     🔍 Buscar comandos  ≡  ● ● ● │  barra de título 40
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Espacio ▾ │ Modelo  Superficie  Inspeccionar  Vista …                        │  pestañas 28
 │           │ [⬚][⬚][⬚] │ [⬚][⬚] │ [⬚][⬚][⬚][⬚] │ …                         │  ribbon 92
@@ -74,8 +74,9 @@ Medidas en `engineering::layout`. Separación entre islas y con el borde: 8. Rad
 
 ### Barra de título
 
-De izquierda a derecha: la marca y el nombre de la app; **Inicio** (casa); **Archivo** (menú de
-documento: nuevo, abrir, guardar, exportar, imprimir); acceso rápido (guardar, deshacer, rehacer);
+De izquierda a derecha: el **icono de la app** (24, en lugar del nombre, que queda como
+etiqueta accesible; `TitleBar::icon`); **Inicio** (casa); **Archivo** (menú de
+documento: nuevo, abrir, guardar, exportar, imprimir); acceso rápido (guardar, deshacer, rehacer: cada app lista solo los que tiene, `TitleBar::quick_access`);
 las **pestañas de documento**; a la derecha la **búsqueda de comandos** (mismo atajo en las tres:
 `Ctrl+K` / `⌘K`), el **menú hamburguesa** (Preferencias, Atajos de teclado, Acerca de) y los
 controles de ventana. En Linux, controles NDL redondos salvo que el usuario elija los del
@@ -131,12 +132,19 @@ ortogonal…).
 
 ## Inicio
 
-Inicio es la misma vista que la de Archivo de la suite de oficina (`nodalia_theme::office`):
-isla de navegación a la izquierda y la página en una isla al lado. Entradas, en este orden:
-**Nuevo**, **Abrir**, **Recientes**, **Ejemplos**, y abajo **Preferencias**. La página de Nuevo
-muestra tarjetas de plantilla de la app (Torno: Pieza, Ensamblaje, Plano; Vortia: plantillas de
-caso por tipo de flujo y calor; Forja: Dibujo en mm, Dibujo en pulgadas) y debajo los recientes
-con miniatura, ruta y fecha.
+Inicio es la vista de Archivo de la suite de oficina (`office::file_view`) dibujada con la tipografía
+de la suite (`engineering::home_look`): isla de navegación a la izquierda y la página en una isla
+al lado. Navegación, en este orden: **Inicio**, **Abrir**, **Ejemplos**, y abajo **Preferencias**.
+Sin fila de Volver cuando no hay documento abierto.
+
+La página de Inicio, de arriba abajo:
+
+1. `home_header`: el icono de la app (52), su nombre en `page_title` y debajo la versión.
+2. **Nuevo** (`start_cards`): tarjetas de 176×116 con un icono CAD en una insignia teñida del
+   acento, el nombre y una línea con lo que trae. Torno: Pieza, Ensamblaje, Plano; Vortia:
+   plantillas de caso por tipo de flujo y calor; Forja: Dibujo en mm, Dibujo en pulgadas.
+3. **Recientes** (`recent_documents`): filas de 56 con miniatura (o el icono CAD del tipo de
+   documento), nombre sobre carpeta, y la fecha en Plex Mono a la derecha.
 
 ## Preferencias
 
@@ -176,7 +184,7 @@ propio que sustituye a los iconos de Torno bajo licencia de marca se añade ahí
 | Fila de árbol | sí | pendiente | pendiente | pendiente |
 | Pestaña, grupo y herramienta del ribbon | sí | pendiente | pendiente | pendiente |
 | Barra de título (`title_bar`) | sí | — | — | — |
-| Inicio | `office::file_view` | — | — | — |
+| Inicio (`home_look`, `home_header`, `start_cards`, `recent_documents`) | sí | — | — | en curso |
 | Preferencias | descrita | — | — | — |
 | Barra de estado (`status_bar`, `status_value`, `status_toggle`) | sí | — | — | — |
 | Barra de vista flotante (`view_bar`) | sí | — | — | — |

@@ -25,7 +25,7 @@ use std::sync::Arc;
 
 use egui::{
     pos2, vec2, Align2, CornerRadius, FontData, FontDefinitions, FontFamily, FontId, Frame, Margin,
-    Rect, Response, RichText, Role, Sense, Stroke, Ui, WidgetInfo,
+    Rect, Response, RichText, Role, Sense, Stroke, StrokeKind, Ui, WidgetInfo,
 };
 
 use crate::{for_egui::color, icons, Palette};
@@ -424,16 +424,21 @@ pub fn ribbon_group<R>(
     let out = ui
         .vertical(|ui| {
             ui.spacing_mut().item_spacing = vec2(2.0, 0.0);
-            let out = ui.horizontal(tools).inner;
+            let row = ui.horizontal(tools);
             ui.add_space(2.0);
-            ui.vertical_centered(|ui| {
-                ui.label(
-                    RichText::new(name)
-                        .font(caption())
-                        .color(color(p.text_secondary)),
-                );
-            });
-            out
+            // The caption is centred under the group's own tools, not across the row's width.
+            let galley =
+                ui.painter()
+                    .layout_no_wrap(name.to_owned(), caption(), color(p.text_secondary));
+            let width = row.response.rect.width().max(galley.size().x);
+            let (r, resp) = ui.allocate_exact_size(vec2(width, galley.size().y), Sense::hover());
+            resp.widget_info(|| WidgetInfo::labeled(Role::Label, true, name));
+            ui.painter().galley(
+                pos2(r.center().x - galley.size().x / 2.0, r.top()),
+                galley,
+                color(p.text_secondary),
+            );
+            row.inner
         })
         .inner;
     let (rect, _) = ui.allocate_exact_size(vec2(9.0, layout::TOOL.y + 14.0), Sense::hover());
@@ -467,6 +472,7 @@ pub struct TitleLabels<'a> {
     pub undo: &'a str,
     pub redo: &'a str,
     pub new_document: &'a str,
+    /// Prefix of a tab's close button label, followed by the document's name ("Close Bracket").
     pub close_document: &'a str,
     /// The placeholder of the command search field ("Search commands").
     pub search: &'a str,
@@ -477,10 +483,18 @@ pub struct TitleLabels<'a> {
 /// (`window_controls::show` on Linux, native elsewhere) in the space `controls_width` reserves.
 #[derive(Clone, Debug, PartialEq)]
 pub struct TitleBar<'a> {
+    /// The app's name: shown when there is no `icon`, and the icon's accessible label.
     pub app: &'a str,
+    /// The app's own icon, drawn at the bar's start in place of the name. Every app of the
+    /// suite passes its icon so the three bars start the same way.
+    pub icon: Option<egui::TextureId>,
     pub documents: &'a [Document<'a>],
     pub active: Option<usize>,
     pub labels: TitleLabels<'a>,
+    /// The quick-access buttons after File, in order: any of [`TitleAction::Save`],
+    /// [`TitleAction::Undo`] and [`TitleAction::Redo`] (others are ignored). An app lists only
+    /// what it supports, so no button is dead.
+    pub quick_access: &'a [TitleAction],
     /// Width kept free at the right edge for window controls (0 for native controls).
     pub controls_width: f32,
     /// Width kept free at the left edge (macOS traffic lights; 0 elsewhere).
@@ -548,6 +562,12 @@ fn text_button(ui: &mut Ui, look: &Look, text: &str) -> Response {
     resp
 }
 
+/// The app icon's side in the [`title_bar`].
+const APP_ICON: f32 = 24.0;
+
+/// The widest a document tab gets; a longer name ends in "…".
+const TAB_MAX: f32 = 240.0;
+
 fn document_tab(
     ui: &mut Ui,
     look: &Look,
@@ -556,10 +576,17 @@ fn document_tab(
     close: &str,
 ) -> (Response, bool) {
     let p = &look.palette;
-    let galley = ui
-        .painter()
-        .layout_no_wrap(doc.name.to_owned(), label(), color(p.text_primary));
-    let width = (galley.size().x + 52.0).clamp(96.0, 240.0);
+    let ink = if active {
+        p.text_primary
+    } else {
+        p.text_secondary
+    };
+    // 12 of padding before the name, 30 for the close button after it.
+    let mut job =
+        egui::text::LayoutJob::simple_singleline(doc.name.to_owned(), label(), color(ink));
+    job.wrap = egui::text::TextWrapping::truncate_at_width(TAB_MAX - 42.0);
+    let galley = ui.ctx().fonts_mut(|f| f.layout_job(job));
+    let width = (galley.size().x + 52.0).clamp(96.0, TAB_MAX);
     let (rect, resp) = ui.allocate_exact_size(vec2(width, 30.0), Sense::click());
     resp.widget_info(|| WidgetInfo::selected(Role::Tab, true, active, doc.name));
     let painter = ui.painter();
@@ -568,25 +595,12 @@ fn document_tab(
     } else if resp.hovered() {
         painter.rect_filled(rect, layout::ROW_RADIUS, color(p.control_bg_hover));
     }
-    let ink = if active {
-        p.text_primary
-    } else {
-        p.text_secondary
-    };
-    let text_rect = Rect::from_min_max(
-        pos2(rect.left() + 12.0, rect.top()),
-        pos2(rect.right() - 30.0, rect.bottom()),
-    );
-    painter.with_clip_rect(text_rect).text(
-        pos2(text_rect.left(), rect.center().y),
-        Align2::LEFT_CENTER,
-        doc.name,
-        label(),
-        color(ink),
-    );
+    let at = pos2(rect.left() + 12.0, rect.center().y - galley.size().y / 2.0);
+    painter.galley(at, galley, color(ink));
     let x = Rect::from_center_size(pos2(rect.right() - 16.0, rect.center().y), vec2(20.0, 20.0));
     let close_resp = ui.interact(x, resp.id.with("close"), Sense::click());
-    close_resp.widget_info(|| WidgetInfo::labeled(Role::Button, true, close));
+    close_resp
+        .widget_info(|| WidgetInfo::labeled(Role::Button, true, format!("{close} {}", doc.name)));
     if close_resp.hovered() {
         painter.rect_filled(x, 6.0, color(p.control_bg_pressed));
     }
@@ -639,11 +653,22 @@ pub fn title_bar_with(
     let ui = &mut child;
     ui.spacing_mut().item_spacing.x = 2.0;
     ui.add_space(bar.leading_width);
-    ui.label(
-        RichText::new(bar.app)
-            .font(panel_title())
-            .color(color(p.text_primary)),
-    );
+    if let Some(texture) = bar.icon {
+        let (r, resp) = ui.allocate_exact_size(vec2(APP_ICON, APP_ICON), Sense::hover());
+        resp.widget_info(|| WidgetInfo::labeled(Role::Image, true, bar.app));
+        ui.painter().image(
+            texture,
+            r,
+            Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)),
+            egui::Color32::WHITE,
+        );
+    } else {
+        ui.label(
+            RichText::new(bar.app)
+                .font(panel_title())
+                .color(color(p.text_primary)),
+        );
+    }
     ui.add_space(10.0);
     let l = &bar.labels;
     if icon_button(ui, look, "home", l.home, 30.0).clicked() {
@@ -652,11 +677,13 @@ pub fn title_bar_with(
     if text_button(ui, look, l.file).clicked() {
         action = Some(TitleAction::File);
     }
-    for (icon, name, a) in [
-        ("save", l.save, TitleAction::Save),
-        ("undo", l.undo, TitleAction::Undo),
-        ("redo", l.redo, TitleAction::Redo),
-    ] {
+    for &a in bar.quick_access {
+        let (icon, name) = match a {
+            TitleAction::Save => ("save", l.save),
+            TitleAction::Undo => ("undo", l.undo),
+            TitleAction::Redo => ("redo", l.redo),
+            _ => continue,
+        };
         if icon_button(ui, look, icon, name, 30.0).clicked() {
             action = Some(a);
         }
@@ -832,4 +859,229 @@ pub fn view_bar(ui: &mut Ui, look: &Look, items: &[ViewItem]) -> Option<usize> {
             });
         });
     clicked
+}
+
+// --- Home ---------------------------------------------------------------------------------------
+
+/// Home is the office suite's File view ([`crate::office::file_view`]) drawn in the suite's
+/// type: a navigation island and the page in an island beside it. This is the
+/// [`crate::office::Look`] to pass it, with Plex for the text and Plex semibold for headings and
+/// the selected entry.
+pub fn home_look(look: &Look) -> crate::office::Look {
+    crate::office::Look::new(look.palette).with_bold(family(Some(SEMIBOLD)))
+}
+
+/// The top of Home: the app's icon (or nothing), its name as the page title and a caption under
+/// it (the version, or what the app is for).
+pub fn home_header(
+    ui: &mut Ui,
+    look: &Look,
+    icon: Option<egui::TextureId>,
+    app: &str,
+    caption_text: &str,
+) {
+    let p = &look.palette;
+    ui.horizontal(|ui| {
+        ui.spacing_mut().item_spacing.x = 14.0;
+        if let Some(texture) = icon {
+            let (r, resp) = ui.allocate_exact_size(vec2(HOME_ICON, HOME_ICON), Sense::hover());
+            resp.widget_info(|| WidgetInfo::labeled(Role::Image, true, app));
+            ui.painter().image(
+                texture,
+                r,
+                Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
+        }
+        ui.vertical(|ui| {
+            ui.spacing_mut().item_spacing.y = 2.0;
+            ui.label(
+                RichText::new(app)
+                    .font(page_title())
+                    .color(color(p.text_primary)),
+            );
+            ui.label(
+                RichText::new(caption_text)
+                    .font(body())
+                    .color(color(p.text_secondary)),
+            );
+        });
+    });
+    ui.add_space(22.0);
+}
+
+/// The app icon's side at the top of Home.
+const HOME_ICON: f32 = 52.0;
+
+/// A way to start a document on Home: a CAD icon from the shared set (group `cad`, tinted in the
+/// accent), a name and one line saying what it starts with.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct StartCard<'a> {
+    pub icon: &'a str,
+    pub name: &'a str,
+    pub detail: &'a str,
+}
+
+/// A start card's size.
+pub const START_CARD: egui::Vec2 = egui::Vec2::new(176.0, 116.0);
+
+/// The start cards in a row that wraps to the width. Returns the index of the one clicked.
+pub fn start_cards(ui: &mut Ui, look: &Look, cards: &[StartCard]) -> Option<usize> {
+    let p = &look.palette;
+    let mut picked = None;
+    ui.horizontal_wrapped(|ui| {
+        ui.spacing_mut().item_spacing = vec2(12.0, 12.0);
+        for (i, card) in cards.iter().enumerate() {
+            let (rect, resp) = ui.allocate_exact_size(START_CARD, Sense::click());
+            resp.widget_info(|| WidgetInfo::labeled(Role::Button, true, card.name));
+            let painter = ui.painter();
+            let (fill, edge) = if resp.hovered() {
+                (p.control_bg_hover, p.accent_default)
+            } else {
+                (p.surface_raised, p.border_subtle)
+            };
+            painter.rect(
+                rect,
+                layout::ISLAND_RADIUS,
+                color(fill),
+                Stroke::new(1.0, color(edge)),
+                StrokeKind::Inside,
+            );
+            let badge = Rect::from_min_size(rect.min + vec2(14.0, 14.0), vec2(40.0, 40.0));
+            painter.rect_filled(badge, 10.0, color(p.accent_subtle));
+            if let Some(glyph) = icons::get(card.icon) {
+                icons::paint(
+                    painter,
+                    badge.shrink(8.0),
+                    glyph,
+                    icons::Style {
+                        accent: Some(color(p.accent_default)),
+                        ..icons::Style::regular(color(p.text_primary))
+                    },
+                );
+            }
+            let text = painter.with_clip_rect(rect.shrink(10.0).intersect(painter.clip_rect()));
+            text.text(
+                pos2(rect.left() + 14.0, rect.bottom() - 40.0),
+                Align2::LEFT_CENTER,
+                card.name,
+                label(),
+                color(p.text_primary),
+            );
+            text.text(
+                pos2(rect.left() + 14.0, rect.bottom() - 21.0),
+                Align2::LEFT_CENTER,
+                card.detail,
+                caption(),
+                color(p.text_secondary),
+            );
+            if resp.clicked() {
+                picked = Some(i);
+            }
+        }
+    });
+    picked
+}
+
+/// A recent document on Home: its name, its folder, when it was last changed (already in words)
+/// and, when the app has one, a thumbnail of it. `icon` (a CAD icon) stands in for the thumbnail.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct RecentDocument<'a> {
+    pub name: &'a str,
+    pub folder: &'a str,
+    pub when: &'a str,
+    pub icon: &'a str,
+    pub thumbnail: Option<egui::TextureId>,
+}
+
+/// A recent document's row height.
+pub const RECENT_ROW: f32 = 56.0;
+
+/// Recent documents, newest first, one row each: thumbnail, name over folder, and the date in
+/// Plex Mono at the right. `empty` is shown when there are none. Returns the index clicked.
+pub fn recent_documents(
+    ui: &mut Ui,
+    look: &Look,
+    list: &[RecentDocument],
+    empty: &str,
+) -> Option<usize> {
+    let p = &look.palette;
+    if list.is_empty() {
+        ui.label(
+            RichText::new(empty)
+                .font(body())
+                .color(color(p.text_secondary)),
+        );
+        return None;
+    }
+    let width = ui.available_width();
+    let date = if width >= 460.0 { 150.0 } else { 0.0 };
+    let mut picked = None;
+    for (i, doc) in list.iter().enumerate() {
+        let (rect, resp) = ui.allocate_exact_size(vec2(width, RECENT_ROW), Sense::click());
+        resp.widget_info(|| WidgetInfo::labeled(Role::Button, true, doc.name));
+        let painter = ui.painter();
+        if resp.hovered() {
+            painter.rect_filled(rect, layout::ROW_RADIUS + 2.0, color(p.control_bg_hover));
+        }
+        let thumb =
+            Rect::from_min_size(pos2(rect.left() + 8.0, rect.top() + 7.0), vec2(64.0, 42.0));
+        painter.rect(
+            thumb,
+            6.0,
+            color(p.surface_sunken),
+            Stroke::new(1.0, color(p.border_subtle)),
+            StrokeKind::Inside,
+        );
+        if let Some(texture) = doc.thumbnail {
+            painter.image(
+                texture,
+                thumb.shrink(1.0),
+                Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)),
+                egui::Color32::WHITE,
+            );
+        } else if let Some(glyph) = icons::get(doc.icon) {
+            let g = Rect::from_center_size(thumb.center(), vec2(22.0, 22.0));
+            icons::paint(
+                painter,
+                g,
+                glyph,
+                icons::Style {
+                    accent: Some(color(p.accent_default)),
+                    ..icons::Style::regular(color(p.text_secondary))
+                },
+            );
+        }
+        let room = rect.right() - date - 12.0;
+        let text = painter.with_clip_rect(
+            Rect::from_min_max(rect.min, pos2(room, rect.bottom())).intersect(painter.clip_rect()),
+        );
+        text.text(
+            pos2(thumb.right() + 14.0, rect.center().y - 9.0),
+            Align2::LEFT_CENTER,
+            doc.name,
+            label(),
+            color(p.text_primary),
+        );
+        text.text(
+            pos2(thumb.right() + 14.0, rect.center().y + 10.0),
+            Align2::LEFT_CENTER,
+            doc.folder,
+            caption(),
+            color(p.text_secondary),
+        );
+        if date > 0.0 {
+            painter.text(
+                pos2(rect.right() - date, rect.center().y),
+                Align2::LEFT_CENTER,
+                doc.when,
+                value_font(),
+                color(p.text_secondary),
+            );
+        }
+        if resp.clicked() {
+            picked = Some(i);
+        }
+    }
+    picked
 }
