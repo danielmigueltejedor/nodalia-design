@@ -424,16 +424,21 @@ pub fn ribbon_group<R>(
     let out = ui
         .vertical(|ui| {
             ui.spacing_mut().item_spacing = vec2(2.0, 0.0);
-            let out = ui.horizontal(tools).inner;
+            let row = ui.horizontal(tools);
             ui.add_space(2.0);
-            ui.vertical_centered(|ui| {
-                ui.label(
-                    RichText::new(name)
-                        .font(caption())
-                        .color(color(p.text_secondary)),
-                );
-            });
-            out
+            // The caption is centred under the group's own tools, not across the row's width.
+            let galley =
+                ui.painter()
+                    .layout_no_wrap(name.to_owned(), caption(), color(p.text_secondary));
+            let width = row.response.rect.width().max(galley.size().x);
+            let (r, resp) = ui.allocate_exact_size(vec2(width, galley.size().y), Sense::hover());
+            resp.widget_info(|| WidgetInfo::labeled(Role::Label, true, name));
+            ui.painter().galley(
+                pos2(r.center().x - galley.size().x / 2.0, r.top()),
+                galley,
+                color(p.text_secondary),
+            );
+            row.inner
         })
         .inner;
     let (rect, _) = ui.allocate_exact_size(vec2(9.0, layout::TOOL.y + 14.0), Sense::hover());

@@ -282,3 +282,29 @@ fn home_draws_in_the_office_view_with_the_suite_type() {
         out.textures_delta.clear();
     }
 }
+
+#[test]
+fn a_ribbon_group_is_as_wide_as_its_tools() {
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Light.palette_with(Accent::Forja));
+    let mut group = egui::Rect::NOTHING;
+    for _ in 0..2 {
+        let mut out = ctx.run_ui(Default::default(), |ui| {
+            ui.horizontal(|ui| {
+                let before = ui.cursor().left();
+                eng::ribbon_group(ui, &look, "Fields", |ui| {
+                    eng::ribbon_tool(ui, &look, "line", "Line", false);
+                });
+                group = egui::Rect::from_x_y_ranges(before..=ui.cursor().left(), 0.0..=1.0);
+            });
+        });
+        out.textures_delta.clear();
+    }
+    // One tool, a gap and the divider: nowhere near the window's width.
+    assert!(
+        group.width() < eng::layout::TOOL.x + 40.0,
+        "{} points wide",
+        group.width()
+    );
+}
