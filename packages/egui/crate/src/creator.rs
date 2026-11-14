@@ -254,9 +254,12 @@ pub fn close_button(ui: &mut Ui, look: &Look, rect: Rect, id: Id) -> bool {
         (rect.center().y * ppp).round() / ppp,
     );
     // The antialiased rim falls just outside `rect`, where a dialog clips its content.
-    let painter = ui
-        .painter()
-        .with_clip_rect(ui.clip_rect().union(rect.expand(2.0)));
+    // `Painter::with_clip_rect` only narrows the clip, so build a painter that may widen it.
+    let painter = egui::Painter::new(
+        ui.ctx().clone(),
+        ui.layer_id(),
+        ui.clip_rect().union(rect.expand(2.0)),
+    );
     painter.circle_filled(centre, 14.0 * k, fill);
     let at = |x: f32, y: f32| centre + vec2(x - 12.0, y - 12.0) * k;
     let stroke = Stroke::new(2.0 * k, ink);

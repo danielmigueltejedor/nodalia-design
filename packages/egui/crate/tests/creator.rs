@@ -185,3 +185,36 @@ fn the_home_icons_exist() {
         assert!(nodalia_theme::icons::get(name).is_some(), "{name}");
     }
 }
+
+/// A dialog puts its close button flush with the edge where it clips its content: the disc and
+/// its antialiased rim still draw whole.
+#[test]
+fn the_close_disc_is_not_clipped_by_a_flush_edge() {
+    let look = look(Mode::Light);
+    let ctx = egui::Context::default();
+    let close = Rect::from_min_size(pos2(100.0, 20.0), vec2(layout::CLOSE, layout::CLOSE));
+    let mut out = ctx.run_ui(egui::RawInput::default(), |ui| {
+        ui.set_clip_rect(Rect::from_min_max(
+            pos2(0.0, 0.0),
+            close.right_top() + vec2(0.0, 400.0),
+        ));
+        cr::close_button(ui, &look, close, egui::Id::NULL.with("close"));
+    });
+    out.textures_delta.clear();
+    let discs: Vec<_> = out
+        .shapes
+        .iter()
+        .filter_map(|c| match &c.shape {
+            egui::Shape::Circle(s) if s.radius > 8.0 => Some((s.center, s.radius, c.clip_rect)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(discs.len(), 1, "{discs:?}");
+    for (centre, radius, clip) in discs {
+        let disc = Rect::from_center_size(centre, vec2(2.0 * radius, 2.0 * radius)).expand(1.0);
+        assert!(
+            clip.contains_rect(disc),
+            "the disc {disc:?} is clipped by {clip:?}"
+        );
+    }
+}
