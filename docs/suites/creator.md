@@ -52,15 +52,21 @@ píldoras con el radio de control, sin líneas divisorias.
 
 ## Inicio
 
-Una isla con un carril a la izquierda y la página al lado, igual en las tres:
+Una isla con un carril a la izquierda y la página al lado, **la misma pantalla en las tres**: la dibuja
+`creator::home::view`, y cada app solo pone sus textos, su marca y sus archivos.
 
-1. **Nuevo archivo** (`primary_button`) y **Abrir…** (`secondary_button`), a todo el ancho del
-   carril.
-2. Las filas **Inicio** y **Aprender** (`home_row`, con icono NDL): la seleccionada es una píldora
-   en el color de texto principal.
+1. **Nuevo archivo** (`primary_button`) y **Abrir…** (`secondary_button`), de 130 de ancho.
+2. Las filas **Inicio** y **Aprender** (`home_row`, iconos `home` y `sparkle`): la seleccionada es una
+   píldora en el color de texto principal.
 3. Abajo, los enlaces **Sitio web** (getnodalia.com/&lt;app&gt;) y **GitHub**.
 
-La página muestra el saludo, los tamaños o plantillas de la app y los recientes con miniatura.
+La página lleva la marca y el nombre de la app (seminegrita a 24), una línea, y debajo
+**Archivos recientes** (`home::recents`): tarjetas de 184 × 236 con miniatura (o el icono de archivo
+si la app no tiene), nombre y carpeta, cerradas por una tarjeta de soltar; o una lista con el mismo
+contenido. El cambio entre tarjetas y lista es de la app y se guarda. Sin recientes, una zona de
+soltar ocupa su sitio. Lo que la app añada después (los tamaños de Pluma) va con
+`home::section_heading`. Más estrecha que 640, los dos botones se ponen encima de la página y todo
+se desplaza.
 
 ## Preferencias
 
@@ -90,4 +96,5 @@ gris con texto seminegrita) y la página a la derecha. Abajo a la derecha **Acep
 | Carril de Inicio | sí | pendiente | sí | — |
 | Pestañas, campos, búsqueda | sí | pendiente | sí | — |
 | Esquinas de isla | sí | pendiente | sí | — |
+| Pantalla de Inicio | sí | pendiente | pendiente | — |
 | Barra de la app | descrita | — | — | — |

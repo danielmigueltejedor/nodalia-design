@@ -31,6 +31,8 @@ use egui::{
 
 use crate::{for_egui::color, icons, Palette};
 
+pub mod home;
+
 /// The suite's measures, in points.
 pub mod layout {
     /// The app bar (menus, workspace selector, search, window controls).
