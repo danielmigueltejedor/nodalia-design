@@ -76,7 +76,7 @@ Medidas en `engineering::layout`. Separación entre islas y con el borde: 8. Rad
 
 De izquierda a derecha: el **icono de la app** (24, en lugar del nombre, que queda como
 etiqueta accesible; `TitleBar::icon`); **Inicio** (casa); **Archivo** (menú de
-documento: nuevo, abrir, guardar, exportar, imprimir); acceso rápido (guardar, deshacer, rehacer);
+documento: nuevo, abrir, guardar, exportar, imprimir); acceso rápido (guardar, deshacer, rehacer: cada app lista solo los que tiene, `TitleBar::quick_access`);
 las **pestañas de documento**; a la derecha la **búsqueda de comandos** (mismo atajo en las tres:
 `Ctrl+K` / `⌘K`), el **menú hamburguesa** (Preferencias, Atajos de teclado, Acerca de) y los
 controles de ventana. En Linux, controles NDL redondos salvo que el usuario elija los del

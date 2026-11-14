@@ -111,7 +111,7 @@ fn the_parts_draw_and_the_text_styles_follow_the_scale() {
 
 #[test]
 fn the_shell_parts_draw() {
-    use eng::{Document, TitleBar, TitleLabels, ViewItem};
+    use eng::{Document, TitleAction, TitleBar, TitleLabels, ViewItem};
     let ctx = egui::Context::default();
     eng::install_fonts(&ctx);
     let look = Look::new(Mode::Light.palette_with(Accent::Forja));
@@ -141,6 +141,7 @@ fn the_shell_parts_draw() {
             search: "Search commands",
             menu: "Menu",
         },
+        quick_access: &[TitleAction::Save, TitleAction::Undo, TitleAction::Redo],
         controls_width: nodalia_theme::window_controls::WIDTH,
         leading_width: 0.0,
     };
@@ -183,7 +184,7 @@ fn the_shell_parts_draw() {
 
 #[test]
 fn the_title_bar_starts_with_the_app_icon_when_there_is_one() {
-    use eng::{TitleBar, TitleLabels};
+    use eng::{TitleAction, TitleBar, TitleLabels};
     fn walk(shape: &egui::Shape, texts: &mut Vec<String>, images: &mut Vec<egui::TextureId>) {
         match shape {
             egui::Shape::Text(t) => texts.push(t.galley.text().to_owned()),
@@ -212,6 +213,7 @@ fn the_title_bar_starts_with_the_app_icon_when_there_is_one() {
             search: "Search commands",
             menu: "Menu",
         },
+        quick_access: &[TitleAction::Save],
         controls_width: 0.0,
         leading_width: 0.0,
     };

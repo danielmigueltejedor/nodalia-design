@@ -486,6 +486,10 @@ pub struct TitleBar<'a> {
     pub documents: &'a [Document<'a>],
     pub active: Option<usize>,
     pub labels: TitleLabels<'a>,
+    /// The quick-access buttons after File, in order: any of [`TitleAction::Save`],
+    /// [`TitleAction::Undo`] and [`TitleAction::Redo`] (others are ignored). An app lists only
+    /// what it supports, so no button is dead.
+    pub quick_access: &'a [TitleAction],
     /// Width kept free at the right edge for window controls (0 for native controls).
     pub controls_width: f32,
     /// Width kept free at the left edge (macOS traffic lights; 0 elsewhere).
@@ -668,11 +672,13 @@ pub fn title_bar_with(
     if text_button(ui, look, l.file).clicked() {
         action = Some(TitleAction::File);
     }
-    for (icon, name, a) in [
-        ("save", l.save, TitleAction::Save),
-        ("undo", l.undo, TitleAction::Undo),
-        ("redo", l.redo, TitleAction::Redo),
-    ] {
+    for &a in bar.quick_access {
+        let (icon, name) = match a {
+            TitleAction::Save => ("save", l.save),
+            TitleAction::Undo => ("undo", l.undo),
+            TitleAction::Redo => ("redo", l.redo),
+            _ => continue,
+        };
         if icon_button(ui, look, icon, name, 30.0).clicked() {
             action = Some(a);
         }
