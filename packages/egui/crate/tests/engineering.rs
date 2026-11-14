@@ -111,7 +111,7 @@ fn the_parts_draw_and_the_text_styles_follow_the_scale() {
 
 #[test]
 fn the_shell_parts_draw() {
-    use eng::{Document, TitleBar, TitleLabels, ViewItem};
+    use eng::{Document, TitleAction, TitleBar, TitleLabels, ViewItem};
     let ctx = egui::Context::default();
     eng::install_fonts(&ctx);
     let look = Look::new(Mode::Light.palette_with(Accent::Forja));
@@ -127,6 +127,7 @@ fn the_shell_parts_draw() {
     ];
     let bar = TitleBar {
         app: "Forja",
+        icon: None,
         documents: &docs,
         active: Some(0),
         labels: TitleLabels {
@@ -140,6 +141,7 @@ fn the_shell_parts_draw() {
             search: "Search commands",
             menu: "Menu",
         },
+        quick_access: &[TitleAction::Save, TitleAction::Undo, TitleAction::Redo],
         controls_width: nodalia_theme::window_controls::WIDTH,
         leading_width: 0.0,
     };
@@ -178,4 +180,131 @@ fn the_shell_parts_draw() {
     }
     assert!((controls.width() - nodalia_theme::window_controls::WIDTH).abs() < 0.01);
     assert!((controls.height() - eng::layout::TITLE_BAR).abs() < 0.01);
+}
+
+#[test]
+fn the_title_bar_starts_with_the_app_icon_when_there_is_one() {
+    use eng::{TitleAction, TitleBar, TitleLabels};
+    fn walk(shape: &egui::Shape, texts: &mut Vec<String>, images: &mut Vec<egui::TextureId>) {
+        match shape {
+            egui::Shape::Text(t) => texts.push(t.galley.text().to_owned()),
+            egui::Shape::Mesh(m) => images.push(m.texture_id),
+            egui::Shape::Vec(v) => v.iter().for_each(|s| walk(s, texts, images)),
+            _ => {}
+        }
+    }
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Dark.palette_with(Accent::Forja));
+    let icon = egui::TextureId::User(7);
+    let bar = TitleBar {
+        app: "Forja",
+        icon: Some(icon),
+        documents: &[],
+        active: None,
+        labels: TitleLabels {
+            home: "Home",
+            file: "File",
+            save: "Save",
+            undo: "Undo",
+            redo: "Redo",
+            new_document: "New",
+            close_document: "Close",
+            search: "Search commands",
+            menu: "Menu",
+        },
+        quick_access: &[TitleAction::Save],
+        controls_width: 0.0,
+        leading_width: 0.0,
+    };
+    let (mut texts, mut images) = (Vec::new(), Vec::new());
+    for _ in 0..2 {
+        let mut out = ctx.run_ui(Default::default(), |ui| {
+            eng::title_bar(ui, &look, &bar);
+        });
+        out.textures_delta.clear();
+        texts.clear();
+        images.clear();
+        for s in &out.shapes {
+            walk(&s.shape, &mut texts, &mut images);
+        }
+    }
+    assert!(images.contains(&icon), "the icon is painted");
+    assert!(
+        !texts.iter().any(|t| t == "Forja"),
+        "the name gives way to the icon"
+    );
+}
+
+#[test]
+fn home_draws_in_the_office_view_with_the_suite_type() {
+    use eng::{RecentDocument, StartCard};
+    use nodalia_theme::office::{self, Entry, Nav};
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Dark.palette_with(Accent::Forja));
+    let home = eng::home_look(&look);
+    assert_eq!(home.bold, egui::FontFamily::Name(eng::SEMIBOLD.into()));
+    let nav = Nav {
+        back: "",
+        top: vec![
+            Entry::item("home", "Home", "home"),
+            Entry::item("open", "Open", "folder-open"),
+        ],
+        bottom: vec![Entry::item("options", "Preferences", "settings")],
+        selected: Some("home"),
+    };
+    let cards = [StartCard {
+        icon: "line",
+        name: "Drawing (mm)",
+        detail: "Metric units",
+    }];
+    let recents = [RecentDocument {
+        name: "Bracket.dxf",
+        folder: "~/Drawings",
+        when: "2026-11-14 04:00",
+        icon: "line",
+        thumbnail: None,
+    }];
+    for _ in 0..2 {
+        let mut out = ctx.run_ui(Default::default(), |ui| {
+            let picked = office::file_view(ui, &home, &nav, |ui| {
+                eng::home_header(ui, &look, None, "Forja", "Version 0.1.0");
+                assert_eq!(eng::start_cards(ui, &look, &cards), None);
+                assert_eq!(
+                    eng::recent_documents(ui, &look, &recents, "Nothing yet"),
+                    None
+                );
+                assert_eq!(eng::recent_documents(ui, &look, &[], "Nothing yet"), None);
+            });
+            assert_eq!(picked, None);
+        });
+        out.textures_delta.clear();
+    }
+}
+
+#[test]
+fn a_ribbon_group_is_as_wide_as_its_tools() {
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Light.palette_with(Accent::Forja));
+    let mut group = egui::Rect::NOTHING;
+    for _ in 0..2 {
+        let mut out = ctx.run_ui(Default::default(), |ui| {
+            ui.horizontal(|ui| {
+                let before = ui.cursor().left();
+                eng::ribbon_group(ui, &look, "Fields", |ui| {
+                    eng::ribbon_tool(ui, &look, "line", "Line", false);
+                });
+                group = egui::Rect::from_x_y_ranges(before..=ui.cursor().left(), 0.0..=1.0);
+            });
+        });
+        out.textures_delta.clear();
+    }
+    // One tool, a gap and the divider: nowhere near the window's width.
+    assert!(
+        group.width() < eng::layout::TOOL.x + 40.0,
+        "{} points wide",
+        group.width()
+    );
 }
