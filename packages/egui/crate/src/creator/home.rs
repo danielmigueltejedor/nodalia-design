@@ -173,7 +173,7 @@ fn side_rail(ui: &mut Ui, look: &Look, rail: &Rail, picked: &mut Option<Pick>) {
     ui.add_space(8.0);
     actions(ui, look, rail, picked);
     ui.add_space(16.0);
-    separator(ui, look, measures::RAIL_BUTTON + 20.0);
+    separator(ui, look, measures::RAIL);
     ui.add_space(14.0);
     if home_row(ui, look, "home", rail.home, true)
         .on_hover_cursor(egui::CursorIcon::PointingHand)
@@ -192,7 +192,7 @@ fn side_rail(ui: &mut Ui, look: &Look, rail: &Rail, picked: &mut Option<Pick>) {
     }
     let foot = 9.0 + rail.links.len() as f32 * 30.0;
     ui.add_space((ui.available_height() - foot).max(24.0));
-    separator(ui, look, measures::RAIL_BUTTON + 20.0);
+    separator(ui, look, measures::RAIL);
     ui.add_space(8.0);
     for (i, link) in rail.links.iter().enumerate() {
         if rail_link(ui, look, link).clicked() {
