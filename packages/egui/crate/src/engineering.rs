@@ -467,6 +467,7 @@ pub struct TitleLabels<'a> {
     pub undo: &'a str,
     pub redo: &'a str,
     pub new_document: &'a str,
+    /// Prefix of a tab's close button label, followed by the document's name ("Close Bracket").
     pub close_document: &'a str,
     /// The placeholder of the command search field ("Search commands").
     pub search: &'a str,
@@ -586,7 +587,8 @@ fn document_tab(
     );
     let x = Rect::from_center_size(pos2(rect.right() - 16.0, rect.center().y), vec2(20.0, 20.0));
     let close_resp = ui.interact(x, resp.id.with("close"), Sense::click());
-    close_resp.widget_info(|| WidgetInfo::labeled(Role::Button, true, close));
+    close_resp
+        .widget_info(|| WidgetInfo::labeled(Role::Button, true, format!("{close} {}", doc.name)));
     if close_resp.hovered() {
         painter.rect_filled(x, 6.0, color(p.control_bg_pressed));
     }
