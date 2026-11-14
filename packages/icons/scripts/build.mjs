@@ -65,4 +65,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   writeFileSync(join(out, 'preview.html'), preview());
   writeFileSync(join(out, 'icons.json'), `${JSON.stringify(index(), null, 2)}\n`);
   console.log(`@nodalia/icons: ${names().length} icons -> dist/`);
+  const { build } = await import('../volumetric/build.mjs');
+  console.log(`@nodalia/icons: ${await build(join(out, 'cad3d'))} volumetric icons -> dist/cad3d/`);
 }
