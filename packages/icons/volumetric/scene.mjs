@@ -19,6 +19,19 @@ export const ROLES = {
   paper: "#ffffff",
 };
 
+// Display values for a dark interface. Outlines stay dark: the shaded faces carry the contrast.
+export const ROLES_DARK = {
+  ink: "#12141a",
+  "face-1": "#b0b5c3",
+  "face-2": "#868c9f",
+  "face-3": "#61677a",
+  "accent-1": "#e8cf7c",
+  "accent-2": "#c8a63d",
+  "accent-3": "#9b7e1d",
+  guide: "#959cad",
+  paper: "#2b2e38",
+};
+
 export const STROKE = 2.4;
 const C = Math.cos(Math.PI / 6);
 const ISO_EL = (Math.asin(Math.tan(Math.PI / 6)) * 180) / Math.PI;

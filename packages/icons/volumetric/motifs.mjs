@@ -48,4 +48,19 @@ export function badge(s, glyph, { role = "accent-3", cx = 50, cy = 50, r = 10 } 
   return s;
 }
 
+// A flat symbol given thickness: the outline `d` (screen space) is drawn again lower and to the
+// right as its side, then on top. For concave outlines (stars, speech bubbles) a solid would not
+// sort cleanly.
+export function token(s, d, { dx = 2.2, dy = 3, top = "accent-1", side = "accent-3" } = {}) {
+  // Shift every point; an arc's radii, rotation and flags stay as they are.
+  const shift = d.replace(/([MLCQAZ])([^MLCQAZ]*)/g, (_, c, args) => {
+    const n = args.trim() ? args.trim().split(/[ ,]+/).map(Number) : [];
+    const out = c === "A" ? n.map((v, i) => (i % 7 === 5 ? v + dx : i % 7 === 6 ? v + dy : v)) : n.map((v, i) => v + (i % 2 ? dy : dx));
+    return c + out.map(r2).join(" ");
+  });
+  s.path(shift, { fill: side, stroke: "ink", width: STROKE });
+  s.path(d, { fill: top, stroke: "ink", width: STROKE });
+  return s;
+}
+
 export { Scene, ROLES, STROKE };
