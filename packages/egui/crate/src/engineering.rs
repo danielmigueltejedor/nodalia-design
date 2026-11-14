@@ -927,6 +927,17 @@ pub const START_CARD: egui::Vec2 = egui::Vec2::new(176.0, 116.0);
 
 /// The start cards in a row that wraps to the width. Returns the index of the one clicked.
 pub fn start_cards(ui: &mut Ui, look: &Look, cards: &[StartCard]) -> Option<usize> {
+    start_cards_with(ui, look, cards, |_, _| {})
+}
+
+/// [`start_cards`], calling `on_item` with each card's index and response as it is drawn, so an
+/// app can register the cards with its automation (agents, tests) by position or click.
+pub fn start_cards_with(
+    ui: &mut Ui,
+    look: &Look,
+    cards: &[StartCard],
+    mut on_item: impl FnMut(usize, &Response),
+) -> Option<usize> {
     let p = &look.palette;
     let mut picked = None;
     ui.horizontal_wrapped(|ui| {
@@ -975,6 +986,7 @@ pub fn start_cards(ui: &mut Ui, look: &Look, cards: &[StartCard]) -> Option<usiz
                 caption(),
                 color(p.text_secondary),
             );
+            on_item(i, &resp);
             if resp.clicked() {
                 picked = Some(i);
             }
@@ -1004,6 +1016,17 @@ pub fn recent_documents(
     look: &Look,
     list: &[RecentDocument],
     empty: &str,
+) -> Option<usize> {
+    recent_documents_with(ui, look, list, empty, |_, _| {})
+}
+
+/// [`recent_documents`], calling `on_item` with each row's index and response as it is drawn.
+pub fn recent_documents_with(
+    ui: &mut Ui,
+    look: &Look,
+    list: &[RecentDocument],
+    empty: &str,
+    mut on_item: impl FnMut(usize, &Response),
 ) -> Option<usize> {
     let p = &look.palette;
     if list.is_empty() {
@@ -1079,6 +1102,7 @@ pub fn recent_documents(
                 color(p.text_secondary),
             );
         }
+        on_item(i, &resp);
         if resp.clicked() {
             picked = Some(i);
         }

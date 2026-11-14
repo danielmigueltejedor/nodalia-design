@@ -133,6 +133,18 @@ pub fn file_view(
     nav: &Nav,
     page: impl FnOnce(&mut Ui),
 ) -> Option<String> {
+    file_view_with(ui, look, nav, |_, _| {}, page)
+}
+
+/// [`file_view`], calling `on_entry` with each navigation row's id ([`BACK`] for the Back row)
+/// and response as it is drawn, so an app can register the rows with its automation.
+pub fn file_view_with(
+    ui: &mut Ui,
+    look: &Look,
+    nav: &Nav,
+    mut on_entry: impl FnMut(&str, &Response),
+    page: impl FnOnce(&mut Ui),
+) -> Option<String> {
     let p = &look.palette;
     let mut picked = None;
     let island = |inner: Margin, outer: Margin| {
@@ -166,14 +178,25 @@ pub fn file_view(
             if nav.back.is_empty() {
                 // Nothing to go back to (a start screen): keep the row's place.
                 ui.add_space(NAV_ROW);
-            } else if nav_row(ui, look, "arrow-left", nav.back, false).clicked() {
-                picked = Some(BACK.to_string());
+            } else {
+                let back = nav_row(ui, look, "arrow-left", nav.back, false);
+                on_entry(BACK, &back);
+                if back.clicked() {
+                    picked = Some(BACK.to_string());
+                }
             }
             ui.add_space(10.0);
-            entries(ui, look, &nav.top, nav.selected, &mut picked);
+            entries(ui, look, &nav.top, nav.selected, &mut picked, &mut on_entry);
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Min), |ui| {
                 let reversed: Vec<Entry> = nav.bottom.iter().rev().cloned().collect();
-                entries(ui, look, &reversed, nav.selected, &mut picked);
+                entries(
+                    ui,
+                    look,
+                    &reversed,
+                    nav.selected,
+                    &mut picked,
+                    &mut on_entry,
+                );
             });
         });
     egui::CentralPanel::default()
@@ -215,11 +238,14 @@ fn entries(
     list: &[Entry],
     selected: Option<&str>,
     picked: &mut Option<String>,
+    on_entry: &mut impl FnMut(&str, &Response),
 ) {
     for entry in list {
         match entry {
             Entry::Item { id, label, icon } => {
-                if nav_row(ui, look, icon, label, selected == Some(*id)).clicked() {
+                let row = nav_row(ui, look, icon, label, selected == Some(*id));
+                on_entry(id, &row);
+                if row.clicked() {
                     *picked = Some((*id).to_string());
                 }
             }
