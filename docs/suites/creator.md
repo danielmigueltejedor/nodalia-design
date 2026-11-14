@@ -31,7 +31,7 @@ Los colores salen de la `Palette` de cada app (`Look::new(palette)`), así que u
 ```
 
 Medidas en `creator::layout`: barra 44, separación entre islas y con el borde 8, radio de isla 16,
-radio de control 10, radio de campo 8, altura de control 28.
+radio de control 10, radio de campo 8, altura de control 28 y de botón 30. Los botones y las pestañas usan la cara media a 13 (`Look::medium_family`).
 
 ### Barra de la app
 
@@ -74,7 +74,7 @@ gris con texto seminegrita) y la página a la derecha. Abajo a la derecha **Acep
 - Título en seminegrita a la izquierda y `close_button` (círculo de 28) a la derecha, a la misma
   distancia del borde que el título.
 - Botones abajo a la derecha. La acción principal, una sola, con `primary_button` y la última;
-  todo lo demás con `secondary_button`. Ancho mínimo 72 para que se alineen.
+  todo lo demás con `secondary_button`. Ancho mínimo 72 para que se alineen, 30 de alto, como en Lienzo.
 - Pestañas dentro de un diálogo (Herramientas / Comandos de menú) con `tab`.
 - Campos, desplegables y tablas con `field_frame` (radio 8); casillas con radio 4.
 - Un comando lanzado por programa (MCP, CLI, canal de control) nunca abre un diálogo.

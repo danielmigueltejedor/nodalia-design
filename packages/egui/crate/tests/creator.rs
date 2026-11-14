@@ -57,7 +57,7 @@ fn every_part_draws_in_both_modes_at_the_suite_measures() {
                 Rect::from_min_size(pos2(0.0, 0.0), vec2(100.0, 100.0)),
             );
         });
-        assert_eq!(sizes[0].y, layout::CONTROL_HEIGHT);
+        assert_eq!(sizes[0].y, layout::BUTTON_HEIGHT);
         assert!(
             sizes[0].x >= layout::BUTTON_MIN_WIDTH,
             "OK keeps the minimum width"

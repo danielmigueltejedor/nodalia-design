@@ -43,8 +43,10 @@ pub mod layout {
     pub const CONTROL_RADIUS: u8 = 10;
     /// Text fields, dropdowns, tables.
     pub const FIELD_RADIUS: u8 = 8;
-    /// Buttons, fields, the workspace selector, tabs.
+    /// Fields, the workspace selector, tabs.
     pub const CONTROL_HEIGHT: f32 = 28.0;
+    /// Dialog buttons (OK, Cancel, New file, Open…).
+    pub const BUTTON_HEIGHT: f32 = 30.0;
     /// The narrowest dialog button, so OK / Cancel / Apply line up.
     pub const BUTTON_MIN_WIDTH: f32 = 72.0;
     /// A Preferences category row.
@@ -64,6 +66,9 @@ pub struct Look {
     /// The semibold face for buttons, titles and selected rows. Defaults to the proportional
     /// family; an app with its own semibold face names it with [`Look::strong_family`].
     pub strong: FontFamily,
+    /// The medium face for button labels and tabs. Defaults to the proportional family; an app
+    /// with its own medium face names it with [`Look::medium_family`].
+    pub medium: FontFamily,
 }
 
 impl Look {
@@ -71,6 +76,7 @@ impl Look {
         Look {
             palette,
             strong: FontFamily::Proportional,
+            medium: FontFamily::Proportional,
         }
     }
 
@@ -78,6 +84,16 @@ impl Look {
     pub fn strong_family(mut self, family: FontFamily) -> Self {
         self.strong = family;
         self
+    }
+
+    /// The app's medium font family.
+    pub fn medium_family(mut self, family: FontFamily) -> Self {
+        self.medium = family;
+        self
+    }
+
+    fn medium_font(&self, size: f32) -> FontId {
+        FontId::new(size, self.medium.clone())
     }
 
     fn strong_font(&self, size: f32) -> FontId {
@@ -125,14 +141,14 @@ fn button_rect(
 ) -> (Rect, Response, std::sync::Arc<egui::Galley>) {
     let galley = ui
         .painter()
-        .layout_no_wrap(text.to_owned(), look.strong_font(12.5), ink);
-    let width = (galley.size().x + 32.0).max(min_width);
+        .layout_no_wrap(text.to_owned(), look.medium_font(13.0), ink);
+    let width = (galley.size().x + 28.0).max(min_width);
     let sense = if enabled {
         Sense::click()
     } else {
         Sense::hover()
     };
-    let (rect, resp) = ui.allocate_exact_size(vec2(width, layout::CONTROL_HEIGHT), sense);
+    let (rect, resp) = ui.allocate_exact_size(vec2(width, layout::BUTTON_HEIGHT), sense);
     resp.widget_info(|| WidgetInfo::labeled(Role::Button, enabled && ui.is_enabled(), text));
     (rect, resp, galley)
 }
