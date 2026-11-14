@@ -308,3 +308,54 @@ fn a_ribbon_group_is_as_wide_as_its_tools() {
         group.width()
     );
 }
+
+#[test]
+fn home_items_report_their_responses() {
+    use eng::{RecentDocument, StartCard};
+    use nodalia_theme::office::{self, Entry, Nav};
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Light.palette_with(Accent::Forja));
+    let home = eng::home_look(&look);
+    let nav = Nav {
+        back: "Back",
+        top: vec![Entry::item("home", "Home", "home")],
+        bottom: vec![Entry::item("options", "Preferences", "settings")],
+        selected: Some("home"),
+    };
+    let cards = [StartCard {
+        icon: "line",
+        name: "Drawing",
+        detail: "Inches",
+    }];
+    let recents = [RecentDocument {
+        name: "a.dxf",
+        folder: "~",
+        when: "",
+        icon: "line",
+        thumbnail: None,
+    }];
+    let (mut entries, mut card, mut recent) = (Vec::new(), Vec::new(), Vec::new());
+    let mut out = ctx.run_ui(Default::default(), |ui| {
+        office::file_view_with(
+            ui,
+            &home,
+            &nav,
+            |id, r| entries.push((id.to_owned(), r.rect)),
+            |ui| {
+                eng::start_cards_with(ui, &look, &cards, |i, r| card.push((i, r.rect)));
+                eng::recent_documents_with(ui, &look, &recents, "", |i, r| {
+                    recent.push((i, r.rect))
+                });
+            },
+        );
+    });
+    out.textures_delta.clear();
+    let ids: Vec<&str> = entries.iter().map(|(id, _)| id.as_str()).collect();
+    assert_eq!(ids, [office::BACK, "home", "options"]);
+    assert!(entries.iter().all(|(_, r)| r.is_positive()));
+    assert_eq!(card.len(), 1);
+    assert_eq!(card[0].1.size(), eng::START_CARD);
+    assert_eq!(recent.len(), 1);
+    assert!((recent[0].1.height() - eng::RECENT_ROW).abs() < 0.01);
+}

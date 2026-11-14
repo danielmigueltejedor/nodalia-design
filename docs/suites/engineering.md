@@ -146,6 +146,10 @@ La página de Inicio, de arriba abajo:
 3. **Recientes** (`recent_documents`): filas de 56 con miniatura (o el icono CAD del tipo de
    documento), nombre sobre carpeta, y la fecha en Plex Mono a la derecha.
 
+Las variantes `office::file_view_with`, `start_cards_with` y `recent_documents_with` llaman a la
+app con el id o el índice y la `Response` de cada elemento al dibujarlo, para registrarlos en su
+automatización (agentes, pruebas).
+
 ## Preferencias
 
 Un diálogo NDL (solo botón de cerrar) con navegación a la izquierda y una página que se desplaza.
