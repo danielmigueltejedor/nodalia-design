@@ -175,7 +175,8 @@ propio que sustituye a los iconos de Torno bajo licencia de marca se añade ahí
 | Isla, cabecera de panel, propiedades | sí | pendiente | pendiente | pendiente |
 | Fila de árbol | sí | pendiente | pendiente | pendiente |
 | Pestaña, grupo y herramienta del ribbon | sí | pendiente | pendiente | pendiente |
-| Barra de título | descrita | — | — | — |
+| Barra de título (`title_bar`) | sí | — | — | — |
 | Inicio | `office::file_view` | — | — | — |
 | Preferencias | descrita | — | — | — |
-| Barra de estado, barra de vista flotante | descritas | — | — | — |
+| Barra de estado (`status_bar`, `status_value`, `status_toggle`) | sí | — | — | — |
+| Barra de vista flotante (`view_bar`) | sí | — | — | — |
