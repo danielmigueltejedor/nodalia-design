@@ -549,6 +549,9 @@ fn text_button(ui: &mut Ui, look: &Look, text: &str) -> Response {
     resp
 }
 
+/// The widest a document tab gets; a longer name ends in "…".
+const TAB_MAX: f32 = 240.0;
+
 fn document_tab(
     ui: &mut Ui,
     look: &Look,
@@ -557,10 +560,17 @@ fn document_tab(
     close: &str,
 ) -> (Response, bool) {
     let p = &look.palette;
-    let galley = ui
-        .painter()
-        .layout_no_wrap(doc.name.to_owned(), label(), color(p.text_primary));
-    let width = (galley.size().x + 52.0).clamp(96.0, 240.0);
+    let ink = if active {
+        p.text_primary
+    } else {
+        p.text_secondary
+    };
+    // 12 of padding before the name, 30 for the close button after it.
+    let mut job =
+        egui::text::LayoutJob::simple_singleline(doc.name.to_owned(), label(), color(ink));
+    job.wrap = egui::text::TextWrapping::truncate_at_width(TAB_MAX - 42.0);
+    let galley = ui.ctx().fonts_mut(|f| f.layout_job(job));
+    let width = (galley.size().x + 52.0).clamp(96.0, TAB_MAX);
     let (rect, resp) = ui.allocate_exact_size(vec2(width, 30.0), Sense::click());
     resp.widget_info(|| WidgetInfo::selected(Role::Tab, true, active, doc.name));
     let painter = ui.painter();
@@ -569,22 +579,8 @@ fn document_tab(
     } else if resp.hovered() {
         painter.rect_filled(rect, layout::ROW_RADIUS, color(p.control_bg_hover));
     }
-    let ink = if active {
-        p.text_primary
-    } else {
-        p.text_secondary
-    };
-    let text_rect = Rect::from_min_max(
-        pos2(rect.left() + 12.0, rect.top()),
-        pos2(rect.right() - 30.0, rect.bottom()),
-    );
-    painter.with_clip_rect(text_rect).text(
-        pos2(text_rect.left(), rect.center().y),
-        Align2::LEFT_CENTER,
-        doc.name,
-        label(),
-        color(ink),
-    );
+    let at = pos2(rect.left() + 12.0, rect.center().y - galley.size().y / 2.0);
+    painter.galley(at, galley, color(ink));
     let x = Rect::from_center_size(pos2(rect.right() - 16.0, rect.center().y), vec2(20.0, 20.0));
     let close_resp = ui.interact(x, resp.id.with("close"), Sense::click());
     close_resp
