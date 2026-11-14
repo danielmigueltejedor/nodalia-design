@@ -233,3 +233,50 @@ fn the_title_bar_starts_with_the_app_icon_when_there_is_one() {
         "the name gives way to the icon"
     );
 }
+
+#[test]
+fn home_draws_in_the_office_view_with_the_suite_type() {
+    use eng::{RecentDocument, StartCard};
+    use nodalia_theme::office::{self, Entry, Nav};
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Dark.palette_with(Accent::Forja));
+    let home = eng::home_look(&look);
+    assert_eq!(home.bold, egui::FontFamily::Name(eng::SEMIBOLD.into()));
+    let nav = Nav {
+        back: "",
+        top: vec![
+            Entry::item("home", "Home", "home"),
+            Entry::item("open", "Open", "folder-open"),
+        ],
+        bottom: vec![Entry::item("options", "Preferences", "settings")],
+        selected: Some("home"),
+    };
+    let cards = [StartCard {
+        icon: "line",
+        name: "Drawing (mm)",
+        detail: "Metric units",
+    }];
+    let recents = [RecentDocument {
+        name: "Bracket.dxf",
+        folder: "~/Drawings",
+        when: "2026-11-14 04:00",
+        icon: "line",
+        thumbnail: None,
+    }];
+    for _ in 0..2 {
+        let mut out = ctx.run_ui(Default::default(), |ui| {
+            let picked = office::file_view(ui, &home, &nav, |ui| {
+                eng::home_header(ui, &look, None, "Forja", "Version 0.1.0");
+                assert_eq!(eng::start_cards(ui, &look, &cards), None);
+                assert_eq!(
+                    eng::recent_documents(ui, &look, &recents, "Nothing yet"),
+                    None
+                );
+                assert_eq!(eng::recent_documents(ui, &look, &[], "Nothing yet"), None);
+            });
+            assert_eq!(picked, None);
+        });
+        out.textures_delta.clear();
+    }
+}
