@@ -27,7 +27,7 @@ fn every_part_draws_in_both_modes_at_the_suite_measures() {
             sizes.push(cr::secondary_button(ui, &look, "Cancel", true).rect.size());
             sizes.push(cr::tab(ui, &look, "Tools", true).rect.size());
             ui.set_width(220.0);
-            sizes.push(cr::nav_row(ui, &look, "General", true).rect.size());
+            sizes.push(cr::nav_row(ui, &look, "General", true, false).rect.size());
             sizes.push(cr::home_row(ui, &look, "home", "Home", true).rect.size());
             let mut q = String::new();
             cr::search_field(ui, &look, &mut q, "Search", 200.0);

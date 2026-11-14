@@ -50,9 +50,9 @@ pub mod layout {
     /// The narrowest dialog button, so OK / Cancel / Apply line up.
     pub const BUTTON_MIN_WIDTH: f32 = 72.0;
     /// A Preferences category row.
-    pub const NAV_ROW: f32 = 30.0;
+    pub const NAV_ROW: f32 = 28.0;
     /// A Home rail row (Home, Learn).
-    pub const HOME_ROW: f32 = 36.0;
+    pub const HOME_ROW: f32 = 32.0;
     /// The round close button of a dialog.
     pub const CLOSE: f32 = 28.0;
     /// The workspace selector at its widest.
@@ -226,33 +226,56 @@ pub fn secondary_button_min(
     resp
 }
 
-/// The round close button at the end of a dialog's heading, drawn in `rect`. Returns whether it
-/// was clicked.
+/// `component.window.close`: the close button's coral under the pointer, in every mode.
+const WINDOW_CLOSE: Color32 = Color32::from_rgb(0xff, 0x5c, 0x4d);
+
+/// The round close button at the end of a dialog's heading, drawn in `rect`: the window close
+/// button's disc and × (NDL's `window-close` on its 24 pt grid, 2 pt strokes with round ends)
+/// scaled to `rect`, coral under the pointer. Returns whether it was clicked.
 pub fn close_button(ui: &mut Ui, look: &Look, rect: Rect, id: Id) -> bool {
     let p = &look.palette;
     let resp = ui.interact(rect, id, Sense::click());
     resp.widget_info(|| WidgetInfo::labeled(Role::Button, true, "Close"));
-    let fill = if resp.is_pointer_button_down_on() {
-        color(p.control_bg_pressed)
-    } else if resp.hovered() {
-        color(p.control_bg_hover)
+    let pressed = resp.is_pointer_button_down_on() && resp.hovered();
+    let (mut fill, ink) = if resp.hovered() || pressed {
+        (WINDOW_CLOSE, Color32::WHITE)
     } else {
-        color(p.control_bg)
+        (color(p.control_bg), color(p.text_secondary))
     };
-    let painter = ui.painter();
-    painter.circle_filled(rect.center(), rect.width().min(rect.height()) / 2.0, fill);
-    let g = Rect::from_center_size(rect.center(), vec2(9.0, 9.0));
-    let ink = Stroke::new(1.6, color(p.text_primary));
-    painter.line_segment([g.left_top(), g.right_bottom()], ink);
-    painter.line_segment([g.right_top(), g.left_bottom()], ink);
+    if pressed {
+        fill = fill.gamma_multiply(0.82).to_opaque();
+    }
+    let k = rect.height().min(rect.width()) / 28.0;
+    let ppp = ui.ctx().pixels_per_point();
+    let centre = pos2(
+        (rect.center().x * ppp).round() / ppp,
+        (rect.center().y * ppp).round() / ppp,
+    );
+    // The antialiased rim falls just outside `rect`, where a dialog clips its content.
+    let painter = ui
+        .painter()
+        .with_clip_rect(ui.clip_rect().union(rect.expand(2.0)));
+    painter.circle_filled(centre, 14.0 * k, fill);
+    let at = |x: f32, y: f32| centre + vec2(x - 12.0, y - 12.0) * k;
+    let stroke = Stroke::new(2.0 * k, ink);
+    for (a, b) in [
+        (at(8.0, 8.0), at(16.0, 16.0)),
+        (at(16.0, 8.0), at(8.0, 16.0)),
+    ] {
+        painter.line_segment([a, b], stroke);
+        painter.circle_filled(a, k, ink);
+        painter.circle_filled(b, k, ink);
+    }
     resp.clicked()
 }
 
 // --- Navigation -------------------------------------------------------------------------------
 
-/// A Preferences category: a grey pill with the strong text when selected, half of it under the
-/// pointer. Fills the width of `ui`.
-pub fn nav_row(ui: &mut Ui, look: &Look, text: &str, selected: bool) -> Response {
+/// A Preferences category: a grey pill when selected, half of it under the pointer, the label
+/// in the primary text when selected and the secondary one otherwise (tertiary when `muted`: a
+/// section with nothing to show). A label wider than the row is elided, with the whole of it as
+/// the tooltip. Fills the width of `ui`.
+pub fn nav_row(ui: &mut Ui, look: &Look, text: &str, selected: bool, muted: bool) -> Response {
     let p = &look.palette;
     let width = ui.available_width();
     let (rect, resp) = ui.allocate_exact_size(vec2(width, layout::NAV_ROW), Sense::click());
@@ -266,19 +289,28 @@ pub fn nav_row(ui: &mut Ui, look: &Look, text: &str, selected: bool) -> Response
     };
     ui.painter()
         .rect_filled(rect, radius(layout::CONTROL_RADIUS), fill);
-    let (font, ink) = if selected {
-        (look.strong_font(13.0), color(p.text_primary))
+    let ink = if selected || resp.hovered() {
+        color(p.text_primary)
+    } else if muted {
+        color(p.text_tertiary)
     } else {
-        (FontId::proportional(13.0), color(p.text_primary))
+        color(p.text_secondary)
     };
-    ui.painter().text(
-        pos2(rect.left() + 12.0, rect.center().y),
-        Align2::LEFT_CENTER,
-        text,
-        font,
+    let mut job =
+        egui::text::LayoutJob::simple_singleline(text.to_owned(), look.medium_font(13.0), ink);
+    job.wrap = egui::text::TextWrapping::truncate_at_width(rect.width() - 20.0);
+    let galley = ui.painter().layout_job(job);
+    let elided = galley.elided;
+    ui.painter().galley(
+        pos2(rect.left() + 12.0, rect.center().y - galley.size().y / 2.0),
+        galley,
         ink,
     );
-    resp
+    if elided {
+        resp.on_hover_text(text)
+    } else {
+        resp
+    }
 }
 
 /// A row of the Home screen's rail (Home, Learn): an NDL icon and a label; the selected row is a
@@ -299,17 +331,18 @@ pub fn home_row(ui: &mut Ui, look: &Look, icon: &str, text: &str, selected: bool
                 radius(layout::CONTROL_RADIUS),
                 color(p.control_bg_hover),
             );
+            color(p.text_primary)
+        } else {
+            color(p.text_secondary)
         }
-        color(p.text_primary)
     };
-    let mut x = rect.left() + 12.0;
     if let Some(icon) = icons::get(icon) {
-        let glyph = Rect::from_min_size(pos2(x, rect.center().y - 9.0), vec2(18.0, 18.0));
+        let glyph =
+            Rect::from_center_size(pos2(rect.left() + 20.0, rect.center().y), vec2(16.0, 16.0));
         icons::paint(ui.painter(), glyph, icon, icons::Style::regular(ink));
-        x += 28.0;
     }
     ui.painter().text(
-        pos2(x, rect.center().y),
+        pos2(rect.left() + 34.0, rect.center().y),
         Align2::LEFT_CENTER,
         text,
         look.strong_font(13.5),
