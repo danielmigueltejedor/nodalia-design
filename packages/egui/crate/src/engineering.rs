@@ -446,3 +446,390 @@ pub fn ribbon_group<R>(
     );
     out
 }
+
+// --- Title bar --------------------------------------------------------------------------------
+
+/// An open document's tab in the [`title_bar`].
+#[derive(Clone, Debug, PartialEq)]
+pub struct Document<'a> {
+    pub name: &'a str,
+    /// Unsaved changes: a dot before the close button.
+    pub modified: bool,
+}
+
+/// The accessible labels (and tooltips-free names) of the title bar's controls, in the app's
+/// language.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TitleLabels<'a> {
+    pub home: &'a str,
+    pub file: &'a str,
+    pub save: &'a str,
+    pub undo: &'a str,
+    pub redo: &'a str,
+    pub new_document: &'a str,
+    pub close_document: &'a str,
+    /// The placeholder of the command search field ("Search commands").
+    pub search: &'a str,
+    pub menu: &'a str,
+}
+
+/// What the [`title_bar`] shows. The app's mark and name lead it; window controls are the app's
+/// (`window_controls::show` on Linux, native elsewhere) in the space `controls_width` reserves.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TitleBar<'a> {
+    pub app: &'a str,
+    pub documents: &'a [Document<'a>],
+    pub active: Option<usize>,
+    pub labels: TitleLabels<'a>,
+    /// Width kept free at the right edge for window controls (0 for native controls).
+    pub controls_width: f32,
+    /// Width kept free at the left edge (macOS traffic lights; 0 elsewhere).
+    pub leading_width: f32,
+}
+
+/// What a click in the [`title_bar`] asked for.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TitleAction {
+    Home,
+    File,
+    Save,
+    Undo,
+    Redo,
+    Document(usize),
+    CloseDocument(usize),
+    NewDocument,
+    Search,
+    Menu,
+}
+
+/// What the [`title_bar`] drew.
+pub struct TitleOutput {
+    pub action: Option<TitleAction>,
+    /// Where the app draws its window controls.
+    pub controls: Rect,
+    /// The empty part of the bar (what `background` returned): drag the window with it,
+    /// double-click to maximize.
+    pub drag: Response,
+}
+
+fn icon_button(ui: &mut Ui, look: &Look, icon: &str, label: &str, size: f32) -> Response {
+    let p = &look.palette;
+    let (rect, resp) = ui.allocate_exact_size(vec2(size, size), Sense::click());
+    resp.widget_info(|| WidgetInfo::labeled(Role::Button, ui.is_enabled(), label));
+    let painter = ui.painter();
+    if resp.hovered() {
+        painter.rect_filled(rect, layout::ROW_RADIUS, color(p.control_bg_hover));
+    }
+    if let Some(glyph) = icons::get(icon) {
+        let r = Rect::from_center_size(rect.center(), vec2(18.0, 18.0));
+        icons::paint(painter, r, glyph, icons::Style::bold(color(p.text_primary)));
+    }
+    resp
+}
+
+fn text_button(ui: &mut Ui, look: &Look, text: &str) -> Response {
+    let p = &look.palette;
+    let galley = ui
+        .painter()
+        .layout_no_wrap(text.to_owned(), label(), color(p.text_primary));
+    let (rect, resp) = ui.allocate_exact_size(vec2(galley.size().x + 20.0, 30.0), Sense::click());
+    resp.widget_info(|| WidgetInfo::labeled(Role::Button, ui.is_enabled(), text));
+    if resp.hovered() {
+        ui.painter()
+            .rect_filled(rect, layout::ROW_RADIUS, color(p.control_bg_hover));
+    }
+    ui.painter().text(
+        rect.center(),
+        Align2::CENTER_CENTER,
+        text,
+        label(),
+        color(p.text_primary),
+    );
+    resp
+}
+
+fn document_tab(
+    ui: &mut Ui,
+    look: &Look,
+    doc: &Document,
+    active: bool,
+    close: &str,
+) -> (Response, bool) {
+    let p = &look.palette;
+    let galley = ui
+        .painter()
+        .layout_no_wrap(doc.name.to_owned(), label(), color(p.text_primary));
+    let width = (galley.size().x + 52.0).clamp(96.0, 240.0);
+    let (rect, resp) = ui.allocate_exact_size(vec2(width, 30.0), Sense::click());
+    resp.widget_info(|| WidgetInfo::selected(Role::Tab, true, active, doc.name));
+    let painter = ui.painter();
+    if active {
+        painter.rect_filled(rect, layout::ROW_RADIUS, color(p.surface_panel));
+    } else if resp.hovered() {
+        painter.rect_filled(rect, layout::ROW_RADIUS, color(p.control_bg_hover));
+    }
+    let ink = if active {
+        p.text_primary
+    } else {
+        p.text_secondary
+    };
+    let text_rect = Rect::from_min_max(
+        pos2(rect.left() + 12.0, rect.top()),
+        pos2(rect.right() - 30.0, rect.bottom()),
+    );
+    painter.with_clip_rect(text_rect).text(
+        pos2(text_rect.left(), rect.center().y),
+        Align2::LEFT_CENTER,
+        doc.name,
+        label(),
+        color(ink),
+    );
+    let x = Rect::from_center_size(pos2(rect.right() - 16.0, rect.center().y), vec2(20.0, 20.0));
+    let close_resp = ui.interact(x, resp.id.with("close"), Sense::click());
+    close_resp.widget_info(|| WidgetInfo::labeled(Role::Button, true, close));
+    if close_resp.hovered() {
+        painter.rect_filled(x, 6.0, color(p.control_bg_pressed));
+    }
+    if doc.modified && !close_resp.hovered() {
+        painter.circle_filled(x.center(), 3.5, color(p.text_secondary));
+    } else if let Some(glyph) = icons::get("close") {
+        let r = Rect::from_center_size(x.center(), vec2(12.0, 12.0));
+        icons::paint(painter, r, glyph, icons::Style::bold(color(ink)));
+    }
+    (resp, close_resp.clicked())
+}
+
+/// The window's title bar ([`layout::TITLE_BAR`] high): app name, Home, File, quick access
+/// (save, undo, redo), document tabs with a new-document button, then from the right the
+/// window controls' space, the menu and the command search.
+pub fn title_bar(ui: &mut Ui, look: &Look, bar: &TitleBar) -> TitleOutput {
+    title_bar_with(ui, look, bar, |ui, rect| {
+        ui.interact(
+            rect,
+            ui.scope_id().with("ndl_eng_title_drag"),
+            Sense::click_and_drag(),
+        )
+    })
+}
+
+/// [`title_bar`] with the app's own handling of the empty area: `background` is called with
+/// the bar's rect before any control is laid out, so the controls win the pointer over it.
+/// Use it to plug in a platform's window-move logic (native drag on macOS, double-click
+/// actions) instead of a plain drag response.
+pub fn title_bar_with(
+    ui: &mut Ui,
+    look: &Look,
+    bar: &TitleBar,
+    background: impl FnOnce(&mut Ui, Rect) -> Response,
+) -> TitleOutput {
+    let p = &look.palette;
+    let full = ui.available_rect_before_wrap();
+    let rect = Rect::from_min_size(full.min, vec2(full.width(), layout::TITLE_BAR));
+    let drag = background(ui, rect);
+    let mut action = None;
+    let controls = Rect::from_min_max(
+        pos2(rect.right() - bar.controls_width, rect.top()),
+        rect.right_bottom(),
+    );
+    let mut child = ui.new_child(
+        egui::UiBuilder::new()
+            .max_rect(rect.shrink2(vec2(8.0, 0.0)))
+            .layout(egui::Layout::left_to_right(egui::Align::Center)),
+    );
+    let ui = &mut child;
+    ui.spacing_mut().item_spacing.x = 2.0;
+    ui.add_space(bar.leading_width);
+    ui.label(
+        RichText::new(bar.app)
+            .font(panel_title())
+            .color(color(p.text_primary)),
+    );
+    ui.add_space(10.0);
+    let l = &bar.labels;
+    if icon_button(ui, look, "home", l.home, 30.0).clicked() {
+        action = Some(TitleAction::Home);
+    }
+    if text_button(ui, look, l.file).clicked() {
+        action = Some(TitleAction::File);
+    }
+    for (icon, name, a) in [
+        ("save", l.save, TitleAction::Save),
+        ("undo", l.undo, TitleAction::Undo),
+        ("redo", l.redo, TitleAction::Redo),
+    ] {
+        if icon_button(ui, look, icon, name, 30.0).clicked() {
+            action = Some(a);
+        }
+    }
+    ui.add_space(8.0);
+    for (i, doc) in bar.documents.iter().enumerate() {
+        let (tab, closed) = document_tab(ui, look, doc, bar.active == Some(i), l.close_document);
+        if closed {
+            action = Some(TitleAction::CloseDocument(i));
+        } else if tab.clicked() {
+            action = Some(TitleAction::Document(i));
+        }
+    }
+    if icon_button(ui, look, "plus", l.new_document, 28.0).clicked() {
+        action = Some(TitleAction::NewDocument);
+    }
+    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.add_space(bar.controls_width);
+        if icon_button(ui, look, "menu", l.menu, 30.0).clicked() {
+            action = Some(TitleAction::Menu);
+        }
+        ui.add_space(4.0);
+        let (r, search) = ui.allocate_exact_size(vec2(200.0, 28.0), Sense::click());
+        search.widget_info(|| WidgetInfo::labeled(Role::SearchInput, true, l.search));
+        let painter = ui.painter();
+        let fill = if search.hovered() {
+            p.control_bg_hover
+        } else {
+            p.control_field_bg
+        };
+        painter.rect_filled(r, 14.0, color(fill));
+        if let Some(glyph) = icons::get("search") {
+            let g = Rect::from_center_size(pos2(r.left() + 16.0, r.center().y), vec2(14.0, 14.0));
+            icons::paint(
+                painter,
+                g,
+                glyph,
+                icons::Style::bold(color(p.text_secondary)),
+            );
+        }
+        painter.text(
+            pos2(r.left() + 30.0, r.center().y),
+            Align2::LEFT_CENTER,
+            l.search,
+            body(),
+            color(p.text_tertiary),
+        );
+        if search.clicked() {
+            action = Some(TitleAction::Search);
+        }
+    });
+    TitleOutput {
+        action,
+        controls,
+        drag,
+    }
+}
+
+// --- Status bar and view bar ------------------------------------------------------------------
+
+/// The status bar ([`layout::STATUS_BAR`] high, caption type): `left` holds what is the app's
+/// (history, layout tabs, the run state), `right` is laid out from the right edge (coordinates
+/// and units with [`status_value`], then [`status_toggle`]s).
+pub fn status_bar(ui: &mut Ui, left: impl FnOnce(&mut Ui), right: impl FnOnce(&mut Ui)) {
+    let width = ui.available_width();
+    ui.allocate_ui_with_layout(
+        vec2(width, layout::STATUS_BAR),
+        egui::Layout::left_to_right(egui::Align::Center),
+        |ui| {
+            ui.style_mut().override_font_id = Some(caption());
+            ui.add_space(8.0);
+            left(ui);
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.add_space(8.0);
+                right(ui);
+            });
+        },
+    );
+}
+
+/// A value in the status bar: Plex Mono at caption size (coordinates, units, residuals).
+pub fn status_value(ui: &mut Ui, look: &Look, text: &str) -> Response {
+    ui.label(
+        RichText::new(text)
+            .font(FontId::new(size::CAPTION + 0.5, FontFamily::Monospace))
+            .color(color(look.palette.text_primary)),
+    )
+}
+
+/// A drafting aid in the status bar (grid, snap, ortho…): an icon, accent-tinted when on.
+pub fn status_toggle(ui: &mut Ui, look: &Look, icon: &str, name: &str, on: bool) -> Response {
+    let p = &look.palette;
+    let (rect, resp) = ui.allocate_exact_size(vec2(24.0, 24.0), Sense::click());
+    resp.widget_info(|| WidgetInfo::selected(Role::Button, true, on, name));
+    let painter = ui.painter();
+    if on {
+        painter.rect_filled(rect, 6.0, color(p.accent_subtle));
+    } else if resp.hovered() {
+        painter.rect_filled(rect, 6.0, color(p.control_bg_hover));
+    }
+    let ink = if on { p.accent_text } else { p.text_secondary };
+    if let Some(glyph) = icons::get(icon) {
+        let r = Rect::from_center_size(rect.center(), vec2(16.0, 16.0));
+        icons::paint(painter, r, glyph, icons::Style::regular(color(ink)));
+    }
+    resp
+}
+
+/// One item of the [`view_bar`].
+#[derive(Clone, Debug, PartialEq)]
+pub enum ViewItem<'a> {
+    Tool {
+        icon: &'a str,
+        name: &'a str,
+        active: bool,
+    },
+    Separator,
+}
+
+/// The floating view bar: a pill-shaped island of view tools (orbit, pan, zoom, fit, visual
+/// style…) over the viewport. The app places it (an `egui::Area` anchored at the bottom centre
+/// of the viewport). Returns the index of the item clicked this frame.
+pub fn view_bar(ui: &mut Ui, look: &Look, items: &[ViewItem]) -> Option<usize> {
+    let p = &look.palette;
+    let mut clicked = None;
+    Frame::NONE
+        .fill(color(p.surface_raised))
+        .stroke(Stroke::new(1.0, color(p.border_subtle)))
+        .corner_radius(CornerRadius::same(20))
+        .inner_margin(Margin::symmetric(6, 4))
+        .show(ui, |ui| {
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 2.0;
+                for (i, item) in items.iter().enumerate() {
+                    match item {
+                        ViewItem::Tool { icon, name, active } => {
+                            let (rect, resp) =
+                                ui.allocate_exact_size(vec2(30.0, 30.0), Sense::click());
+                            resp.widget_info(|| {
+                                WidgetInfo::selected(Role::Button, true, *active, *name)
+                            });
+                            let painter = ui.painter();
+                            if *active {
+                                painter.rect_filled(rect, 15.0, color(p.accent_subtle));
+                            } else if resp.hovered() {
+                                painter.rect_filled(rect, 15.0, color(p.control_bg_hover));
+                            }
+                            let ink = if *active {
+                                p.accent_text
+                            } else {
+                                p.text_primary
+                            };
+                            if let Some(glyph) = icons::get(icon) {
+                                let r = Rect::from_center_size(rect.center(), vec2(18.0, 18.0));
+                                icons::paint(painter, r, glyph, icons::Style::regular(color(ink)));
+                            }
+                            if resp.clicked() {
+                                clicked = Some(i);
+                            }
+                        }
+                        ViewItem::Separator => {
+                            let (rect, _) = ui.allocate_exact_size(vec2(9.0, 30.0), Sense::hover());
+                            ui.painter().line_segment(
+                                [
+                                    pos2(rect.center().x, rect.top() + 7.0),
+                                    pos2(rect.center().x, rect.bottom() - 7.0),
+                                ],
+                                Stroke::new(1.0, color(p.border_subtle)),
+                            );
+                        }
+                    }
+                }
+            });
+        });
+    clicked
+}

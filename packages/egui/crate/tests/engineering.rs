@@ -108,3 +108,74 @@ fn the_parts_draw_and_the_text_styles_follow_the_scale() {
         eng::value_font()
     );
 }
+
+#[test]
+fn the_shell_parts_draw() {
+    use eng::{Document, TitleBar, TitleLabels, ViewItem};
+    let ctx = egui::Context::default();
+    eng::install_fonts(&ctx);
+    let look = Look::new(Mode::Light.palette_with(Accent::Forja));
+    let docs = [
+        Document {
+            name: "Bracket",
+            modified: true,
+        },
+        Document {
+            name: "A very long drawing name that is clipped",
+            modified: false,
+        },
+    ];
+    let bar = TitleBar {
+        app: "Forja",
+        documents: &docs,
+        active: Some(0),
+        labels: TitleLabels {
+            home: "Home",
+            file: "File",
+            save: "Save",
+            undo: "Undo",
+            redo: "Redo",
+            new_document: "New",
+            close_document: "Close",
+            search: "Search commands",
+            menu: "Menu",
+        },
+        controls_width: nodalia_theme::window_controls::WIDTH,
+        leading_width: 0.0,
+    };
+    let mut controls = egui::Rect::NOTHING;
+    for _ in 0..2 {
+        let mut out = ctx.run_ui(Default::default(), |ui| {
+            let t = eng::title_bar(ui, &look, &bar);
+            assert_eq!(t.action, None);
+            controls = t.controls;
+            eng::status_bar(
+                ui,
+                |ui| {
+                    ui.label("Model");
+                },
+                |ui| {
+                    eng::status_toggle(ui, &look, "grid", "Grid", true);
+                    eng::status_value(ui, &look, "12.5000, 4.0039, 0.0000");
+                },
+            );
+            let items = [
+                ViewItem::Tool {
+                    icon: "orbit",
+                    name: "Orbit",
+                    active: true,
+                },
+                ViewItem::Separator,
+                ViewItem::Tool {
+                    icon: "zoom",
+                    name: "Zoom",
+                    active: false,
+                },
+            ];
+            assert_eq!(eng::view_bar(ui, &look, &items), None);
+        });
+        out.textures_delta.clear();
+    }
+    assert!((controls.width() - nodalia_theme::window_controls::WIDTH).abs() < 0.01);
+    assert!((controls.height() - eng::layout::TITLE_BAR).abs() < 0.01);
+}

@@ -58,6 +58,14 @@ Los SVG para GTK se generan desde `icons.mjs` con las clases de recoloreado de G
 
 Los iconos de aplicación y los cursores siguen siendo del sistema: Nodalix OS conserva su tema de iconos de aplicación y su tema de cursores.
 
+## Iconos volumétricos de CAD
+
+Las apps de ingeniería (Torno, Vortia, Forja) comparten además un juego de iconos en volumen para las operaciones de modelado: extruir, revolucionar, chapa, ensamblajes, superficies, croquis, render... Viven en `packages/icons/volumetric` y son de todas: si una app necesita uno nuevo, se dibuja aquí y lo reciben las demás.
+
+- Se dibujan en código sobre una escena isométrica (`scene.mjs`): sólidos con cara superior clara, izquierda media y derecha oscura, contorno de tinta, y el acento para la geometría que crea la operación. `icons/<grupo>.mjs` tiene un dibujo por icono.
+- Usan solo colores de rol (`ROLES`: `ink`, `line`, `face-1..3`, `accent-1..3`, `guide`, `paper`), así que cada app los recolorea con su paleta. `line` es el trazo que va sobre el fondo de la interfaz y no sobre una cara; en tema oscuro se vuelve claro.
+- `npm run build` los escribe en `dist/cad3d/` (claro), `dist/cad3d/dark/` (oscuro), `index.json` y una vista previa. Los trazados son absolutos (`M L C Q A Z`) sobre una caja de 64 px.
+
 ## Reglas de dibujo
 
 - Rejilla de 24 px con 3 px de margen libre; coordenadas en múltiplos de 0,25 px.

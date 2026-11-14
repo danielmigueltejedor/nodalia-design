@@ -4,8 +4,8 @@
   "description": "Nodalia Design Language icons: original 24 px stroke icons as SVG files, a sprite, an index and a preview page.",
   "license": "MIT",
   "type": "module",
-  "files": ["dist", "src"],
-  "exports": { ".": "./dist/icons.json", "./sprite": "./dist/sprite.svg", "./svg/*": "./dist/svg/*", "./mono/*": "./dist/mono/*", "./src": "./src/icons.mjs", "./bold": "./src/bold.mjs" },
+  "files": ["dist", "src", "volumetric"],
+  "exports": { ".": "./dist/icons.json", "./sprite": "./dist/sprite.svg", "./svg/*": "./dist/svg/*", "./mono/*": "./dist/mono/*", "./src": "./src/icons.mjs", "./bold": "./src/bold.mjs", "./cad3d": "./dist/cad3d/index.json", "./cad3d/*": "./dist/cad3d/*", "./volumetric": "./volumetric/scene.mjs" },
   "scripts": { "build": "node scripts/build.mjs", "test": "node --test \"test/*.test.mjs\"" },
   "engines": { "node": ">=20" }
 }
